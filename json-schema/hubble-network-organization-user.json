@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/hubble-network/refs/heads/main/json-schema/hubble-network-organization-user.json",
+  "title": "Hubble Organization User",
+  "description": "A user within an organization",
+  "x-derived-from": "openapi/hubble-network-platform-openapi.yml#/components/schemas/organizationUser",
+  "x-generated": "2026-08-04",
+  "x-method": "derived",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "an id for the user"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "the user's email address"
+    },
+    "email_confirmed": {
+      "type": "boolean",
+      "description": "whether the user's email has been confirmed"
+    },
+    "first_name": {
+      "type": "string",
+      "description": "the user's first name"
+    },
+    "last_name": {
+      "type": "string",
+      "description": "the user's last name"
+    },
+    "created_at": {
+      "$ref": "#/$defs/utcTimestampInteger"
+    },
+    "last_active_at": {
+      "$ref": "#/$defs/utcTimestampInteger"
+    },
+    "role": {
+      "$ref": "#/$defs/userRole"
+    }
+  },
+  "$defs": {
+    "userRole": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "member"
+      ],
+      "description": "The role a user is assigned within an organization"
+    },
+    "utcTimestampInteger": {
+      "type": "integer",
+      "format": "int64",
+      "description": "An UTC second-precision timestamp formatted as an integer"
+    }
+  }
+}

@@ -1,0 +1,93 @@
+generated: '2026-08-04'
+method: searched
+source: https://hubble.com/docs/release-notes
+url: https://hubble.com/docs/release-notes
+scheme: dated release notes; API versioned by URL path major (/v1, /v2); Device SDK semver (v1.0, v2.0)
+current_version: v1 (Cloud API), v2 device registration, Device SDK v2.0
+model: rolling release / continuous deployment with backward compatibility inside the supported firmware
+  window
+window: recent entries only — the live page is the source of truth
+entries:
+- date: '2026-07-21'
+  breaking: false
+  additions: true
+  highlight: 'Normalized API routes: shorter /v1/org/... and /v2/... paths. Legacy /api/... routes remain
+    functional as aliases.'
+- date: '2026-07-14'
+  breaking: false
+  additions: true
+  highlight: Test webhook deliveries — send an example packet batch in the live request format to verify
+    connectivity and token validation (operationId test-webhook-endpoint).
+- date: '2026-07-02'
+  breaking: false
+  additions: true
+  highlight: Device encryption details (mode, counter source, period exponent) now returned by Get Device.
+- date: '2026-06-23'
+  breaking: false
+  additions: true
+  highlight: Granular API key scopes manageable from the Dashboard, with preset use-case bundles or custom
+    selection, plus calendar expiration dates.
+- date: '2026-05-20'
+  breaking: false
+  additions: true
+  highlight: Install location (lat, long, location_name) added to device endpoints for satellite pass
+    prediction.
+- date: '2026-05-18'
+  breaking: false
+  additions: true
+  highlight: Self-serve upgrade from Sandbox to the full Terrestrial Network with monthly subscription
+    plans.
+- date: '2026-05-04'
+  breaking: false
+  additions: true
+  highlight: CSV export of device data from the Dashboard (30-day packet history or full device inventory).
+- date: '2026-04-27'
+  breaking: false
+  additions: true
+  highlight: Device SDK v2.0 — "timeless" protocol for the Terrestrial Network, removing the real-time-clock
+    requirement.
+- date: '2026-04-24'
+  breaking: false
+  additions: true
+  highlight: 'Dashboard device management: register, rename, and bulk-promote devices between environments.'
+- date: '2026-04-01'
+  breaking: false
+  additions: true
+  highlight: SDK reference documentation published on GitHub Pages, versioned per release branch.
+- date: '2026-03-09'
+  breaking: false
+  additions: true
+  highlight: 'Device Detail view in the Dashboard: location history, network activity, packet logs, sensor
+    data.'
+- date: '2026-01-15'
+  breaking: false
+  additions: true
+  highlight: Hubble Connect mobile app launched on iOS and Android for gateway testing in Sandbox.
+- date: '2026-01-06'
+  breaking: false
+  additions: true
+  highlight: Device SDK v1.0 production release with sample applications.
+- date: '2026-01-05'
+  breaking: false
+  additions: true
+  highlight: Sandbox self-serve signup — accounts can be created without approval.
+- date: '2025-11-14'
+  breaking: false
+  additions: true
+  highlight: Public OpenAPI definition URL published for import into developer tools (https://hubble.com/docs/openapi.yaml).
+- date: '2025-11-11'
+  breaking: false
+  additions: true
+  highlight: Device registration supports custom names and tags; batch update endpoint added.
+- date: '2025-10-30'
+  breaking: false
+  additions: true
+  highlight: Platform tags and custom tags introduced for device organization and filtering.
+- date: '2025-09-17'
+  breaking: false
+  additions: true
+  highlight: Webhook retry mechanism with exponential backoff.
+- date: '2025-08-01'
+  breaking: false
+  additions: true
+  highlight: API key authorization scopes introduced for granular permission control.

@@ -1,0 +1,72 @@
+specification: API Commons Rate Limits
+specificationVersion: '0.1'
+schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/RateLimits
+provider: Hubble Network
+providerId: hubble-network
+created: '2026-08-04'
+modified: '2026-08-04'
+generated: '2026-08-04'
+method: searched
+reconciled: true
+tags:
+- Rate Limiting
+- IoT
+- Devices
+description: 'The Hubble Cloud API applies a leaky-bucket rate limit at two levels: per endpoint and per
+  organization. Limits are the same in Sandbox and production and are not raised by plan tier in published
+  material. No RateLimit-* or Retry-After headers are documented — a 429 status is the only signal.'
+sources:
+- https://hubble.com/docs/api-specification/hubble-platform-api
+headers:
+  requestId: X-Request-ID
+  continuationToken: Continuation-Token
+  retryAfter: null
+  rateLimitHeaders: null
+responseCodes:
+  throttled: 429
+algorithm: leaky-bucket
+limits:
+- name: Per-endpoint requests
+  scope: endpoint
+  metric: requests_per_second
+  limit_count: 3
+  timeFrame: second
+  description: Each endpoint is limited to three requests per second.
+- name: Per-organization requests
+  scope: organization
+  metric: requests_per_second
+  limit_count: 15
+  timeFrame: second
+  description: An organization is limited to fifteen requests per second across all endpoints.
+- name: Packets per page
+  scope: response
+  metric: records_per_page
+  limit_count: 1000
+  timeFrame: request
+  description: The Packets API returns up to 1,000 packets per page, cursored with a Continuation-Token
+    header.
+- name: Webhook batch size
+  scope: webhook
+  metric: packets_per_delivery
+  limit_count: 1000
+  timeFrame: delivery
+  description: Configurable webhook batch size, 10-1000 packets per delivery.
+- name: Webhook endpoints per organization
+  scope: organization
+  metric: webhook_endpoints
+  limit_count: 2
+  timeFrame: concurrent
+  description: Up to two webhook endpoints may be registered simultaneously, to allow migration between
+    receivers.
+- name: Sandbox devices
+  scope: organization
+  metric: devices
+  limit_count: 100
+  timeFrame: concurrent
+  description: A Sandbox organization may register up to 100 non-billable devices.
+- name: Packet history window
+  scope: organization
+  metric: days
+  limit_count: 30
+  timeFrame: rolling
+  description: Historical packets are queryable up to 30 days back; extension available on the Scale plan.

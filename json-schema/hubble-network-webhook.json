@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/hubble-network/refs/heads/main/json-schema/hubble-network-webhook.json",
+  "title": "Hubble Packet Webhook",
+  "description": "A registered packet webhook endpoint, including the shared secret presented to the receiver in the HTTP-X-HUBBLE-TOKEN header.",
+  "x-derived-from": "openapi/hubble-network-platform-openapi.yml#/components/schemas/webhookWithSecret",
+  "x-generated": "2026-08-04",
+  "x-method": "derived",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "#/$defs/basicWebhook"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "secret": {
+          "$ref": "#/$defs/webhookSecret"
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "basicWebhook": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/legacyWebhook"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "webhook_id": {
+              "$ref": "#/$defs/webhookId"
+            },
+            "org_id": {
+              "$ref": "#/$defs/orgId"
+            },
+            "name": {
+              "$ref": "#/$defs/webhookName"
+            }
+          }
+        }
+      ]
+    },
+    "legacyWebhook": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "$ref": "#/$defs/webhookURL"
+        },
+        "max_batch_size": {
+          "$ref": "#/$defs/webhookMaxBatchSize"
+        }
+      }
+    },
+    "orgId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The ID for an organization"
+    },
+    "webhookId": {
+      "type": "string",
+      "description": "An identifier for a webhook"
+    },
+    "webhookMaxBatchSize": {
+      "type": "integer",
+      "description": "The maximum number of packets that Hubble will batch into one webhook request",
+      "default": 100,
+      "minimum": 10,
+      "maximum": 1000
+    },
+    "webhookName": {
+      "type": "string",
+      "description": "A name/description for a webhook",
+      "maxLength": 250
+    },
+    "webhookSecret": {
+      "type": "string",
+      "description": "A confidential, unique string generated for your webhook endpoint to validate that the request came from Hubble.\nHubble will send this token in the HTTP header `HTTP-X-HUBBLE-TOKEN` when making HTTPS requests to your endpoint.\n"
+    },
+    "webhookURL": {
+      "type": "string",
+      "description": "A webhook url",
+      "maxLength": 2000
+    }
+  }
+}

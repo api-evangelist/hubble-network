@@ -1,0 +1,68 @@
+generated: '2026-08-04'
+method: searched
+source: https://hubble.com/docs/guides/dashboard/sandbox + https://hubble.com/pricing
+summary: 'Every Hubble account includes a Sandbox environment. There is no separate test host, no test-vs-live
+  key prefix and no synthetic test data: Sandbox is a tag-scoped environment on the SAME api.hubble.com
+  host and the SAME API keys, distinguished by the reserved platform tag `_env`. Devices carry real firmware
+  and emit real Bluetooth packets — the difference is which gateways are allowed to hear them.'
+separation:
+  mechanism: platform tag
+  field: _env
+  values:
+  - sandbox
+  - production
+  host: https://api.hubble.com
+  key_prefixes: null
+  separate_credentials: false
+  promotion: Set the `_env` platform tag from "sandbox" to "production" (batch-update-devices / update-device).
+    Upgrading to a paid plan promotes existing Sandbox devices automatically.
+limits:
+  max_devices: 100
+  billable: false
+  gateway_coverage: Local only — packets are captured by your own phone running the Hubble Connect app,
+    not by the 100M+ production gateway fleet.
+  rate_limits: Identical to production (3 req/s per endpoint, 15 req/s per org).
+  data_retention: Same as production.
+signup:
+  url: https://dash.hubble.com/create-account
+  self_serve: true
+  credit_card_required: false
+  plan: Starter — $0/month, up to 100 sandbox devices, 13 bytes of payload per packet
+  since: 2026-01-05 (self-serve Sandbox signup launched)
+tooling:
+- name: Hubble Connect
+  type: mobile app
+  platforms:
+  - iOS
+  - Android
+  purpose: Acts as a local BLE gateway so a developer can see their own device packets in Sandbox without
+    production network coverage.
+  docs: https://hubble.com/docs/guides/hubble-connect
+  since: '2026-01-15'
+- name: hubblenetwork CLI
+  type: cli
+  install: pip install pyhubblenetwork
+  purpose: '`hubblenetwork ble scan` verifies a device is transmitting and decrypting locally; `hubblenetwork
+    org get-packets` pulls packets from the backend.'
+  docs: https://hubble.com/docs/guides/cli
+- name: Send a Test Webhook
+  type: api operation
+  operationId: test-webhook-endpoint
+  path: /v1/org/{org_id}/webhooks/{webhook_id}/test
+  purpose: Delivers an example packet batch to a configured webhook URL using the same request format
+    as live delivery, to verify connectivity and token validation.
+  since: '2026-07-14'
+- name: Packet Webhook Example
+  type: api operation
+  operationId: packet-webhook-example
+  path: /v1/webhook/testBatch
+  purpose: Documents the exact packet-batch request shape a consumer must implement to receive webhooks.
+- name: Pluto SDR validation
+  type: hardware harness
+  purpose: Validate satellite transmissions locally with a PlutoSDR before relying on a satellite pass.
+  docs: https://hubble.com/docs/network/satellite/quick-start
+  repo: https://github.com/HubbleNetwork/sdr-docker
+test_values:
+  published: false
+  note: Hubble publishes NO magic test identifiers, test keys, or fixture values. Device secret keys are
+    generated per device at registration and are never example values. Nothing was invented for this artifact.

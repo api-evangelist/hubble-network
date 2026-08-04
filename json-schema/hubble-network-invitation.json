@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/hubble-network/refs/heads/main/json-schema/hubble-network-invitation.json",
+  "title": "Hubble Invitation",
+  "description": "An invitation to join an organization",
+  "x-derived-from": "openapi/hubble-network-platform-openapi.yml#/components/schemas/invitation",
+  "x-generated": "2026-08-04",
+  "x-method": "derived",
+  "type": "object",
+  "required": [
+    "invitee_email",
+    "role",
+    "created_at",
+    "expires_at"
+  ],
+  "properties": {
+    "invitee_email": {
+      "type": "string",
+      "format": "email",
+      "description": "Email address of the invited user"
+    },
+    "inviter_email": {
+      "type": "string",
+      "format": "email",
+      "description": "Email address of the user who sent the invitation"
+    },
+    "created_at": {
+      "$ref": "#/$defs/utcTimestampInteger",
+      "description": "Timestamp when the invitation was created"
+    },
+    "expires_at": {
+      "$ref": "#/$defs/utcTimestampInteger",
+      "description": "Timestamp when the invitation expires"
+    },
+    "role": {
+      "$ref": "#/$defs/userRole",
+      "description": "Role that will be assigned to the invited user"
+    }
+  },
+  "$defs": {
+    "userRole": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "member"
+      ],
+      "description": "The role a user is assigned within an organization"
+    },
+    "utcTimestampInteger": {
+      "type": "integer",
+      "format": "int64",
+      "description": "An UTC second-precision timestamp formatted as an integer"
+    }
+  }
+}

@@ -1,0 +1,273 @@
+generated: '2026-08-04'
+method: derived
+source: openapi/hubble-network-platform-openapi.yml ($ref graph + id-reference fields)
+root_entity: organization
+identifiers:
+  format: UUID
+  prefixes: null
+  note: Hubble uses bare UUIDs with no type prefix — org_id, device.id, webhook_id, gateway_id, key_id
+    are all unprefixed UUIDs, so an identifier is not self-describing out of context.
+entities:
+- name: organization
+  schema: organization
+  id_field: org_id
+  id_type: uuid
+  description: Top-level tenant. Every operation path is scoped to an org_id.
+  fields:
+  - name
+  - org_id
+  - contact_info
+  - address
+  - timezone
+  - org_type
+  - production_org_id
+  operations:
+  - retrieve-organization-metadata
+  - update-organization-metadata
+  note: org_type distinguishes sandbox from production; a sandbox org may be paired to a production org
+    via production_org_id.
+- name: device
+  schema: organizationDevice
+  id_field: id
+  id_type: uuid
+  description: A registered Bluetooth hardware endpoint that beacons on the Hubble Network.
+  fields:
+  - id
+  - name
+  - created_ts
+  - tags
+  - encryption
+  - eid_rotation
+  - install_location
+  - most_recent_packet
+  operations:
+  - register-new-devices
+  - list-devices
+  - get-device
+  - update-device
+  - delete-device
+  - batch-update-devices
+  - batch-delete-devices
+- name: packet
+  schema: packet
+  id_field: null
+  description: A decrypted Bluetooth advertisement received by a gateway or satellite. Not individually
+    addressable — identified by device id + sequence_number + timestamp.
+  fields:
+  - location
+  - device
+  - network_type
+  - gateway
+  operations:
+  - retrieve-organization-packets
+  - packet-webhook-example
+- name: packetBatch
+  schema: packetBatch
+  description: Array wrapper delivered to webhook endpoints.
+  fields:
+  - packets
+- name: webhook
+  schema: basicWebhook
+  id_field: webhook_id
+  id_type: uuid
+  description: A registered HTTPS endpoint that receives packet batches.
+  fields:
+  - webhook_id
+  - org_id
+  - name
+  - url
+  - max_batch_size
+  - secret
+  operations:
+  - create-webhook-endpoint
+  - list-registered-webhooks
+  - update-webhook-endpoint
+  - delete-webhook-endpoint
+  - test-webhook-endpoint
+- name: apiKey
+  schema: apiKeyItem
+  id_field: key_id
+  id_type: uuid
+  description: A scoped JWT bearer credential for the organization.
+  fields:
+  - key_id
+  - key_name
+  - created_at
+  - expires_at_seconds
+  - scopes
+  operations:
+  - provision-api-key
+  - list-api-keys
+  - update-api-key
+  - delete-api-key
+  - validate-api-key
+  - list-key-scopes
+- name: organizationUser
+  schema: organizationUser
+  id_field: user_id
+  description: A human member of the organization with a role.
+  fields:
+  - user_id
+  - email
+  - email_confirmed
+  - first_name
+  - last_name
+  - created_at
+  - last_active_at
+  - role
+  operations:
+  - list-users-in-organization
+  - add-user-to-organization
+  - update-user-in-organization
+  - delete-user-from-organization
+- name: invitation
+  schema: invitation
+  id_field: invitee_email
+  description: A pending invitation to join the organization.
+  fields:
+  - invitee_email
+  - inviter_email
+  - created_at
+  - expires_at
+  - role
+  operations:
+  - list-pending-invites
+  - invite-user-to-organization
+  - delete-invitation
+- name: gateway
+  schema: gateway
+  id_field: gateway_id
+  id_type: uuid
+  description: The scanning relay that detected a BLE advertisement. Only surfaced on self-provided packets
+    where provider_id == org_id; gateways are not otherwise a managed resource in this API.
+  fields:
+  - gateway_id
+  - service_id
+- name: location
+  schema: location
+  description: GPS fix attached to a packet.
+  fields:
+  - latitude
+  - longitude
+  - altitude
+  - horizontal_accuracy
+  - vertical_accuracy
+  - timestamp
+- name: installLocation
+  schema: installLocation
+  description: Fixed installation position of a device, used for satellite pass prediction.
+  fields:
+  - lat
+  - long
+  - location_name
+- name: billingInvoice
+  schema: BillingActiveDevicesResponse / BillingSubscription / BillingPaymentMethodCard
+  description: 'Billing projections backed by Stripe: invoices, usage, active devices for the period,
+    subscription snapshot and saved card payment methods.'
+  operations:
+  - get-recent-invoices
+  - get-invoice-pdf
+  - get-billing-usage
+  - get-billing-active-devices
+  - get-billing-subscription
+  - get-billing-payment-method
+  note: get-billing-subscription and get-billing-payment-method are documented as reading directly from
+    the org Stripe customer — Stripe is the system of record for billing.
+relationships:
+- from: organization
+  to: device
+  type: has_many
+  via: org_id path parameter
+- from: organization
+  to: webhook
+  type: has_many
+  via: org_id path parameter
+  cardinality_limit: 2
+- from: organization
+  to: apiKey
+  type: has_many
+  via: org_id path parameter
+- from: organization
+  to: organizationUser
+  type: has_many
+  via: org_id path parameter
+- from: organization
+  to: invitation
+  type: has_many
+  via: org_id path parameter
+- from: organization
+  to: organization
+  type: has_one
+  via: production_org_id
+  note: sandbox org paired to its production org
+- from: device
+  to: packet
+  type: has_many
+  via: packet.device.id
+- from: device
+  to: installLocation
+  type: has_one
+  via: install_location
+- from: device
+  to: deviceEncryption
+  type: has_one
+  via: encryption
+- from: device
+  to: eidRotation
+  type: has_one
+  via: eid_rotation
+- from: packet
+  to: location
+  type: has_one
+  via: location
+- from: packet
+  to: gateway
+  type: belongs_to
+  via: gateway.gateway_id
+- from: packet
+  to: device
+  type: belongs_to
+  via: device.id
+- from: packetBatch
+  to: packet
+  type: has_many
+  via: packets[]
+- from: webhook
+  to: packetBatch
+  type: has_many
+  via: HTTPS POST delivery
+- from: apiKey
+  to: authScope
+  type: has_many
+  via: scopes[]
+- from: organizationUser
+  to: userRole
+  type: has_one
+  via: role
+- from: invitation
+  to: userRole
+  type: has_one
+  via: role
+enumerations:
+- name: authScope
+  values: 16
+  schema: authScope
+- name: deviceEncryption
+  values:
+  - AES-256-CTR
+  - AES-128-CTR
+  - AES-128-EAX
+  - NONE
+- name: network_type
+  values:
+  - TERRESTRIAL
+  - SATELLITE
+- name: errorResponse.name
+  values:
+  - Bad Request
+  - Unauthorized
+  - Not Found
+  - Too Many Requests
+  - Internal Server Error
+schema_count: 48
+operation_count: 39

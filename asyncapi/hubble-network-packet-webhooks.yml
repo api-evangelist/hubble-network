@@ -1,0 +1,110 @@
+generated: '2026-08-04'
+method: searched
+source: https://hubble.com/docs/guides/cloud-integration/get-data + openapi/hubble-network-platform-openapi.yml#packet-webhook-example
+spec_type: Webhooks
+asyncapi_published: false
+asyncapi_search:
+  result: none
+  checked:
+  - https://hubble.com/asyncapi.yaml
+  - https://hubble.com/docs/asyncapi.yaml
+  - https://hubble.com/docs/llms.txt (full docs index)
+  - https://github.com/HubbleNetwork (all 23 public repos)
+  note: 'Hubble publishes no AsyncAPI document. The event surface is documented in prose plus one OpenAPI
+    operation (packet-webhook-example) that models the inbound request a consumer must implement. Nothing
+    was fabricated: this file is a webhook catalog, not a generated AsyncAPI.'
+transport: HTTPS POST push to a customer-registered endpoint
+delivery:
+  guarantee: at-least-once
+  ordering: not guaranteed
+  ack: 2xx within 10 seconds
+  retries: exponential backoff for up to 3 hours
+  duplicates: possible — consumers must be idempotent
+  filtering: none — all packets for all devices in the organization are delivered
+authentication:
+  header: HTTP-X-HUBBLE-TOKEN
+  type: shared secret
+  issued: A confidential unique string generated per webhook endpoint at creation (components.schemas.webhookSecret).
+  signature: null
+  note: A static shared secret in a header — there is no HMAC body signature and no timestamp/replay window,
+    so a receiver cannot verify payload integrity, only sender knowledge of the token. Rotation requires
+    update-webhook-endpoint.
+batching:
+  field: max_batch_size
+  default: 100
+  min: 10
+  max: 1000
+  cadence: every several seconds, or as soon as max_batch_size is reached
+  actual_size: between 1 and max_batch_size
+limits:
+  endpoints_per_organization: 2
+  note: Two simultaneous endpoints are allowed specifically to support migration between receivers.
+events:
+- name: packet.batch
+  channel: customer webhook URL
+  operation: receive
+  criticality: high
+  description: A batch of decrypted Bluetooth packets received for the organization across all registered
+    devices.
+  payload_schema: components.schemas.packetBatch
+  media_type: application/json
+  modeled_by: openapi/hubble-network-platform-openapi.yml#packet-webhook-example
+  fields:
+  - field: packets[].device.id
+    description: Device UUID.
+  - field: packets[].device.payload
+    description: Decrypted payload, Base64 encoded.
+  - field: packets[].device.rssi
+    description: Received signal strength.
+  - field: packets[].device.timestamp
+    description: Unix timestamp of the packet.
+  - field: packets[].device.sequence_number
+    description: Device sequence number — use with id + timestamp to de-duplicate.
+  - field: packets[].device.counter
+    description: Time-based counter associated with the packet.
+  - field: packets[].device.name
+    description: Device name.
+  - field: packets[].device.tags
+    description: Custom and platform tags on the device.
+  - field: packets[].location
+    description: Latitude, longitude, altitude, accuracy and timestamp of the detection.
+  - field: packets[].network_type
+    description: TERRESTRIAL or SATELLITE.
+  - field: packets[].gateway
+    description: Gateway id and BLE service id of the receiving gateway; only present on self-provided
+      packets.
+management_operations:
+- operationId: create-webhook-endpoint
+  method: post
+  path: /v1/org/{org_id}/webhooks
+  scope: write-webhooks
+- operationId: list-registered-webhooks
+  method: get
+  path: /v1/org/{org_id}/webhooks
+  scope: read-webhooks
+- operationId: update-webhook-endpoint
+  method: patch
+  path: /v1/org/{org_id}/webhooks/{webhook_id}
+  scope: write-webhooks
+- operationId: delete-webhook-endpoint
+  method: delete
+  path: /v1/org/{org_id}/webhooks/{webhook_id}
+  scope: write-webhooks
+- operationId: test-webhook-endpoint
+  method: post
+  path: /v1/org/{org_id}/webhooks/{webhook_id}/test
+  scope: write-webhooks
+  description: Sends an example packet batch to the configured URL in the live request format.
+observability:
+  operationId: get-webhook-metrics
+  path: /v1/org/{org_id}/webhook_metrics
+  description: Total webhook requests, success rate and time-interval breakdowns.
+polling_alternative:
+  operationId: retrieve-organization-packets
+  path: /v1/org/{org_id}/packets
+  description: Cursor-paginated pull alternative to webhooks, Continuation-Token header, up to 1,000 packets
+    per page, 30-day lookback.
+x-evidence:
+- url: https://hubble.com/docs/guides/cloud-integration/get-data
+  http_status: 200
+  fetched: '2026-08-04'

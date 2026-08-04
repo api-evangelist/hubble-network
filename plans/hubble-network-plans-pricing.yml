@@ -1,0 +1,100 @@
+specification: API Commons Plans
+specificationVersion: '0.1'
+schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/Plans
+provider: Hubble Network
+providerId: hubble-network
+created: '2026-08-04'
+modified: '2026-08-04'
+generated: '2026-08-04'
+method: searched
+reconciled: true
+tags:
+- IoT
+- Connectivity
+- Bluetooth
+- Devices
+description: Hubble prices connectivity in flat monthly tiers banded by active device count, with a free
+  Sandbox-only Starter tier. Enterprise is custom-quoted.
+sources:
+- https://hubble.com/pricing
+plans:
+- id: hubble-starter
+  name: Starter
+  type: free
+  price: 0
+  currency: USD
+  timeFrame: month
+  description: Free sandbox access, no credit card required.
+  entries:
+  - label: Sandbox devices
+    name: devices
+    type: limit
+    metric: active_devices
+    limit: 100
+    timeFrame: month
+  - label: Payload per packet
+    name: payload_bytes
+    type: limit
+    metric: bytes
+    limit: 13
+    timeFrame: packet
+  features:
+  - Hubble Sandbox
+  - API + SDK access
+  - Reference applications
+  - Documentation
+  - Community forum
+- id: hubble-growth
+  name: Growth
+  type: subscription
+  price: 2000
+  currency: USD
+  timeFrame: month
+  description: Full production Terrestrial Network access.
+  entries:
+  - label: Active devices
+    name: devices
+    type: limit
+    metric: active_devices
+    limit: 1000
+    timeFrame: month
+  features:
+  - Production network (100M+ access points)
+  - Standard business-hours support
+- id: hubble-scale
+  name: Scale
+  type: subscription
+  price: 10000
+  currency: USD
+  timeFrame: month
+  description: Higher device volume with extended retention and priority support.
+  entries:
+  - label: Active devices
+    name: devices
+    type: limit
+    metric: active_devices
+    limit: 10000
+    timeFrame: month
+  features:
+  - Dedicated professional services
+  - 30-day data retention extension
+  - Priority SLA and support
+- id: hubble-enterprise
+  name: Enterprise
+  type: custom
+  price: null
+  currency: USD
+  timeFrame: month
+  description: Custom deployments and specialized integrations, quoted by sales.
+  entries:
+  - label: Active devices
+    name: devices
+    type: limit
+    metric: active_devices
+    limit: -1
+    timeFrame: month
+  features:
+  - Single sign-on
+  - Multi-year volume discounts
+  - Custom reporting
+  - Quarterly business reviews with roadmap previews

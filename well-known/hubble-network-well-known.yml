@@ -1,0 +1,108 @@
+generated: '2026-08-04'
+method: probed
+source: live GET of /.well-known/* on every apis.yml and OpenAPI servers[] host
+result: none — no /.well-known/ document is served on any Hubble host. hubble.com and api.hubble.com return
+  application-level 404s; dash.hubble.com and network.hubble.com return SPA/proxy 404s. No security.txt
+  (RFC 9116), no OIDC/OAuth discovery, no api-catalog (RFC 9727), no ai-plugin.json, no A2A agent card.
+hosts_probed:
+- hubble.com
+- api.hubble.com
+- dash.hubble.com
+- network.hubble.com
+documents:
+- host: https://hubble.com
+  path: /.well-known/security.txt
+  status: 404
+- host: https://hubble.com
+  path: /.well-known/openid-configuration
+  status: 404
+- host: https://hubble.com
+  path: /.well-known/oauth-authorization-server
+  status: 404
+- host: https://hubble.com
+  path: /.well-known/oauth-protected-resource
+  status: 404
+- host: https://hubble.com
+  path: /.well-known/api-catalog
+  status: 404
+- host: https://hubble.com
+  path: /.well-known/ai-plugin.json
+  status: 404
+- host: https://hubble.com
+  path: /.well-known/agent-card.json
+  status: 404
+- host: https://hubble.com
+  path: /.well-known/agent.json
+  status: 404
+- host: https://api.hubble.com
+  path: /.well-known/security.txt
+  status: 404
+- host: https://api.hubble.com
+  path: /.well-known/openid-configuration
+  status: 404
+- host: https://api.hubble.com
+  path: /.well-known/oauth-authorization-server
+  status: 404
+- host: https://api.hubble.com
+  path: /.well-known/oauth-protected-resource
+  status: 404
+- host: https://api.hubble.com
+  path: /.well-known/api-catalog
+  status: 404
+- host: https://api.hubble.com
+  path: /.well-known/ai-plugin.json
+  status: 404
+- host: https://api.hubble.com
+  path: /.well-known/agent-card.json
+  status: 404
+- host: https://api.hubble.com
+  path: /.well-known/agent.json
+  status: 404
+- host: https://dash.hubble.com
+  path: /.well-known/security.txt
+  status: 404
+- host: https://dash.hubble.com
+  path: /.well-known/openid-configuration
+  status: 404
+- host: https://dash.hubble.com
+  path: /.well-known/oauth-authorization-server
+  status: 404
+- host: https://dash.hubble.com
+  path: /.well-known/oauth-protected-resource
+  status: 404
+- host: https://dash.hubble.com
+  path: /.well-known/api-catalog
+  status: 404
+- host: https://dash.hubble.com
+  path: /.well-known/ai-plugin.json
+  status: 404
+- host: https://dash.hubble.com
+  path: /.well-known/agent-card.json
+  status: 404
+- host: https://dash.hubble.com
+  path: /.well-known/agent.json
+  status: 404
+- host: https://network.hubble.com
+  path: /.well-known/security.txt
+  status: 404
+- host: https://network.hubble.com
+  path: /.well-known/openid-configuration
+  status: 404
+- host: https://network.hubble.com
+  path: /.well-known/oauth-authorization-server
+  status: 404
+- host: https://network.hubble.com
+  path: /.well-known/oauth-protected-resource
+  status: 404
+- host: https://network.hubble.com
+  path: /.well-known/api-catalog
+  status: 404
+- host: https://network.hubble.com
+  path: /.well-known/ai-plugin.json
+  status: 404
+- host: https://network.hubble.com
+  path: /.well-known/agent-card.json
+  status: 404
+- host: https://network.hubble.com
+  path: /.well-known/agent.json
+  status: 404

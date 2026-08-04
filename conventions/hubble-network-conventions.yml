@@ -1,0 +1,95 @@
+generated: '2026-08-04'
+method: searched
+source: https://hubble.com/docs/api-specification/hubble-platform-api + https://hubble.com/docs/guides/cloud-integration/get-data
+  + openapi/hubble-network-platform-openapi.yml
+authentication:
+  style: bearer-jwt-api-key
+  header: 'Authorization: Bearer <token>'
+  tenancy: org_id UUID in the path on every operation
+  scopes: 16
+  artifact: authentication/hubble-network-authentication.yml
+idempotency:
+  supported: false
+  request_header: null
+  scope: null
+  retention: null
+  note: 'Hubble publishes NO request idempotency contract — there is no Idempotency-Key header or parameter
+    in the OpenAPI or the docs, and retries of a write are not de-duplicated. Idempotency appears only
+    on the DELIVERY side: packet webhooks are at-least-once with exponential-backoff retries up to 3 hours,
+    and Hubble instructs CONSUMERS to make their webhook handlers idempotent. That is the provider asking
+    the integrator to absorb duplicates, not the provider offering an idempotency guarantee. No `Idempotency`
+    pointer is emitted for this provider.'
+  consumer_guidance: Webhook receivers must tolerate duplicate packet batches; de-duplicate on device
+    id + sequence_number + timestamp.
+pagination:
+  style: cursor
+  request_header: Continuation-Token
+  response_header: Continuation-Token
+  page_size:
+    packets: 1000
+  ordering: ingestion timestamp ascending
+  termination: Absence of a Continuation-Token in the response means all available data has been retrieved.
+  note: The cursor travels in HTTP HEADERS, not in the JSON body or a query string — an unusual choice
+    worth noting for client generators. Tokens are held briefly to absorb clock drift.
+  time_window:
+    params:
+    - start
+    - end
+    max_lookback: 30 days
+  filters:
+  - device_id
+field_expansion:
+  supported: false
+sparse_fieldsets:
+  supported: false
+metadata:
+  supported: true
+  mechanism: device tags
+  kinds:
+  - name: custom tags
+    description: Arbitrary customer-defined key/values for organizing and filtering devices.
+    since: '2025-10-30'
+  - name: platform tags
+    description: Hubble-reserved tags. `_env` selects sandbox vs production.
+    reserved_prefix: _
+  filtering: Devices can be listed and filtered by tag.
+request_tracing:
+  header: X-Request-ID
+  direction: both
+  note: Every response carries X-Request-ID. A client-supplied X-Request-ID on the request is logged and
+    mapped to the response. Share it with Hubble Support when troubleshooting.
+versioning:
+  style: uri-path
+  current: /v1 (with /v2 for device registration)
+  aliases:
+  - /api/... -> /v1/...
+  - /api/v2/... -> /v2/...
+  artifact: lifecycle/hubble-network-lifecycle.yml
+error_envelope:
+  media_type: application/json
+  shape: '{code, name, description}'
+  stable_field: name
+  unstable_field: description
+  rfc9457: false
+  artifact: errors/hubble-network-problem-types.yml
+rate_limit_signaling:
+  algorithm: leaky bucket
+  per_endpoint: 3 requests/second
+  per_organization: 15 requests/second
+  status_code: 429
+  headers: null
+  note: No RateLimit-* or Retry-After headers are documented — a client only learns it is throttled from
+    the 429 status. Hubble recommends backoff retry logic.
+  artifact: rate-limits/hubble-network-rate-limits.yml
+webhooks:
+  auth_header: HTTP-X-HUBBLE-TOKEN
+  delivery: at-least-once
+  max_batch_size: 1000
+  max_endpoints_per_org: 2
+  ack: 2xx within 10 seconds
+  retries: exponential backoff up to 3 hours
+  artifact: asyncapi/hubble-network-packet-webhooks.yml
+encodings:
+  payload: Base64
+  timestamps: Unix epoch (integer for created_ts, number for packet timestamps)
+  identifiers: UUID

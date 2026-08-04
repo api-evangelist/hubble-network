@@ -1,0 +1,174 @@
+generated: '2026-08-04'
+method: derived
+status: candidate
+source: openapi/hubble-network-platform-openapi.yml
+searched:
+  result: no hosted or remote MCP server published
+  checked:
+  - https://hubble.com/docs/ (full docs index + llms.txt)
+  - https://github.com/HubbleNetwork (all 23 public repos)
+  - npm @modelcontextprotocol / @hubblenetwork namespaces
+  note: Hubble's published agent surface is a Claude Code plugin/Agent Skill (HubbleNetwork/agent-plugins
+    → hubble-cloud-api), not an MCP server. The skill drives the REST API directly via curl/HTTP rather
+    than exposing MCP tools. See skills/.
+server:
+  name: hubble-network
+  transport: http
+  url: null
+tools:
+- name: validate_api_key
+  description: Validate an API Key
+  category: API Keys
+  source_operation: openapi/hubble-network-platform-openapi.yml#validate-api-key
+- name: provision_api_key
+  description: Provision an API Key
+  category: API Keys
+  source_operation: openapi/hubble-network-platform-openapi.yml#provision-api-key
+- name: list_api_keys
+  description: List all API Keys
+  category: API Keys
+  source_operation: openapi/hubble-network-platform-openapi.yml#list-api-keys
+- name: delete_api_key
+  description: Delete an API Key
+  category: API Keys
+  source_operation: openapi/hubble-network-platform-openapi.yml#delete-api-key
+- name: update_api_key
+  description: Update an API Key
+  category: API Keys
+  source_operation: openapi/hubble-network-platform-openapi.yml#update-api-key
+- name: list_key_scopes
+  description: List Key Scopes
+  category: API Keys
+  source_operation: openapi/hubble-network-platform-openapi.yml#list-key-scopes
+- name: update_organization_metadata
+  description: Update Organization Metadata
+  category: Organizations
+  source_operation: openapi/hubble-network-platform-openapi.yml#update-organization-metadata
+- name: retrieve_organization_metadata
+  description: Retrieve Organization Metadata
+  category: Organizations
+  source_operation: openapi/hubble-network-platform-openapi.yml#retrieve-organization-metadata
+- name: register_new_devices
+  description: Register New Devices
+  category: Devices
+  source_operation: openapi/hubble-network-platform-openapi.yml#register-new-devices
+- name: list_devices
+  description: List Devices
+  category: Devices
+  source_operation: openapi/hubble-network-platform-openapi.yml#list-devices
+- name: batch_update_devices
+  description: Batch Update Devices
+  category: Devices
+  source_operation: openapi/hubble-network-platform-openapi.yml#batch-update-devices
+- name: batch_delete_devices
+  description: Batch Delete Devices
+  category: Devices
+  source_operation: openapi/hubble-network-platform-openapi.yml#batch-delete-devices
+- name: get_device
+  description: Get Device
+  category: Devices
+  source_operation: openapi/hubble-network-platform-openapi.yml#get-device
+- name: update_device
+  description: Update Device
+  category: Devices
+  source_operation: openapi/hubble-network-platform-openapi.yml#update-device
+- name: delete_device
+  description: Delete Device
+  category: Devices
+  source_operation: openapi/hubble-network-platform-openapi.yml#delete-device
+- name: retrieve_organization_packets
+  description: Retrieve Organization Packets
+  category: Packets
+  source_operation: openapi/hubble-network-platform-openapi.yml#retrieve-organization-packets
+- name: packet_webhook_example
+  description: Packet Webhook Example
+  category: Packets
+  source_operation: openapi/hubble-network-platform-openapi.yml#packet-webhook-example
+- name: get_api_metrics
+  description: Get Organization API Metrics
+  category: Platform Metrics
+  source_operation: openapi/hubble-network-platform-openapi.yml#get-api-metrics
+- name: get_packet_metrics
+  description: Get Organization Packet Metrics
+  category: Platform Metrics
+  source_operation: openapi/hubble-network-platform-openapi.yml#get-packet-metrics
+- name: get_webhook_metrics
+  description: Get Organization Webhook Metrics
+  category: Platform Metrics
+  source_operation: openapi/hubble-network-platform-openapi.yml#get-webhook-metrics
+- name: get_device_metrics
+  description: Get Organization Device Metrics
+  category: Platform Metrics
+  source_operation: openapi/hubble-network-platform-openapi.yml#get-device-metrics
+- name: list_users_in_organization
+  description: List Organization Users
+  category: Organizations
+  source_operation: openapi/hubble-network-platform-openapi.yml#list-users-in-organization
+- name: add_user_to_organization
+  description: Add User to Organization
+  category: Organizations
+  source_operation: openapi/hubble-network-platform-openapi.yml#add-user-to-organization
+- name: update_user_in_organization
+  description: Update User in Organization
+  category: Organizations
+  source_operation: openapi/hubble-network-platform-openapi.yml#update-user-in-organization
+- name: delete_user_from_organization
+  description: Delete User from Organization
+  category: Organizations
+  source_operation: openapi/hubble-network-platform-openapi.yml#delete-user-from-organization
+- name: list_pending_invites
+  description: List Pending Invites
+  category: Organizations
+  source_operation: openapi/hubble-network-platform-openapi.yml#list-pending-invites
+- name: invite_user_to_organization
+  description: Invite User to Organization
+  category: Organizations
+  source_operation: openapi/hubble-network-platform-openapi.yml#invite-user-to-organization
+- name: delete_invitation
+  description: Delete Invitation
+  category: Organizations
+  source_operation: openapi/hubble-network-platform-openapi.yml#delete-invitation
+- name: create_webhook_endpoint
+  description: Create a Webhook Endpoint
+  category: Packet Webhooks
+  source_operation: openapi/hubble-network-platform-openapi.yml#create-webhook-endpoint
+- name: list_registered_webhooks
+  description: List Registered Webhooks
+  category: Packet Webhooks
+  source_operation: openapi/hubble-network-platform-openapi.yml#list-registered-webhooks
+- name: update_webhook_endpoint
+  description: Update a Webhook Endpoint
+  category: Packet Webhooks
+  source_operation: openapi/hubble-network-platform-openapi.yml#update-webhook-endpoint
+- name: delete_webhook_endpoint
+  description: Delete a Webhook Endpoint
+  category: Packet Webhooks
+  source_operation: openapi/hubble-network-platform-openapi.yml#delete-webhook-endpoint
+- name: test_webhook_endpoint
+  description: Send a Test Webhook
+  category: Packet Webhooks
+  source_operation: openapi/hubble-network-platform-openapi.yml#test-webhook-endpoint
+- name: get_recent_invoices
+  description: Get Recent Invoices
+  category: Billing
+  source_operation: openapi/hubble-network-platform-openapi.yml#get-recent-invoices
+- name: get_invoice_pdf
+  description: Get Invoice PDF
+  category: Billing
+  source_operation: openapi/hubble-network-platform-openapi.yml#get-invoice-pdf
+- name: get_billing_usage
+  description: Get Billing Usage
+  category: Billing
+  source_operation: openapi/hubble-network-platform-openapi.yml#get-billing-usage
+- name: get_billing_active_devices
+  description: List active devices for the current billing period
+  category: Billing
+  source_operation: openapi/hubble-network-platform-openapi.yml#get-billing-active-devices
+- name: get_billing_subscription
+  description: Get current subscription / plan
+  category: Billing
+  source_operation: openapi/hubble-network-platform-openapi.yml#get-billing-subscription
+- name: get_billing_payment_method
+  description: List saved card payment methods
+  category: Billing
+  source_operation: openapi/hubble-network-platform-openapi.yml#get-billing-payment-method

@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/hubble-network/refs/heads/main/json-schema/hubble-network-packet-batch.json",
+  "title": "Hubble Packet Batch",
+  "description": "A batch of packets delivered to a registered packet webhook endpoint. Up to 1,000 packets per batch.",
+  "x-derived-from": "openapi/hubble-network-platform-openapi.yml#/components/schemas/packetBatch",
+  "x-generated": "2026-08-04",
+  "x-method": "derived",
+  "type": "object",
+  "properties": {
+    "packets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/packet"
+      }
+    }
+  },
+  "$defs": {
+    "deviceId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Primary UUID identifier for a registered device"
+    },
+    "deviceName": {
+      "type": "string",
+      "description": "Assigned name for the device",
+      "maxLength": 250
+    },
+    "deviceTags": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Tags are user-defined key/value pairs that can be attributed to a device. \nA device may have up to 10 tags.\n**Custom tags:** create your own tags with `key` length up to 32 characters and `value` length up to 128 characters.\n**Platform tags:** use Hubble-defined tags to organize devices.\n- `_env` tag: `production` indicates if a device belongs to the live environment, and `sandbox` for the test environment. A device will always have an `_env` tag assigned.\n",
+      "example": {
+        "_env": "production"
+      }
+    },
+    "gateway": {
+      "type": "object",
+      "description": "Metadata about the scanning gateway that received this packet \u2014 the relay\nthat detected the BLE advertisement, not the device that emitted it.\nOnly present on self-provided packets (`provider_id == org_id`) where\ngateway context was attached at ingest. Both fields are optional.\n",
+      "properties": {
+        "gateway_id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Stable unique identifier of the gateway device that received the packet.\nThis is the gateway UUID issued at registration time and is consistent\nacross all packets from the same gateway.\n"
+        },
+        "service_id": {
+          "type": "string",
+          "description": "Normalized 16-bit BLE service UUID that the advertisement was scanned\nunder (lowercase hex, e.g. `fca6` for Hubble packets). Identifies which\nBLE service profile the gateway matched when it captured this packet.\n",
+          "example": "fca6"
+        }
+      }
+    },
+    "location": {
+      "type": "object",
+      "required": [
+        "latitude",
+        "longitude",
+        "altitude",
+        "timestamp"
+      ],
+      "properties": {
+        "latitude": {
+          "type": "number",
+          "description": "Latitude in Decimal Degrees DDD.DDDDD\u00b0"
+        },
+        "longitude": {
+          "type": "number",
+          "description": "Longitude in Decimal Degrees DDD.DDDDD\u00b0"
+        },
+        "altitude": {
+          "type": "number",
+          "description": "Altitude in meters for the provided gps coordinates"
+        },
+        "horizontal_accuracy": {
+          "type": "number",
+          "description": "Horizontal accuracy in meters for the provided gps coordinates"
+        },
+        "vertical_accuracy": {
+          "type": "number",
+          "description": "Vertical accuracy in meters for the provided gps coordinates"
+        },
+        "timestamp": {
+          "$ref": "#/$defs/utcTimestampNumber"
+        }
+      }
+    },
+    "packet": {
+      "type": "object",
+      "properties": {
+        "location": {
+          "$ref": "#/$defs/location"
+        },
+        "device": {
+          "type": "object",
+          "required": [
+            "id",
+            "payload",
+            "timestamp"
+          ],
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/deviceId"
+            },
+            "name": {
+              "$ref": "#/$defs/deviceName"
+            },
+            "tags": {
+              "$ref": "#/$defs/deviceTags"
+            },
+            "payload": {
+              "type": "string",
+              "description": "A packet's decrypted payload in Base64 format"
+            },
+            "rssi": {
+              "type": "number"
+            },
+            "timestamp": {
+              "$ref": "#/$defs/utcTimestampNumber"
+            },
+            "counter": {
+              "type": "number",
+              "description": "The time-based counter associated with this packet.\n"
+            },
+            "sequence_number": {
+              "type": "number",
+              "description": "The sequence number of this packet\n"
+            }
+          }
+        },
+        "network_type": {
+          "type": "string",
+          "enum": [
+            "TERRESTRIAL",
+            "SATELLITE"
+          ]
+        },
+        "gateway": {
+          "$ref": "#/$defs/gateway"
+        }
+      }
+    },
+    "utcTimestampNumber": {
+      "type": "number",
+      "format": "double",
+      "description": "An UTC second-precision timestamp formatted as a floating point number"
+    }
+  }
+}

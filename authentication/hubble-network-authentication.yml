@@ -1,0 +1,54 @@
+generated: '2026-08-04'
+method: searched
+source: openapi/hubble-network-platform-openapi.yml
+docs: https://hubble.com/docs/api-specification/hubble-platform-api
+summary:
+  types:
+  - http
+  http_schemes:
+  - bearer
+  bearer_formats:
+  - JWT
+  api_key_in:
+  - header
+  oauth2_flows: []
+  model: Organization-scoped API key presented as a JWT bearer token, with 16 granular authorization scopes.
+schemes:
+- name: BearerAuth
+  type: http
+  scheme: bearer
+  bearerFormat: JWT
+  applied: globally (root security requirement) to all 39 operations
+  header: 'Authorization: Bearer <api-key-jwt>'
+  issuance: Hubble Dashboard > Developer Tools > API Tokens. Keys are named, given an expiration date,
+    and optionally restricted to a scope set. A key created with no scopes receives ALL scopes (admin-level
+    access). Tokens cannot be retrieved after creation.
+  validation_endpoint: GET /v1/org/{org_id}/check (operationId validate-api-key)
+  rotation: Keys carry a calendar expiration (apiKeyExpiration); update-api-key can change name, scopes
+    and expiry; delete-api-key revokes.
+  sources:
+  - openapi/hubble-network-platform-openapi.yml
+tenancy:
+  parameter: org_id
+  in: path
+  required: true
+  note: Every operation is scoped to an organization UUID carried in the path. The org_id is shown in
+    the Dashboard under Developer Tools > API Tokens or Organization Settings.
+scopes:
+  model: api-key-scopes
+  count: 16
+  artifact: scopes/hubble-network-scopes.yml
+  enumeration_endpoint: GET /v1/org/{org_id}/key_scopes (operationId list-key-scopes)
+  note: Not OAuth 2.0 scopes — these are permission scopes attached to an organization API key. Every
+    endpoint documents its Required Scope.
+webhook_authentication:
+  header: HTTP-X-HUBBLE-TOKEN
+  note: Outbound packet webhooks carry a shared secret in the HTTP-X-HUBBLE-TOKEN header; the receiver
+    must validate it. There is no HMAC signature scheme.
+sso:
+  available: Enterprise plan only
+  source: https://hubble.com/pricing
+x-evidence:
+- url: https://hubble.com/docs/api-specification/hubble-platform-api
+  http_status: 200
+  fetched: '2026-08-04'

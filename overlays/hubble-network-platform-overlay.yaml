@@ -1,0 +1,49 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for Hubble Platform API
+  version: 1.0.0
+extends: openapi/_original/hubble-network-platform-openapi-original.yml
+x-generated: '2026-08-04'
+x-method: generated
+x-source: https://hubble.com/docs/openapi.yaml
+actions:
+- target: $
+  description: 'The published document omits the required root `openapi` version key. It is otherwise
+    valid OpenAPI 3.0.x (it uses `nullable: true`, a 3.0-only construct), so 3.0.3 is asserted.'
+  update:
+    openapi: 3.0.3
+- target: $.info
+  update:
+    x-apievangelist-provider: hubble-network
+    x-apievangelist-harvested: '2026-08-04'
+    x-apievangelist-source: https://hubble.com/docs/openapi.yaml
+    contact:
+      name: Hubble Support
+      url: https://hubble.com/docs/support
+    license: null
+- target: $
+  description: Declare the tag set the operations already use so tooling can render grouped navigation;
+    the published document has no root `tags` array.
+  update:
+    tags:
+    - name: API Keys
+      description: Provision, list, update, delete and validate scoped API keys.
+    - name: Organizations
+      description: Organization metadata, users, roles and invitations.
+    - name: Devices
+      description: Register and manage Bluetooth devices on the Hubble Network.
+    - name: Packets
+      description: Retrieve and stream decrypted device packet data.
+    - name: Packet Webhooks
+      description: Register and test webhook endpoints that receive packet batches.
+    - name: Platform Metrics
+      description: API, packet, webhook and device activity metrics.
+    - name: Billing
+      description: Usage, invoices, subscription and payment methods.
+- target: $.components.securitySchemes.BearerAuth
+  description: Document that the bearer JWT is an organization API key carrying granular authorization
+    scopes.
+  update:
+    description: Organization API key issued from the Hubble Dashboard (Developer Tools > API Tokens),
+      presented as a JWT bearer token. Each key carries a subset of the 16 documented authorization scopes;
+      a key created with no scopes receives all of them (admin-level).

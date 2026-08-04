@@ -1,0 +1,49 @@
+generated: '2026-08-04'
+method: searched
+source: https://hubble.com/docs/guides/cli + https://pypi.org/project/pyhubblenetwork/
+name: hubblenetwork
+package: pyhubblenetwork
+registry: pypi
+version_seen: 0.12.0
+repo: https://github.com/HubbleNetwork/pyhubblenetwork
+docs: https://hubble.com/docs/guides/cli
+requirements: Python 3.9 or later
+install:
+- method: pip
+  command: pip install pyhubblenetwork
+- method: pipx
+  command: pipx install pyhubblenetwork
+  note: isolated CLI-only install
+description: 'First-party Python SDK and CLI for developing, debugging and testing Hubble Network devices.
+  It spans both sides of the platform: local BLE scanning/decryption on the host, and Cloud API calls
+  against the organization.'
+commands:
+- group: ble
+  command: hubblenetwork ble scan
+  description: Scan for nearby Hubble BLE advertisements and validate that a device is transmitting and
+    decrypting correctly.
+  flags:
+  - flag: --payload-format
+    values:
+    - hex
+    - base64
+    - string
+- group: org
+  command: hubblenetwork org get-packets
+  description: Retrieve packets for the organization from the Hubble backend.
+  flags:
+  - flag: --payload-format
+    values:
+    - hex
+    - base64
+    - string
+  backing_operation: openapi/hubble-network-platform-openapi.yml#retrieve-organization-packets
+- group: root
+  command: hubblenetwork --help
+  description: Display the command surface.
+note: Device registration and management are exposed through the Python API rather than CLI subcommands;
+  the CLI focuses on local BLE scanning and packet retrieval.
+related_tools:
+- name: hubble-inplay-cfg
+  description: CLI that generates IN100 .cfg JSON for Hubble beacon devices.
+  repo: https://github.com/HubbleNetwork/hubble-inplay-cfg

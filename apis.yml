@@ -1,23 +1,213 @@
 aid: hubble-network
 name: Hubble Network
-description: 'Hubble Network is a company surfaced via the API Evangelist harvest backlog (source: secondary-market)
-  and added to the network as a stub for full-pipeline profiling.'
+description: 'Hubble Network is a Seattle-based IoT connectivity company, founded in
+  2021 by Alex Haro (Life360) and Ben Wild (Amazon Sidewalk), building a dual-stack
+  global network that any standard Bluetooth Low Energy 5.0+ chip can reach with no
+  modem and no custom radio hardware. The Terrestrial Network aggregates 100M+ BLE
+  scanning gateways across 2,500+ cities, and a low-Earth-orbit Satellite Network is
+  rolling out on the same silicon. The platform is built API-first: the Hubble Platform
+  (Cloud) API at api.hubble.com covers device registration and lifecycle, encrypted
+  packet retrieval and streaming, packet webhooks, platform metrics, organization and
+  user administration, scoped API keys, and billing. Hubble publishes a public OpenAPI
+  definition, an open-source Device SDK in C, a Python SDK/CLI, gateway SDKs for Linux,
+  iOS and Android, and an official Claude Code agent skill for its Cloud API.'
 url: https://raw.githubusercontent.com/api-evangelist/hubble-network/refs/heads/main/apis.yml
+image: https://hubble.com/favicon.ico
 x-type: company
 x-source: harvest:secondary-market
-x-tier: stub
-x-tier-reason: harvest
+x-tier: profiled
+x-tier-reason: enrichment-pipeline
 specificationVersion: '0.20'
 created: '2026-08-04'
 modified: '2026-08-04'
 tags:
 - Company
-apis: []
+- IoT
+- Bluetooth
+- Satellite
+- Connectivity
+- Asset Tracking
+- Devices
+- Networks
+- Telemetry
+- Logistics
+apis:
+- aid: hubble-network:hubble-platform-api
+  name: Hubble Platform API
+  description: 'The Hubble Cloud API is the API-first control plane for the Hubble
+    Network platform. It manages devices (register, list, get, update, batch update,
+    batch delete), retrieves and streams decrypted Bluetooth packet data with continuation-token
+    pagination, configures packet webhooks (create, list, update, delete, test), reports
+    platform metrics for API, packet, webhook and device activity, administers organizations,
+    users and invitations, provisions scoped API keys, and exposes billing usage, invoices,
+    subscription and payment methods. Authentication is a JWT bearer API key carrying
+    up to 16 granular authorization scopes; the API is versioned in the URL path (/v1,
+    /v2) with legacy /api aliases supported for a minimum of one year.'
+  humanURL: https://hubble.com/docs/api-specification/hubble-platform-api
+  baseURL: https://api.hubble.com
+  image: https://hubble.com/favicon.ico
+  tags:
+  - IoT
+  - Devices
+  - Bluetooth
+  - Packets
+  - Webhooks
+  - Billing
+  properties:
+  - type: OpenAPI
+    url: openapi/hubble-network-platform-openapi.yml
+  - type: OpenAPI
+    name: Hubble-published OpenAPI (verbatim harvest)
+    url: openapi/_original/hubble-network-platform-openapi-original.yml
+  - type: Documentation
+    url: https://hubble.com/docs/api-specification/hubble-platform-api
+  - type: APIReference
+    url: https://hubble.com/docs/api-specification/hubble-platform-api
+  - type: JSONSchema
+    name: Device
+    url: json-schema/hubble-network-device.json
+  - type: JSONSchema
+    name: Packet
+    url: json-schema/hubble-network-packet.json
+  - type: JSONSchema
+    name: Packet Batch
+    url: json-schema/hubble-network-packet-batch.json
+  - type: JSONSchema
+    name: Organization
+    url: json-schema/hubble-network-organization.json
+  - type: JSONSchema
+    name: API Key
+    url: json-schema/hubble-network-api-key.json
+  - type: JSONSchema
+    name: Packet Webhook
+    url: json-schema/hubble-network-webhook.json
+  - type: JSONSchema
+    name: Organization User
+    url: json-schema/hubble-network-organization-user.json
+  - type: JSONSchema
+    name: Invitation
+    url: json-schema/hubble-network-invitation.json
+  - type: JSONSchema
+    name: Error Response
+    url: json-schema/hubble-network-error.json
+  - type: JSONSchema
+    name: Billing Subscription
+    url: json-schema/hubble-network-billing-subscription.json
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: AgenticAccess
+  url: agentic-access/hubble-network-agentic-access.yml
+- type: DomainSecurity
+  url: security/hubble-network-domain-security.yml
+- type: Authentication
+  url: authentication/hubble-network-authentication.yml
 - type: Website
-  url: https://forgeglobal.com/hubble-network_stock/
+  url: https://hubble.com/
+- type: DeveloperPortal
+  url: https://hubble.com/docs/
+- type: Documentation
+  url: https://hubble.com/docs/
+- type: APIReference
+  url: https://hubble.com/docs/api-specification/hubble-platform-api
+- type: GettingStarted
+  url: https://hubble.com/docs/intro
+- type: Support
+  url: https://hubble.com/docs/support
+- type: Community
+  url: https://github.com/HubbleNetwork/community-discussions
+- type: Blog
+  url: https://hubble.com/blog
+- type: GitHubOrganization
+  url: https://github.com/HubbleNetwork
+- type: Pricing
+  url: https://hubble.com/pricing
+- type: SignUp
+  url: https://dash.hubble.com/create-account
+- type: Login
+  url: https://dash.hubble.com/
+- type: TermsOfService
+  url: https://hubble.com/legal/terms
+- type: PrivacyPolicy
+  url: https://hubble.com/legal/privacy-policy
+- type: SLA
+  url: https://hubble.com/legal/sla
+- type: CoverageMap
+  url: https://network.hubble.com/
+- type: StatusPage
+  url: https://status.hubble.com/
+- type: ChangeLog
+  url: https://hubble.com/docs/release-notes
+- type: ChangeLog
+  name: Structured changelog artifact
+  url: changelog/hubble-network-changelog.yml
+- type: Deprecation
+  name: Versioning and deprecation policy (minimum 1-year support window)
+  url: https://hubble.com/docs/api-specification/hubble-platform-api
+- type: Lifecycle
+  url: lifecycle/hubble-network-lifecycle.yml
+- type: Security
+  name: Vulnerability handling and disclosure policy
+  url: https://hubble.com/docs/security/sdk/vulnerability-handling
+- type: VulnerabilityDisclosure
+  url: security/hubble-network-vulnerability-disclosure.yml
+- type: Packages
+  url: packages/hubble-network-packages.yml
+- type: SDKs
+  url: packages/hubble-network-packages.yml
+- type: CLI
+  url: cli/hubble-network-cli.yml
+- type: Sandbox
+  url: sandbox/hubble-network-sandbox.yml
+- type: Conventions
+  url: conventions/hubble-network-conventions.yml
+- type: Conformance
+  url: conformance/hubble-network-conformance.yml
+- type: ErrorCatalog
+  url: errors/hubble-network-problem-types.yml
+- type: DataModel
+  url: data-model/hubble-network-data-model.yml
+- type: Examples
+  url: examples/hubble-network-platform-examples.yml
+- type: RateLimits
+  url: rate-limits/hubble-network-rate-limits.yml
+- type: Plans
+  url: plans/hubble-network-plans-pricing.yml
+- type: Webhooks
+  url: asyncapi/hubble-network-packet-webhooks.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: AgentSkill
+  name: hubble-cloud-api (Hubble-published Claude Code skill)
+  url: skills/hubble-network-cloud-api-SKILL.md
+- type: LLMsTxt
+  url: llms/hubble-network-llms.txt
+- type: Overlay
+  url: overlays/hubble-network-platform-overlay.yaml
+- type: Scopes
+  name: API key authorization scopes (16) — not OAuth 2.0
+  url: scopes/hubble-network-scopes.yml
+- type: MCPServerCandidate
+  name: Derived candidate MCP tool list — Hubble publishes NO hosted MCP server
+  url: mcp/hubble-network-mcp.yml
+- type: ToolCrosswalk
+  name: Agent-surface to REST crosswalk — Hubble's own Agent Skill covers 34 of 39 operations, all
+    on the legacy /api alias
+  url: mcp/hubble-network-tool-crosswalk.yml
+- type: WellKnownProbe
+  name: /.well-known/ probe results — nothing published on any Hubble host
+  url: well-known/hubble-network-well-known.yml
+x-enrichment:
+  date: '2026-08-04'
+  status: enriched
+  artifacts_added: 11
+  artifacts_total: 40
+  pass: local-v1
+  note: >-
+    Second local pass. Re-probed contract discovery (no OpenAPI at any api.hubble.com root path, no
+    GraphQL, no AsyncAPI, no .proto in any of the 23 public repos, no /.well-known/ document and no A2A
+    agent card on any of five hosts) and confirmed the harvested spec is byte-identical to the live
+    hubble.com/docs/openapi.yaml. Added 10 derived JSON Schemas and the agent-surface tool crosswalk.

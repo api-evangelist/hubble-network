@@ -1,0 +1,61 @@
+generated: '2026-08-04'
+method: searched
+source: https://github.com/HubbleNetwork/agent-plugins (provider-published) + openapi/hubble-network-platform-openapi.yml
+note: Hubble publishes its own Claude Code plugin marketplace at github.com/HubbleNetwork/agent-plugins,
+  containing the hubble-cloud-api Agent Skill. That skill is saved here VERBATIM. The two additional skills
+  are API Evangelist generated flows grounded in real operationIds from the published OpenAPI.
+provider_marketplace:
+  url: https://github.com/HubbleNetwork/agent-plugins
+  install: claude plugin marketplace add https://github.com/HubbleNetwork/agent-plugins
+  plugin: hubble-cloud-api
+  version: 1.0.0
+  license: MIT
+  bundled_resources:
+  - skills/hubble-cloud-api/SKILL.md
+  - references/api-reference.md
+  - references/examples.md
+  - references/troubleshooting.md
+  - references/workflows.md
+  - resources/hubble-openapi.yaml
+skills:
+- file: hubble-network-cloud-api-SKILL.md
+  name: hubble-cloud-api
+  method: searched
+  official: true
+  source: https://raw.githubusercontent.com/HubbleNetwork/agent-plugins/main/hubble-cloud-api-skill/skills/hubble-cloud-api/SKILL.md
+  description: Hubble-authored Agent Skill covering device management, packet retrieval and streaming,
+    webhook configuration, metrics, user management and billing on the Hubble Cloud API.
+  api: openapi/hubble-network-platform-openapi.yml
+  manifest: hubble-network-cloud-api-plugin.json
+- file: hubble-network-onboard-devices-and-pull-packets.md
+  name: hubble-network-onboard-devices-and-pull-packets
+  method: generated
+  official: false
+  description: Register Bluetooth devices, promote them from Sandbox to production via the _env platform
+    tag, and pull decrypted packets with Continuation-Token header pagination.
+  api: openapi/hubble-network-platform-openapi.yml
+  operations:
+  - validate-api-key
+  - list-key-scopes
+  - register-new-devices
+  - list-devices
+  - get-device
+  - batch-update-devices
+  - retrieve-organization-packets
+  - get-packet-metrics
+- file: hubble-network-configure-packet-webhook.md
+  name: hubble-network-configure-packet-webhook
+  method: generated
+  official: false
+  description: Build a conformant packet-batch receiver, register and test a webhook endpoint, rotate/migrate
+    within the 2-endpoint cap, and monitor delivery success.
+  api: openapi/hubble-network-platform-openapi.yml
+  operations:
+  - validate-api-key
+  - create-webhook-endpoint
+  - list-registered-webhooks
+  - test-webhook-endpoint
+  - update-webhook-endpoint
+  - delete-webhook-endpoint
+  - get-webhook-metrics
+  - packet-webhook-example

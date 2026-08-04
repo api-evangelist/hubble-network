@@ -1,0 +1,186 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/hubble-network/refs/heads/main/json-schema/hubble-network-device.json",
+  "title": "Hubble Device",
+  "description": "A Bluetooth device registered on the Hubble Network, identified by a UUID and carrying encryption material, custom tags and Hubble-reserved platform tags.",
+  "x-derived-from": "openapi/hubble-network-platform-openapi.yml#/components/schemas/organizationDevice",
+  "x-generated": "2026-08-04",
+  "x-method": "derived",
+  "type": "object",
+  "required": [
+    "name",
+    "id",
+    "created_ts",
+    "tags"
+  ],
+  "properties": {
+    "name": {
+      "$ref": "#/$defs/deviceName"
+    },
+    "id": {
+      "$ref": "#/$defs/deviceId"
+    },
+    "created_ts": {
+      "$ref": "#/$defs/utcTimestampInteger"
+    },
+    "tags": {
+      "$ref": "#/$defs/deviceTags"
+    },
+    "encryption": {
+      "$ref": "#/$defs/deviceEncryption"
+    },
+    "eid_rotation": {
+      "$ref": "#/$defs/eidRotation"
+    },
+    "install_location": {
+      "$ref": "#/$defs/installLocation"
+    },
+    "most_recent_packet": {
+      "type": "object",
+      "description": "Most recent packet metadata for different network types.\nThe most recent packet value is only updated periodically.\n",
+      "properties": {
+        "satellite": {
+          "type": "object",
+          "properties": {
+            "timestamp": {
+              "$ref": "#/$defs/utcTimestampNumber",
+              "description": "Unix timestamp of a recent satellite packet"
+            },
+            "location": {
+              "$ref": "#/$defs/latLongLocation",
+              "description": "Location data from a recent satellite packet"
+            }
+          }
+        },
+        "terrestrial": {
+          "type": "object",
+          "properties": {
+            "timestamp": {
+              "$ref": "#/$defs/utcTimestampNumber",
+              "description": "Unix timestamp of a recent terrestrial packet"
+            },
+            "location": {
+              "$ref": "#/$defs/latLongLocation",
+              "description": "Location data from a recent terrestrial packet"
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "deviceEncryption": {
+      "type": "string",
+      "enum": [
+        "AES-256-CTR",
+        "AES-128-CTR",
+        "AES-128-EAX",
+        "NONE"
+      ],
+      "description": "Encryption mode configured for the device at registration."
+    },
+    "deviceId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Primary UUID identifier for a registered device"
+    },
+    "deviceName": {
+      "type": "string",
+      "description": "Assigned name for the device",
+      "maxLength": 250
+    },
+    "deviceTags": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Tags are user-defined key/value pairs that can be attributed to a device. \nA device may have up to 10 tags.\n**Custom tags:** create your own tags with `key` length up to 32 characters and `value` length up to 128 characters.\n**Platform tags:** use Hubble-defined tags to organize devices.\n- `_env` tag: `production` indicates if a device belongs to the live environment, and `sandbox` for the test environment. A device will always have an `_env` tag assigned.\n",
+      "example": {
+        "_env": "production"
+      }
+    },
+    "eidRotation": {
+      "type": "object",
+      "description": "Configuration for EID (Ephemeral ID) rotation on a device.\nEID rotation allows devices to use rotating ephemeral identifiers based on the specified counter source.\nWhen not specified, devices will use the UNIX_TIME counter source which relies on the device knowing an accurate epoch time.\nThe DEVICE_UPTIME counter source enables EID rotation without requiring a real-time clock.\n",
+      "properties": {
+        "counter_source": {
+          "type": "string",
+          "enum": [
+            "UNIX_TIME",
+            "DEVICE_UPTIME"
+          ],
+          "description": "The counter source used for EID rotation.\n* `UNIX_TIME` - Counter is based on the current Unix (epoch) time.\n* `DEVICE_UPTIME` - Counter is based on the device's uptime.\n"
+        },
+        "period_exponent": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 15,
+          "default": 15,
+          "description": "Base-2 exponent of the EID rotation period in seconds, used only with `encryption` of \"AES-128-EAX\" (IN100 protocol).\nMatches the IN100 hardware's configuration field. Must be between 10 (~17 minutes) and 15 (~9 hours) inclusive.\n"
+        }
+      }
+    },
+    "installLocation": {
+      "type": "object",
+      "description": "Fixed installation location of a device.\nTo clear a previously set location, send lat/long of 0,0.\n",
+      "required": [
+        "lat",
+        "long"
+      ],
+      "properties": {
+        "lat": {
+          "type": "number",
+          "format": "double",
+          "minimum": -90,
+          "maximum": 90,
+          "description": "Latitude in Decimal Degrees DDD.DDDDD\u00b0"
+        },
+        "long": {
+          "type": "number",
+          "format": "double",
+          "minimum": -180,
+          "maximum": 180,
+          "description": "Longitude in Decimal Degrees DDD.DDDDD\u00b0"
+        },
+        "location_name": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Human-readable label for the location."
+        }
+      }
+    },
+    "latLongLocation": {
+      "type": "object",
+      "required": [
+        "latitude",
+        "longitude"
+      ],
+      "properties": {
+        "latitude": {
+          "type": "number",
+          "description": "Latitude in Decimal Degrees DDD.DDDDD\u00b0",
+          "format": "double",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "longitude": {
+          "type": "number",
+          "description": "Longitude in Decimal Degrees DDD.DDDDD\u00b0",
+          "format": "double",
+          "minimum": -180,
+          "maximum": 180
+        }
+      }
+    },
+    "utcTimestampInteger": {
+      "type": "integer",
+      "format": "int64",
+      "description": "An UTC second-precision timestamp formatted as an integer"
+    },
+    "utcTimestampNumber": {
+      "type": "number",
+      "format": "double",
+      "description": "An UTC second-precision timestamp formatted as a floating point number"
+    }
+  }
+}

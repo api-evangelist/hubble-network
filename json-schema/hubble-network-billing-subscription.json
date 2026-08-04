@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/hubble-network/refs/heads/main/json-schema/hubble-network-billing-subscription.json",
+  "title": "Hubble Billing Subscription",
+  "description": "The billing subscription attached to a Hubble organization.",
+  "x-derived-from": "openapi/hubble-network-platform-openapi.yml#/components/schemas/BillingSubscription",
+  "x-generated": "2026-08-04",
+  "x-method": "derived",
+  "type": "object",
+  "required": [
+    "plan",
+    "status"
+  ],
+  "properties": {
+    "plan": {
+      "type": "string",
+      "enum": [
+        "GROWTH",
+        "SCALE",
+        "ENTERPRISE",
+        "SANDBOX"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "description": "Stripe subscription status, or `none` when there is no subscription."
+    },
+    "current_period_start": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Start of the current billing period (Hubble unix-microsecond timestamp), if applicable."
+    },
+    "current_period_end": {
+      "type": "integer",
+      "format": "int64",
+      "description": "End of the current billing period (Hubble unix-microsecond timestamp), if applicable."
+    },
+    "next_payment_date": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Approximate next charge date (Hubble unix-microsecond timestamp), if applicable."
+    },
+    "cancel_at_period_end": {
+      "type": "boolean"
+    },
+    "prepaid_devices": {
+      "type": "integer"
+    },
+    "price_monthly_cents": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "overage_per_device_cents": {
+      "type": "integer",
+      "format": "int64"
+    }
+  }
+}

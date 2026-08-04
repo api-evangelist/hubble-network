@@ -1,0 +1,48 @@
+generated: '2026-08-04'
+method: searched
+source: https://hubble.com/docs/api-specification/hubble-platform-api + https://hubble.com/docs/release-notes
+  + https://hubble.com/legal/sla + https://status.hubble.com/
+versioning:
+  scheme: uri-path
+  current: v1 (with v2 for device registration)
+  model: rolling release / continuous deployment
+  docs: https://hubble.com/docs/api-specification/hubble-platform-api
+  note: Major backwards-incompatible changes are shipped as a higher version segment in the path. Legacy
+    /api/... and /api/v2/... paths remain fully supported as aliases for /v1/... and /v2/... . Device
+    SDK is separately versioned (v2.0 "timeless" protocol, released 2026-04-27) with its own reference
+    docs per release branch.
+deprecation:
+  policy_url: https://hubble.com/docs/api-specification/hubble-platform-api
+  sunset_header: false
+  deprecation_header: false
+  minimum_support_window: 1 year
+  policy: Previous major versions are supported for a minimum of one year after a new version is minted,
+    and customers are contacted to migrate. Cloud updates are kept compatible with device firmware/SDK
+    versions inside the active or maintained support window. No RFC 8594 Sunset/Deprecation headers are
+    emitted.
+sla:
+  url: https://hubble.com/legal/sla
+  uptime_target: 99.5%
+  availability_definition: Monthly uptime measured as API success rate >= 90%.
+  performance_targets:
+  - 99.0% of satellite packets delivered in <= 6 hours
+  - 99.9% of terrestrial packets delivered in <= 5 minutes
+  support_response: 4 hours for all severities, business hours 9:00-18:00 PT weekdays; update cadence
+    2h (critical), 2x daily (high), 2-3 days (medium), weekly (low).
+status_page: https://status.hubble.com/
+status_page_platform: incident.io
+release_notes: https://hubble.com/docs/release-notes
+data_retention:
+  packets: 30 days of packet history queryable via the Packets API; retention extension available on the
+    Scale plan.
+deprecated_operations: []
+x-evidence:
+- url: https://status.hubble.com/
+  http_status: 200
+  fetched: '2026-08-04'
+- url: https://hubble.com/legal/sla
+  http_status: 200
+  fetched: '2026-08-04'
+- url: https://hubble.com/docs/release-notes
+  http_status: 200
+  fetched: '2026-08-04'

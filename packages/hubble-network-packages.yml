@@ -1,0 +1,69 @@
+generated: '2026-08-04'
+method: searched
+source: https://pypi.org/project/pyhubblenetwork/ + https://github.com/HubbleNetwork
+notes: Hubble ships firmware/device SDKs as source repositories (C, Zephyr/FreeRTOS/bare-metal) rather
+  than registry packages. Only the Python host-side SDK/CLI is published to a public package registry;
+  the iOS Gateway SDK is distributed as a Swift package from a public GitHub releases repo. No npm, Maven,
+  NuGet, Go module, RubyGems, Packagist or crates.io package was found under a Hubble namespace.
+packages:
+- language: python
+  registry: pypi
+  name: pyhubblenetwork
+  version_seen: 0.12.0
+  url: https://pypi.org/project/pyhubblenetwork/
+  install: pip install pyhubblenetwork
+  source: https://github.com/HubbleNetwork/pyhubblenetwork
+  description: Hubble SDK host-side tools — Python library and hubblenetwork CLI for developing, debugging
+    and testing Hubble Network devices.
+  official: true
+  x-evidence:
+    fetched: '2026-08-04'
+    url: https://pypi.org/pypi/pyhubblenetwork/json
+    http_status: 200
+- language: c
+  registry: github
+  name: hubble-device-sdk
+  url: https://github.com/HubbleNetwork/hubble-device-sdk
+  install: git clone https://github.com/HubbleNetwork/hubble-device-sdk
+  description: Hubble Device SDK — embedded C SDK for BLE 5.0+ silicon (Nordic, TI, Silicon Labs, Espressif,
+    InPlay); Zephyr, FreeRTOS and bare-metal ports.
+  official: true
+- language: python
+  registry: github
+  name: gateway-sdk-python
+  url: https://github.com/HubbleNetwork/gateway-sdk-python
+  install: git clone https://github.com/HubbleNetwork/gateway-sdk-python
+  description: Python SDK for building Hubble Network BLE gateways — scanner, sender, auth, GPS and data
+    models.
+  official: true
+- language: swift
+  registry: github
+  name: gateway-sdk-ios-releases
+  url: https://github.com/HubbleNetwork/gateway-sdk-ios-releases
+  install: Swift Package Manager from the public releases repo
+  description: Public distribution of the Hubble Gateway SDK for iOS.
+  official: true
+- language: java
+  registry: github
+  name: quickstart-android
+  url: https://github.com/HubbleNetwork/quickstart-android
+  install: git clone https://github.com/HubbleNetwork/quickstart-android
+  description: Minimal Android app demonstrating the Hubble Gateway SDK.
+  official: true
+registries_probed:
+- registry: pypi
+  result: hit (pyhubblenetwork)
+- registry: npm
+  result: no first-party package found
+- registry: maven-central
+  result: no first-party package found
+- registry: nuget
+  result: no first-party package found
+- registry: pkg.go.dev
+  result: no first-party module found
+- registry: rubygems
+  result: no first-party gem found
+- registry: packagist
+  result: no first-party package found
+- registry: crates.io
+  result: no first-party crate found

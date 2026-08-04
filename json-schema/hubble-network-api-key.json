@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/hubble-network/refs/heads/main/json-schema/hubble-network-api-key.json",
+  "title": "Hubble API Key",
+  "description": "An API Token used to authenticate with the Hubble Platform",
+  "x-derived-from": "openapi/hubble-network-platform-openapi.yml#/components/schemas/apiKeyItem",
+  "x-generated": "2026-08-04",
+  "x-method": "derived",
+  "type": "object",
+  "properties": {
+    "key_id": {
+      "$ref": "#/$defs/apiKeyId"
+    },
+    "key_name": {
+      "$ref": "#/$defs/apiKeyId"
+    },
+    "created_at": {
+      "$ref": "#/$defs/utcTimestampInteger"
+    },
+    "expires_at_seconds": {
+      "$ref": "#/$defs/apiKeyExpiration"
+    },
+    "scopes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/authScope"
+      },
+      "description": "List of authorization scopes assigned to this API key"
+    }
+  },
+  "$defs": {
+    "apiKeyExpiration": {
+      "type": "integer",
+      "format": "int64",
+      "description": "An UTC second-precision timestamp formatted as an integer.\nCan be set to 0 to indicate that there is no expiration.\n"
+    },
+    "apiKeyId": {
+      "type": "string",
+      "description": "An ID for an API key"
+    },
+    "authScope": {
+      "type": "string",
+      "enum": [
+        "read-api-keys",
+        "write-api-keys",
+        "read-users",
+        "write-users",
+        "read-organization-metadata",
+        "write-organization-metadata",
+        "read-devices",
+        "write-devices",
+        "read-invitations",
+        "write-invitations",
+        "read-packets",
+        "read-platform-metrics",
+        "read-billing-usage",
+        "read-billing-invoices",
+        "read-webhooks",
+        "write-webhooks"
+      ],
+      "description": "Authorization scope for API key permissions"
+    },
+    "utcTimestampInteger": {
+      "type": "integer",
+      "format": "int64",
+      "description": "An UTC second-precision timestamp formatted as an integer"
+    }
+  }
+}

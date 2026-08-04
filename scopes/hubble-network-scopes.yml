@@ -1,0 +1,131 @@
+generated: '2026-08-04'
+method: searched
+source: openapi/hubble-network-platform-openapi.yml (components.schemas.authScope)
+docs: https://hubble.com/docs/api-specification/hubble-platform-api
+model: api-key-scopes
+note: 'Hubble does NOT implement OAuth 2.0. These are authorization scopes attached to an organization
+  API key at issuance. Recorded here because they are a genuine, enumerable, documented permission surface,
+  retrievable at runtime via GET /v1/org/{org_id}/key_scopes. Default behaviour: a key created with no
+  scopes receives all 16 (admin-level).'
+enumeration_endpoint:
+  operationId: list-key-scopes
+  path: /v1/org/{org_id}/key_scopes
+  method: get
+schemes:
+- name: BearerAuth
+  source: openapi/hubble-network-platform-openapi.yml
+  type: http-bearer-jwt
+  flows: []
+scopes:
+- scope: read-api-keys
+  description: View API keys and their metadata
+  access: read
+  sources:
+  - openapi/hubble-network-platform-openapi.yml
+  - https://hubble.com/docs/api-specification/hubble-platform-api
+- scope: write-api-keys
+  description: Create, update, and delete API keys
+  access: write
+  sources:
+  - openapi/hubble-network-platform-openapi.yml
+  - https://hubble.com/docs/api-specification/hubble-platform-api
+- scope: read-users
+  description: View user information and roles
+  access: read
+  sources:
+  - openapi/hubble-network-platform-openapi.yml
+  - https://hubble.com/docs/api-specification/hubble-platform-api
+- scope: write-users
+  description: Add, update, and remove users from the organization
+  access: write
+  sources:
+  - openapi/hubble-network-platform-openapi.yml
+  - https://hubble.com/docs/api-specification/hubble-platform-api
+- scope: read-organization-metadata
+  description: View organization details and settings
+  access: read
+  sources:
+  - openapi/hubble-network-platform-openapi.yml
+  - https://hubble.com/docs/api-specification/hubble-platform-api
+- scope: write-organization-metadata
+  description: Update organization information
+  access: write
+  sources:
+  - openapi/hubble-network-platform-openapi.yml
+  - https://hubble.com/docs/api-specification/hubble-platform-api
+- scope: read-devices
+  description: View device information and status
+  access: read
+  sources:
+  - openapi/hubble-network-platform-openapi.yml
+  - https://hubble.com/docs/api-specification/hubble-platform-api
+- scope: write-devices
+  description: Register and manage devices
+  access: write
+  sources:
+  - openapi/hubble-network-platform-openapi.yml
+  - https://hubble.com/docs/api-specification/hubble-platform-api
+- scope: read-invitations
+  description: View pending invitations
+  access: read
+  sources:
+  - openapi/hubble-network-platform-openapi.yml
+  - https://hubble.com/docs/api-specification/hubble-platform-api
+- scope: write-invitations
+  description: Create and revoke user invitations
+  access: write
+  sources:
+  - openapi/hubble-network-platform-openapi.yml
+  - https://hubble.com/docs/api-specification/hubble-platform-api
+- scope: read-packets
+  description: Access packet data and retrieval endpoints
+  access: read
+  sources:
+  - openapi/hubble-network-platform-openapi.yml
+  - https://hubble.com/docs/api-specification/hubble-platform-api
+- scope: read-platform-metrics
+  description: View platform metrics and analytics
+  access: read
+  sources:
+  - openapi/hubble-network-platform-openapi.yml
+  - https://hubble.com/docs/api-specification/hubble-platform-api
+- scope: read-billing-usage
+  description: View billing usage information
+  access: read
+  sources:
+  - openapi/hubble-network-platform-openapi.yml
+  - https://hubble.com/docs/api-specification/hubble-platform-api
+- scope: read-billing-invoices
+  description: View billing invoices
+  access: read
+  sources:
+  - openapi/hubble-network-platform-openapi.yml
+  - https://hubble.com/docs/api-specification/hubble-platform-api
+- scope: read-webhooks
+  description: View webhook configurations
+  access: read
+  sources:
+  - openapi/hubble-network-platform-openapi.yml
+  - https://hubble.com/docs/api-specification/hubble-platform-api
+- scope: write-webhooks
+  description: Create and manage webhook endpoints
+  access: write
+  sources:
+  - openapi/hubble-network-platform-openapi.yml
+  - https://hubble.com/docs/api-specification/hubble-platform-api
+example_combinations:
+- name: Read-only
+  scopes:
+  - read-api-keys
+  - read-users
+  - read-devices
+- name: Device management
+  scopes:
+  - read-devices
+  - write-devices
+- name: User management
+  scopes:
+  - read-users
+  - write-users
+  - read-invitations
+  - write-invitations

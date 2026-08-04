@@ -1,0 +1,91 @@
+generated: '2026-08-04'
+method: derived
+source: openapi/hubble-network-platform-openapi.yml + https://hubble.com/docs/api-specification/hubble-platform-api
+format: custom
+note: Hubble does NOT use RFC 9457 problem+json. Every error is the same JSON envelope (components.schemas.errorResponse)
+  returned as application/json. `name` is a stable short enum; `description` is explicitly documented
+  as changeable and must not be programmed against. Programmatic handling should branch on the HTTP status
+  code and `name`.
+envelope:
+  media_type: application/json
+  schema: components.schemas.errorResponse
+  fields:
+  - field: code
+    type: integer
+    description: The HTTP status code, repeated in the body.
+  - field: name
+    type: string
+    stable: true
+    enum:
+    - Bad Request
+    - Unauthorized
+    - Not Found
+    - Too Many Requests
+    - Internal Server Error
+    description: Short stable error name — the field to branch on.
+  - field: description
+    type: string
+    stable: false
+    description: Human-readable diagnosis. Documented as subject to change; do not program against it.
+  tracing_header: X-Request-ID
+status_codes_returned:
+- 200
+- 400
+- 401
+- 403
+- 404
+- 429
+- 500
+problems:
+- status: 400
+  name: Bad Request
+  title: Bad Request
+  remediation: The request was malformed, or a path/query/body parameter failed validation. The description
+    field carries a human-readable diagnosis and should not be programmed against.
+  envelope: errorResponse
+  first_seen_operation: openapi/hubble-network-platform-openapi.yml#validate-api-key
+  operations: 0
+  operation_count: 36
+- status: 401
+  name: Unauthorized
+  title: Unauthorized
+  remediation: The API key is missing, expired, or not valid for this organization. Validate with GET
+    /v1/org/{org_id}/check.
+  envelope: errorResponse
+  first_seen_operation: openapi/hubble-network-platform-openapi.yml#add-user-to-organization
+  operations: 0
+  operation_count: 5
+- status: 403
+  name: Forbidden
+  title: Forbidden
+  remediation: The API key is valid but lacks the authorization scope required by this operation. The
+    required scope is documented per endpoint; re-issue the key with the needed scope.
+  envelope: errorResponse
+  first_seen_operation: openapi/hubble-network-platform-openapi.yml#get-billing-active-devices
+  operations: 0
+  operation_count: 3
+- status: 404
+  name: Not Found
+  title: Not Found
+  remediation: The organization, device, webhook, key or invoice identifier does not exist in this organization.
+  envelope: errorResponse
+  first_seen_operation: openapi/hubble-network-platform-openapi.yml#test-webhook-endpoint
+  operations: 0
+  operation_count: 2
+- status: 429
+  name: Too Many Requests
+  title: Too Many Requests
+  remediation: Rate limit exceeded — 3 requests/second per endpoint and 15 requests/second per organization
+    (leaky bucket). Back off and retry with exponential backoff.
+  envelope: errorResponse
+  first_seen_operation: openapi/hubble-network-platform-openapi.yml#retrieve-organization-packets
+  operation_count: 1
+- status: 500
+  name: Internal Server Error
+  title: Internal Server Error
+  remediation: An internal error occurred. The returned description indicates only that a retry should
+    occur; Hubble logs the full error. Share the X-Request-ID with Hubble Support when reporting.
+  envelope: errorResponse
+  first_seen_operation: openapi/hubble-network-platform-openapi.yml#validate-api-key
+  operations: 0
+  operation_count: 39

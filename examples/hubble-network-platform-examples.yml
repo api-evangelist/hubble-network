@@ -1,0 +1,239 @@
+generated: '2026-08-04'
+method: derived
+source: openapi/hubble-network-platform-openapi.yml (in-spec example/examples values, extracted verbatim)
+note: Hubble ships example values inline in its published OpenAPI. Extracted here unchanged for reuse;
+  no example was invented. Additional runnable examples live in the provider-published agent skill (references/examples.md
+  in github.com/HubbleNetwork/agent-plugins).
+counts:
+  operations_with_examples: 10
+  schemas_with_examples: 3
+operations:
+- operationId: provision-api-key
+  path: /v1/org/{org_id}/key
+  method: post
+  summary: Provision an API Key
+  examples:
+  - location: requestBody.content.application/json.schema.properties.scopes.example
+    value:
+    - read-api-keys
+    - read-users
+    - read-devices
+- operationId: update-api-key
+  path: /v1/org/{org_id}/key/{key_id}
+  method: patch
+  summary: Update an API Key
+  examples:
+  - location: requestBody.content.application/json.schema.properties.set_scopes.example
+    value:
+    - read-api-keys
+    - read-users
+    - read-devices
+- operationId: register-new-devices
+  path: /v2/org/{org_id}/devices
+  method: post
+  summary: Register New Devices
+  examples:
+  - location: requestBody.content.application/json.schema.example
+    value:
+      n_devices: 1
+      encryption: AES-256-CTR
+      names:
+      - my-device
+  - location: requestBody.content.application/json.examples
+    value:
+      encryptedProtocolUnixTime:
+        summary: AES-CTR + UNIX_TIME eid_rotation
+        description: 'Default-style encrypted device. Omit `eid_rotation` or set only `counter_source`
+          to `UNIX_TIME`.
+
+          '
+        value:
+          n_devices: 1
+          encryption: AES-256-CTR
+          names:
+          - sensor-001
+      encryptedProtocolDeviceUptime:
+        summary: AES-CTR + DEVICE_UPTIME eid_rotation
+        description: 'Configure a device to leverage its uptime as the EID rotation counter source used
+          for encryption.
+
+          '
+        value:
+          n_devices: 1
+          encryption: AES-128-CTR
+          names:
+          - uptime-sensor
+          eid_rotation:
+            counter_source: DEVICE_UPTIME
+      encryptedProtocolIN100:
+        summary: AES-128-EAX (IN100 protocol) with DEVICE_UPTIME
+        description: 'Provision a device using the IN100 protocol (AES-EAX authenticated encryption).
+
+          '
+        value:
+          n_devices: 1
+          encryption: AES-128-EAX
+          names:
+          - in100-sensor
+          eid_rotation:
+            counter_source: DEVICE_UPTIME
+            period_exponent: 15
+  - location: responses.200.content.application/json.examples
+    value:
+      encryptedProtocolUnixTime:
+        summary: Matches AES-CTR + UNIX_TIME eid_rotation
+        value:
+          devices:
+          - device_id: 6ea53e36-b7fb-429f-8c2e-d536cab71089
+            name: sensor-001
+            created_ts: 1734567890
+            tags:
+              _env: production
+            protocol:
+              terrestrial:
+                version: 0
+            eid_rotation:
+              counter_source: UNIX_TIME
+            key: YWJjZGVmZw==
+      encryptedProtocolDeviceUptime:
+        summary: Matches AES-CTR + DEVICE_UPTIME eid_rotation
+        value:
+          devices:
+          - device_id: 7fb53e36-b7fb-429f-8c2e-d536cab71090
+            name: uptime-sensor
+            created_ts: 1734567891
+            tags:
+              _env: production
+            protocol:
+              terrestrial:
+                version: 0
+            eid_rotation:
+              counter_source: DEVICE_UPTIME
+            key: YWJjZGVmZw==
+      encryptedProtocolIN100:
+        summary: Matches AES-128-EAX (IN100 protocol) with DEVICE_UPTIME
+        value:
+          devices:
+          - device_id: 8ab53e36-b7fb-429f-8c2e-d536cab71091
+            name: in100-sensor
+            created_ts: 1734567892
+            tags:
+              _env: production
+            protocol:
+              terrestrial:
+                version: 2
+            eid_rotation:
+              counter_source: DEVICE_UPTIME
+              period_exponent: 15
+            key: YWJjZGVmZw==
+- operationId: batch-update-devices
+  path: /v1/org/{org_id}/devices
+  method: patch
+  summary: Batch Update Devices
+  examples:
+  - location: requestBody.content.application/json.schema.properties.updates.items.properties.set_destination_org_id.example
+    value: 123e4567-e89b-12d3-a456-426614174000
+  - location: requestBody.content.application/json.examples
+    value:
+      updateNames:
+        value:
+          updates:
+          - device_id: 6ea53e36-b7fb-429f-8c2e-d536cab71089
+            set_name: Device 1
+          - device_id: 7fb64f47-c8gc-530g-9d3f-e647dbc8219a
+            set_name: Device 2
+      updateTags:
+        value:
+          updates:
+          - device_id: 6ea53e36-b7fb-429f-8c2e-d536cab71089
+            set_tags:
+              location: warehouse-a
+          - device_id: 7fb64f47-c8gc-530g-9d3f-e647dbc8219a
+            set_tags:
+              location: warehouse-b
+  - location: responses.200.content.application/json.examples
+    value:
+      success:
+        value:
+          devices:
+          - id: 6ea53e36-b7fb-429f-8c2e-d536cab71089
+            name: Device 1
+            created_ts: 1609459200
+            tags:
+              location: warehouse-a
+            most_recent_packet: {}
+          - id: 7fb64f47-c8gc-530g-9d3f-e647dbc8219a
+            name: Device 2
+            created_ts: 1609459200
+            tags:
+              location: warehouse-b
+            most_recent_packet: {}
+- operationId: batch-delete-devices
+  path: /v1/org/{org_id}/devices
+  method: delete
+  summary: Batch Delete Devices
+  examples:
+  - location: requestBody.content.application/json.examples
+    value:
+      deleteMultipleDevices:
+        value:
+          device_ids:
+          - 6ea53e36-b7fb-429f-8c2e-d536cab71089
+          - 7fb64f47-c8gc-530g-9d3f-e647dbc8219a
+          - 8gc75g58-d9hd-641h-0e4g-f758ecd932b0
+- operationId: update-device
+  path: /v1/org/{org_id}/devices/{device_id}
+  method: patch
+  summary: Update Device
+  examples:
+  - location: requestBody.content.application/json.schema.properties.set_destination_org_id.example
+    value: 123e4567-e89b-12d3-a456-426614174000
+- operationId: add-user-to-organization
+  path: /v1/org/{org_id}/users
+  method: post
+  summary: Add User to Organization
+  examples:
+  - location: requestBody.content.application/json.schema.example
+    value:
+      email: newuser@example.com
+      role: member
+- operationId: update-user-in-organization
+  path: /v1/org/{org_id}/users/{user_id}
+  method: patch
+  summary: Update User in Organization
+  examples:
+  - location: requestBody.content.application/json.schema.example
+    value:
+      set_first_name: John
+      set_last_name: Doe
+      set_role: admin
+- operationId: delete-user-from-organization
+  path: /v1/org/{org_id}/users/{user_id}
+  method: delete
+  summary: Delete User from Organization
+  examples:
+  - location: responses.200.content.application/json.schema.example
+    value: {}
+- operationId: delete-invitation
+  path: /v1/org/{org_id}/invitations
+  method: delete
+  summary: Delete Invitation
+  examples:
+  - location: responses.200.content.application/json.schema.example
+    value: {}
+schemas:
+- schema: BillingPaymentMethodCard
+  examples:
+  - location: properties.type.example
+    value: card
+  - location: properties.brand.example
+    value: visa
+- schema: deviceTags
+  examples:
+  - location: example
+    value:
+      _env: production
+- schema: gateway
+  examples:
+  - location: properties.service_id.example
+    value: fca6

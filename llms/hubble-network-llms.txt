@@ -1,0 +1,137 @@
+# Hubble Network Platform Docs
+
+> Documentation for developers integrating with Hubble Network — an IoT connectivity platform using Bluetooth chips and a satellite/terrestrial gateway network.
+
+> Full content is available as plain text per section below.
+
+## Quick Start
+
+> Full content: [Quick Start — plain text](https://hubble.com/docs/llms-quick-start.txt)
+
+- [Quick Start](https://hubble.com/docs/intro): Get started integrating with Hubble Network — connect your first device, explore the Device SDK, and access the Cloud API.
+
+## Network
+
+> Full content: [Network — plain text](https://hubble.com/docs/llms-network.txt)
+
+- [Satellite Certification Requirements](https://hubble.com/docs/network/satellite/certification): Understand the regulatory certification your device needs to transmit on the Hubble Satellite Network in the US, Canada, and Mexico, and how to complete it.
+- [How It Works](https://hubble.com/docs/network/satellite/how-it-works): Understand how the Hubble Satellite Network transmits data from your Bluetooth devices to your application via low-Earth-orbit Hubble satellites.
+- [Satellite Quick Start](https://hubble.com/docs/network/satellite/quick-start): Bring a device onto Hubble's Satellite Network, from qualifying hardware and building a transmitting sample to validating locally with a Pluto SDR, confirming cloud reception, and enabling pass prediction.
+- [Satellite Transmission Guidance](https://hubble.com/docs/network/satellite/transmission-guidance): Understand how Hubble's Satellite Network works, including pass timing, device requirements, and best practices for maximizing transmission success rate.
+- [Coverage](https://hubble.com/docs/network/terrestrial/coverage): Our growing global Terrestrial Network – powered by Bluetooth® Low Energy (BLE) scanning gateways – captures device broadcasts across many environments, from major cities to highways and ports to rural regions.
+- [How It Works](https://hubble.com/docs/network/terrestrial/how-it-works): Understand how Bluetooth® Low Energy (BLE) connectivity networks work for Internet of Things Devices.
+- [Transmission Guidance](https://hubble.com/docs/network/terrestrial/transmission-guidance): Understand how Terrestrial Network works and how to maximize detections on the network.
+
+## Security
+
+> Full content: [Security — plain text](https://hubble.com/docs/llms-security.txt)
+
+- [Encryption Concepts](https://hubble.com/docs/security/device/encryption-concepts): Defines the cryptographic primitives used by the Hubble Terrestrial Network, including AES-256/AES-128, CMAC, KBKDF, nonce generation, and AES-128-EAX.
+- [Device Encryption Modes](https://hubble.com/docs/security/device/encryption-modes): Explains how to configure EID rotation encryption when registering devices, covering AES-CTR vs. AES-128-EAX algorithms, key size, counter source (UNIX_TIME vs. DEVICE_UPTIME), and period exponent for IN100 devices.
+- [SDK Encryption](https://hubble.com/docs/security/device/sdk-encryption): Describes how the Hubble Device SDK implements BLE advertisement encryption, including the hubble_ble_advertise_get function, key derivation hierarchy (Km, Ke, Kn, Kd), key rotation on sequence number rollover, and server-side replay protection.
+- [Network Security](https://hubble.com/docs/security/network)
+- [Vulnerabilities](https://hubble.com/docs/security/sdk/vulnerabilities)
+- [Vulnerability Handling](https://hubble.com/docs/security/sdk/vulnerability-handling)
+
+## Guides
+
+> Full content: [Guides — plain text](https://hubble.com/docs/llms-guides.txt)
+
+- [Hubble CLI](https://hubble.com/docs/guides/cli): Register and manage devices in your Hubble organization, scan for BLE advertisements locally, and validate that devices are transmitting and decrypting correctly using this Python SDK and CLI for working with Hubble Network.
+- [Set Up Your Dev Environment](https://hubble.com/docs/guides/cloud-integration/dev-environment): Set up your developer environment with the OpenAPI spec, Agent Plugin, or Hubble CLI to interact with the Cloud API.
+- [Get Device Packet Data](https://hubble.com/docs/guides/cloud-integration/get-data)
+- [Onboard Your Devices](https://hubble.com/docs/guides/cloud-integration/register-devices): Generate secret keys and register devices for Hubble Network beaconing.
+- [Dash Quick Start](https://hubble.com/docs/guides/dashboard/dash-quick-start)
+- [Sandbox Environment](https://hubble.com/docs/guides/dashboard/sandbox)
+- [Show Custom Payload](https://hubble.com/docs/guides/dashboard/sensor-widget): Program your application to encode custom payload using the type/value library so that it creates a Sensor Widget in your Dashboard.
+- [Users & Roles](https://hubble.com/docs/guides/dashboard/users-and-roles)
+- [Integrate the Device SDK](https://hubble.com/docs/guides/device-integration): Enable your device to transmit data on Hubble’s Terrestrial Bluetooth® Low Energy (BLE) Network with a simple integration into your application firmware.
+- [Bare Metal Quick Start](https://hubble.com/docs/guides/device-integration/bare-metal): Port the Hubble Device SDK to a bare metal environment — one without a traditional real-time operating system (RTOS) such as FreeRTOS or Zephyr.
+- [Your Custom Device](https://hubble.com/docs/guides/device-integration/custom-device): Factors to keep in mind when building bespoke application firmware for your Hubble-connected device.
+- [Custom Payload](https://hubble.com/docs/guides/device-integration/custom-payload)
+- [End Device Provisioning](https://hubble.com/docs/guides/device-integration/end-device-provisioning)
+- [Timing Management](https://hubble.com/docs/guides/device-integration/timing-management)
+- [Hubble Connect](https://hubble.com/docs/guides/hubble-connect)
+- [Backend Implementation](https://hubble.com/docs/guides/implementation/backend)
+- [Register with Bluetooth®](https://hubble.com/docs/guides/implementation/bluetooth)
+- [Working with an ODM](https://hubble.com/docs/guides/implementation/odm): Options for Hubble customers working with an ODM to produce Bluetooth beacon devices with a Hubble image to properly handle registered device ownership.
+- [Provisioning Devices at Scale](https://hubble.com/docs/guides/implementation/provisioning-at-scale)
+- [Pilot Framework](https://hubble.com/docs/guides/implementation/rollout): Evaluate coverage, prove device connectivity, test in the real world, and confirm your backend integration — four steps for validating Hubble Network in a live pilot before ramping up in production.
+- [Integration](https://hubble.com/docs/guides/Integration)
+- [Asset Tracking](https://hubble.com/docs/guides/use-case/asset-tracking)
+
+## Device SDK
+
+> Full content: [Device SDK — plain text](https://hubble.com/docs/llms-device-sdk.txt)
+
+- [Device SDK Reference & Downloads by Version](https://hubble.com/docs/device-sdk/downloads): Browse the auto-generated SDK reference and download the Hubble Device SDK for each official release branch.
+- [Introduction](https://hubble.com/docs/device-sdk/intro)
+- [Previous Device SDK Reference & Downloads by Version](https://hubble.com/docs/device-sdk/previous-releases): Browse the auto-generated SDK reference and download the Hubble Device SDK for each official release branch.
+- [Satellite Network SDK](https://hubble.com/docs/device-sdk/satellite)
+- [Terrestrial Network SDK](https://hubble.com/docs/device-sdk/terrestrial)
+- [Advertising Packet](https://hubble.com/docs/device-sdk/terrestrial/advertising-packet)
+- [API Overview](https://hubble.com/docs/device-sdk/terrestrial/api-overview)
+- [Sample Applications](https://hubble.com/docs/device-sdk/terrestrial/samples): Review Sample Apps for functional examples of how to use the SDK. You will need to generate a device key first.
+- [SDK Reference](https://hubble.com/docs/device-sdk/terrestrial/sdk-reference): The SDK Reference documents the full API for each release of the Hubble Device SDK.
+- [Versioning](https://hubble.com/docs/device-sdk/versioning)
+
+## Cloud API
+
+> Full content: [Cloud API — plain text](https://hubble.com/docs/llms-cloud-api.txt)
+
+- [Add User to Organization](https://hubble.com/docs/api-specification/add-user-to-organization): Add a user to the organization.
+- [Batch Delete Devices](https://hubble.com/docs/api-specification/batch-delete-devices): Delete multiple registered devices from your organization in a single request.
+- [Batch Update Devices](https://hubble.com/docs/api-specification/batch-update-devices): Update multiple registered devices belonging to your organization in a single request.
+- [Create a Webhook Endpoint](https://hubble.com/docs/api-specification/create-webhook-endpoint): Register an endpoint that can receive webhook events for packet data.
+- [Delete an API Key](https://hubble.com/docs/api-specification/delete-api-key): Permanently delete an API Key from your organization.
+- [Delete Device](https://hubble.com/docs/api-specification/delete-device): Delete a registered device from your organization.
+- [Delete Invitation](https://hubble.com/docs/api-specification/delete-invitation): Revoke a pending invitation to the organization.
+- [Delete User from Organization](https://hubble.com/docs/api-specification/delete-user-from-organization): Remove a user from the organization.
+- [Delete a Webhook Endpoint](https://hubble.com/docs/api-specification/delete-webhook-endpoint): Delete a webhook endpoint.
+- [Get Organization API Metrics](https://hubble.com/docs/api-specification/get-api-metrics): Retrieves API request metrics including total requests, success rate, and time interval-based breakdowns.
+- [List active devices for the current billing period](https://hubble.com/docs/api-specification/get-billing-active-devices): Returns the paginated list of devices that were active during the organization's
+- [List saved card payment methods](https://hubble.com/docs/api-specification/get-billing-payment-method): Returns every **card** payment method attached to the org's Stripe customer (self-serve; no manual Dashboard 'invoice default' required).
+- [Get current subscription / plan](https://hubble.com/docs/api-specification/get-billing-subscription): Returns the organization's current self-serve subscription snapshot from Stripe (plan tier, status, billing period fields).
+- [Get Billing Usage](https://hubble.com/docs/api-specification/get-billing-usage): Retrieve the most recent billing usage for your organization.
+- [Get Device](https://hubble.com/docs/api-specification/get-device): Return a specific registered device belonging to your organization.
+- [Get Organization Device Metrics](https://hubble.com/docs/api-specification/get-device-metrics): Retrieves metrics for active, never active, and total registered devices over time.
+- [Get Invoice PDF](https://hubble.com/docs/api-specification/get-invoice-pdf): Retrieve an invoice PDF.
+- [Get Organization Packet Metrics](https://hubble.com/docs/api-specification/get-packet-metrics): Retrieves packet metrics across a time range providing totals and time interval-based breakdowns.
+- [Get Recent Invoices](https://hubble.com/docs/api-specification/get-recent-invoices): Retrieve the most recent invoices for your organization.
+- [Get Organization Webhook Metrics](https://hubble.com/docs/api-specification/get-webhook-metrics): Retrieves webhook metrics including total requests, success rate, and time interval-based breakdowns for webhook events.
+- [Hubble Platform API](https://hubble.com/docs/api-specification/hubble-platform-api): The Hubble platform is built API-first. Use our Cloud API to manage your devices
+- [Invite User to Organization](https://hubble.com/docs/api-specification/invite-user-to-organization): Invite a user to join the organization.
+- [List all API Keys](https://hubble.com/docs/api-specification/list-api-keys): List all valid API Keys for your organization.
+- [List Devices](https://hubble.com/docs/api-specification/list-devices): Returns all devices for your organization.
+- [List Key Scopes](https://hubble.com/docs/api-specification/list-key-scopes): Retrieve a list of all available authorization scopes that can be assigned to API keys.
+- [List Pending Invites](https://hubble.com/docs/api-specification/list-pending-invites): Page through pending invites to an organization.
+- [List Registered Webhooks](https://hubble.com/docs/api-specification/list-registered-webhooks): Retrieve a list of registered webhooks.
+- [List Organization Users](https://hubble.com/docs/api-specification/list-users-in-organization): Page through users in an organization.
+- [Packet Webhook Example](https://hubble.com/docs/api-specification/packet-webhook-example): This endpoint is an example webhook endpoint that each organization can implement in order to receive packet data.
+- [Provision an API Key](https://hubble.com/docs/api-specification/provision-api-key): Provision a new API Key for your organization.
+- [Register New Devices](https://hubble.com/docs/api-specification/register-new-devices): Register one or more devices to your organization.
+- [Retrieve Organization Metadata](https://hubble.com/docs/api-specification/retrieve-organization-metadata): Retrieve metadata for an organization.
+- [Retrieve Organization Packets](https://hubble.com/docs/api-specification/retrieve-organization-packets): Stream or query packets for your organization.
+- [Send a Test Webhook](https://hubble.com/docs/api-specification/test-webhook-endpoint): Send an example packet batch to the configured webhook URL to test webhook delivery
+- [Update an API Key](https://hubble.com/docs/api-specification/update-api-key): Update metadata for an API key, including name, authorization scopes, and expiration time.
+- [Update Device](https://hubble.com/docs/api-specification/update-device): Update a registered device belonging to your organization.
+- [Update Organization Metadata](https://hubble.com/docs/api-specification/update-organization-metadata): Update metadata for an organization.
+- [Update User in Organization](https://hubble.com/docs/api-specification/update-user-in-organization): Update a user's metadata and/or role in the organization.
+- [Update a Webhook Endpoint](https://hubble.com/docs/api-specification/update-webhook-endpoint): Update certain fields of a webhook endpoint.
+- [Validate an API Key](https://hubble.com/docs/api-specification/validate-api-key): Confirm your API key is valid.
+- [OpenAPI Spec (YAML)](https://hubble.com/docs/openapi.yaml): Raw OpenAPI spec for import into API clients and AI coding tools
+
+## Release Notes
+
+> Full content: [Release Notes — plain text](https://hubble.com/docs/llms-release-notes.txt)
+
+- [Release Notes](https://hubble.com/docs/release-notes)
+
+## Other
+
+> Full content: [Other — plain text](https://hubble.com/docs/llms-other.txt)
+
+- [Chip Compatibility](https://hubble.com/docs/compatibility): What Bluetooth Low Energy chip sets and MCUs are compatible with Hubble Network, and which RTOSes to use.
+- [Feedback](https://hubble.com/docs/feedback)
+- [Support](https://hubble.com/docs/support)
+

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/hubble-network/refs/heads/main/json-schema/hubble-network-error.json",
+  "title": "Hubble Error Response",
+  "description": "The Hubble API error envelope. The `name` field is the stable machine-readable discriminator; `description` is human-readable and may change.",
+  "x-derived-from": "openapi/hubble-network-platform-openapi.yml#/components/schemas/errorResponse",
+  "x-generated": "2026-08-04",
+  "x-method": "derived",
+  "type": "object",
+  "properties": {
+    "code": {
+      "type": "integer",
+      "description": "The HTTP status code"
+    },
+    "description": {
+      "type": "string",
+      "description": "A description for the error.\nFor user errors, we attempt to be as descriptive as possible to help with diagnosing the issue.\nFor internal errors, the error description is only indicates that a retry should occur but we log the full error so that we can diagnose it.\nError descriptions can change over time and should not be programmed against.\n"
+    },
+    "name": {
+      "type": "string",
+      "enum": [
+        "Bad Request",
+        "Unauthorized",
+        "Not Found",
+        "Too Many Requests",
+        "Internal Server Error"
+      ],
+      "description": "`name` is a short name for the error.\n"
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "hubble-cloud-api",
+  "version": "1.0.0",
+  "description": "Complete Claude Skill for Hubble Network Cloud API integration with devices, packets, webhooks, and metrics",
+  "author": {
+    "name": "Hubble Network",
+    "email": "[email protected]",
+    "url": "https://hubble.com"
+  },
+  "homepage": "https://docs.hubble.com",
+  "repository": "https://github.com/HubbleNetwork/claude-hubble-cloud-api-skill",
+  "license": "MIT",
+  "keywords": [
+    "hubble",
+    "iot",
+    "bluetooth",
+    "cloud",
+    "api",
+    "devices",
+    "packets",
+    "webhooks",
+    "network",
+    "gateway",
+    "sensors"
+  ],
+  "skills": [
+    "./skills/hubble-cloud-api"
+  ]
+}

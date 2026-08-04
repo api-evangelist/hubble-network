@@ -1,0 +1,400 @@
+generated: '2026-08-04'
+method: derived
+source: >-
+  Derived by aligning Hubble's OWN published agent surface — the hubble-cloud-api Agent Skill at
+  github.com/HubbleNetwork/agent-plugins (references/api-reference.md, fetched 2026-08-04, HTTP 200) —
+  and the derived candidate MCP tool list (mcp/hubble-network-mcp.yml) against the 39 operations in
+  openapi/hubble-network-platform-openapi.yml.
+purpose: >-
+  Bind each agent-facing tool to its backing REST operationId so the tool inherits a REAL inputSchema
+  (that operation's parameters + requestBody) instead of a guessed one. For Hubble the interesting
+  divergence is NOT MCP-vs-REST — Hubble publishes no MCP server and no GraphQL — it is
+  SKILL-vs-REST: the provider's own Agent Skill covers 34 of 39 operations and instructs agents to
+  call them at the LEGACY /api/... alias paths rather than the canonical /v1//v2 paths in the spec.
+
+surfaces:
+  rest_openapi: openapi/hubble-network-platform-openapi.yml   # 39 operations, 48 schemas, OpenAPI 3.0.3
+  graphql: null                                               # none published; no .graphql in any of the 23 public repos
+  mcp:
+    url: null                                                 # Hubble publishes NO hosted or remote MCP server
+    status: candidate
+    note: tools in mcp/hubble-network-mcp.yml are DERIVED 1:1 from OpenAPI operations, not published by Hubble.
+  agent_skill:
+    url: https://github.com/HubbleNetwork/agent-plugins
+    file: skills/hubble-network-cloud-api-SKILL.md
+    reference: https://raw.githubusercontent.com/HubbleNetwork/agent-plugins/main/hubble-cloud-api-skill/skills/hubble-cloud-api/references/api-reference.md
+    status: published
+    official: true
+    note: This is Hubble's real, first-party agent surface. It drives the REST API directly over HTTP/curl.
+
+# PATH-FORM DIVERGENCE — the single most consequential finding in this crosswalk.
+# Hubble's published Agent Skill uses the legacy /api/... alias on EVERY endpoint (66 occurrences)
+# and the canonical /v1/... form ZERO times. The aliases are supported for a minimum of one year
+# (lifecycle/hubble-network-lifecycle.yml), so agents following the provider's own skill are wired
+# to the deprecation-eligible surface rather than the versioned one.
+path_form_divergence:
+  skill_path_form: /api/org/{org_id}/...        # and /api/v2/org/{org_id}/devices
+  openapi_path_form: /v1/org/{org_id}/...       # and /v2/org/{org_id}/devices
+  skill_uses_api_alias: 66
+  skill_uses_v1_canonical: 0
+  alias_support_window: minimum 1 year from the introduction of the versioned path
+  impact: >-
+    Every operationId below is reachable at both forms today. An agent grounded only in the skill will
+    break first when Hubble retires an alias. Recommend the provider re-ground the skill on /v1//v2.
+
+# Each row: the agent-facing tool -> the REST operationId that backs it. The tool's real input
+# contract is that operation's parameters + requestBody in the OpenAPI.
+# in_skill: does Hubble's own published Agent Skill document this operation?
+crosswalk:
+- tool: validate_api_key
+  category: API Keys
+  rest: [validate-api-key]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: GET /api/org/{org_id}/check
+- tool: provision_api_key
+  category: API Keys
+  rest: [provision-api-key]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: POST /api/org/{org_id}/key
+- tool: list_api_keys
+  category: API Keys
+  rest: [list-api-keys]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: GET /api/org/{org_id}/key
+- tool: delete_api_key
+  category: API Keys
+  rest: [delete-api-key]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: DELETE /api/org/{org_id}/key/{key_id}
+- tool: update_api_key
+  category: API Keys
+  rest: [update-api-key]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: PATCH /api/org/{org_id}/key/{key_id}
+- tool: list_key_scopes
+  category: API Keys
+  rest: [list-key-scopes]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: GET /api/org/{org_id}/key_scopes
+- tool: retrieve_organization_metadata
+  category: Organizations
+  rest: [retrieve-organization-metadata]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: GET /api/org/{org_id}
+- tool: update_organization_metadata
+  category: Organizations
+  rest: [update-organization-metadata]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: PATCH /api/org/{org_id}
+- tool: register_new_devices
+  category: Devices
+  rest: [register-new-devices]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: POST /api/v2/org/{org_id}/devices
+  note: The only /v2 operation in the API; the skill mirrors the v2 alias correctly.
+- tool: list_devices
+  category: Devices
+  rest: [list-devices]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: GET /api/org/{org_id}/devices
+- tool: batch_update_devices
+  category: Devices
+  rest: [batch-update-devices]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: PATCH /api/org/{org_id}/devices
+- tool: batch_delete_devices
+  category: Devices
+  rest: [batch-delete-devices]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: DELETE /api/org/{org_id}/devices
+- tool: get_device
+  category: Devices
+  rest: [get-device]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: GET /api/org/{org_id}/devices/{device_id}
+- tool: update_device
+  category: Devices
+  rest: [update-device]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: PATCH /api/org/{org_id}/devices/{device_id}
+- tool: delete_device
+  category: Devices
+  rest: [delete-device]
+  binding: rest
+  confidence: high
+  in_skill: false
+  note: >-
+    Single-device delete is in the OpenAPI but absent from the published Agent Skill, which documents
+    only the batch DELETE /devices form. An agent grounded on the skill must delete one device via the
+    batch endpoint.
+- tool: retrieve_organization_packets
+  category: Packets
+  rest: [retrieve-organization-packets]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: GET /api/org/{org_id}/packets
+  note: Continuation-Token travels in HTTP HEADERS on both request and response. Max 1,000 packets/page, 30-day lookback.
+- tool: packet_webhook_example
+  category: Packets
+  rest: [packet-webhook-example]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: POST /api/webhook/testBatch
+  note: >-
+    Receiver-side contract, not a Hubble-hosted operation — it documents the payload Hubble POSTs to
+    YOUR endpoint. Not an agent-callable tool in the normal sense.
+- tool: get_api_metrics
+  category: Platform Metrics
+  rest: [get-api-metrics]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: GET /api/org/{org_id}/api_metrics
+- tool: get_packet_metrics
+  category: Platform Metrics
+  rest: [get-packet-metrics]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: GET /api/org/{org_id}/packet_metrics
+- tool: get_webhook_metrics
+  category: Platform Metrics
+  rest: [get-webhook-metrics]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: GET /api/org/{org_id}/webhook_metrics
+- tool: get_device_metrics
+  category: Platform Metrics
+  rest: [get-device-metrics]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: GET /api/org/{org_id}/device_metrics
+- tool: list_users_in_organization
+  category: Organizations
+  rest: [list-users-in-organization]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: GET /api/org/{org_id}/users
+- tool: add_user_to_organization
+  category: Organizations
+  rest: [add-user-to-organization]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: POST /api/org/{org_id}/users
+- tool: update_user_in_organization
+  category: Organizations
+  rest: [update-user-in-organization]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: PATCH /api/org/{org_id}/users/{user_id}
+- tool: delete_user_from_organization
+  category: Organizations
+  rest: [delete-user-from-organization]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: DELETE /api/org/{org_id}/users/{user_id}
+- tool: list_pending_invites
+  category: Organizations
+  rest: [list-pending-invites]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: GET /api/org/{org_id}/invitations
+- tool: invite_user_to_organization
+  category: Organizations
+  rest: [invite-user-to-organization]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: POST /api/org/{org_id}/invitations
+- tool: delete_invitation
+  category: Organizations
+  rest: [delete-invitation]
+  binding: rest
+  confidence: medium
+  in_skill: true
+  skill_path: DELETE /api/org/{org_id}/invitations/{invitation_id}
+  note: >-
+    SHAPE MISMATCH. The OpenAPI declares DELETE /v1/org/{org_id}/invitations (identifier in the request
+    body); the published Agent Skill documents DELETE /api/org/{org_id}/invitations/{invitation_id}
+    (identifier in the path). One of the two is wrong. An agent cannot satisfy both from the same
+    contract — flagged for the provider rather than resolved here.
+- tool: create_webhook_endpoint
+  category: Packet Webhooks
+  rest: [create-webhook-endpoint]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: POST /api/org/{org_id}/webhooks
+  note: Maximum 2 webhook endpoints per organization.
+- tool: list_registered_webhooks
+  category: Packet Webhooks
+  rest: [list-registered-webhooks]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: GET /api/org/{org_id}/webhooks
+- tool: update_webhook_endpoint
+  category: Packet Webhooks
+  rest: [update-webhook-endpoint]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: PATCH /api/org/{org_id}/webhooks/{webhook_id}
+- tool: delete_webhook_endpoint
+  category: Packet Webhooks
+  rest: [delete-webhook-endpoint]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: DELETE /api/org/{org_id}/webhooks/{webhook_id}
+- tool: test_webhook_endpoint
+  category: Packet Webhooks
+  rest: [test-webhook-endpoint]
+  binding: rest
+  confidence: high
+  in_skill: false
+  note: >-
+    POST /v1/org/{org_id}/webhooks/{webhook_id}/test exists in the OpenAPI but is NOT documented in the
+    published Agent Skill. This is the operation that verifies a receiver before going live — a
+    meaningful omission for an agent onboarding a webhook.
+- tool: get_recent_invoices
+  category: Billing
+  rest: [get-recent-invoices]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: GET /api/org/{org_id}/billing/invoices
+- tool: get_invoice_pdf
+  category: Billing
+  rest: [get-invoice-pdf]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: GET /api/org/{org_id}/billing/invoices/{invoice_id}/pdf
+- tool: get_billing_usage
+  category: Billing
+  rest: [get-billing-usage]
+  binding: rest
+  confidence: high
+  in_skill: true
+  skill_path: GET /api/org/{org_id}/billing/usage
+- tool: get_billing_active_devices
+  category: Billing
+  rest: [get-billing-active-devices]
+  binding: rest
+  confidence: high
+  in_skill: false
+- tool: get_billing_subscription
+  category: Billing
+  rest: [get-billing-subscription]
+  binding: rest
+  confidence: high
+  in_skill: false
+- tool: get_billing_payment_method
+  category: Billing
+  rest: [get-billing-payment-method]
+  binding: rest
+  confidence: high
+  in_skill: false
+
+# Tools exposed by an agent surface with NO backing public REST operation.
+mcp_only: []
+graphql_only: []
+
+# REST operations with no coverage in Hubble's own published Agent Skill — the real gap for an agent
+# that installs the provider plugin and assumes it is complete.
+skill_uncovered:
+- operation: delete-device
+  capability: Devices
+  reason: Skill documents only the batch DELETE /devices form.
+- operation: test-webhook-endpoint
+  capability: Packet Webhooks
+  reason: Endpoint-verification operation omitted from the skill's webhook section.
+- operation: get-billing-active-devices
+  capability: Billing
+  reason: Skill's billing section covers invoices, invoice PDF and usage only.
+- operation: get-billing-subscription
+  capability: Billing
+  reason: Skill's billing section covers invoices, invoice PDF and usage only.
+- operation: get-billing-payment-method
+  capability: Billing
+  reason: >-
+    Skill's billing section covers invoices, invoice PDF and usage only. This operation is also the
+    newest in the API (self-serve card payment methods via Stripe).
+
+# Operations with no MCP tool. Empty because the candidate MCP tool list was derived 1:1 from the
+# OpenAPI — there is no published MCP server whose coverage could diverge.
+rest_only: []
+
+coverage:
+  rest_operations_total: 39
+  tools_named: 39
+  tools_bound_to_rest: 39
+  binding_confidence_high: 38
+  binding_confidence_medium: 1
+  mcp_only: 0
+  graphql_only: 0
+  skill_covered_operations: 34
+  skill_uncovered_operations: 5
+  skill_coverage_pct: 87.2
+  contract_shape_conflicts: 1
+
+findings_for_provider:
+- id: skill-grounded-on-legacy-alias
+  severity: medium
+  detail: >-
+    The first-party Agent Skill references /api/... on all 66 endpoint mentions and /v1/... zero times.
+    Re-ground it on the canonical versioned paths so agents are not wired to the alias window.
+- id: invitation-delete-shape-conflict
+  severity: medium
+  detail: >-
+    OpenAPI says DELETE /v1/org/{org_id}/invitations (body); the Agent Skill says
+    DELETE /api/org/{org_id}/invitations/{invitation_id} (path). The two contracts disagree.
+- id: skill-missing-webhook-test
+  severity: low
+  detail: >-
+    test-webhook-endpoint is the pre-flight verification step for a webhook receiver and is absent from
+    the skill, so an agent onboarding a webhook has no documented way to verify it before going live.
+- id: no-mcp-server
+  severity: low
+  detail: >-
+    Hubble ships a Claude Code Agent Skill but no MCP server. The 39 operations are uniformly shaped
+    (JWT bearer, org-scoped paths) and would map cleanly to MCP tools; mcp/hubble-network-mcp.yml
+    already carries the derived candidate list.

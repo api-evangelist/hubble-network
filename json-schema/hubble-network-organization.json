@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/hubble-network/refs/heads/main/json-schema/hubble-network-organization.json",
+  "title": "Hubble Organization",
+  "description": "The top-level tenant container that owns devices, users, API keys, webhooks and billing on the Hubble platform.",
+  "x-derived-from": "openapi/hubble-network-platform-openapi.yml#/components/schemas/organization",
+  "x-generated": "2026-08-04",
+  "x-method": "derived",
+  "type": "object",
+  "properties": {
+    "name": {
+      "$ref": "#/$defs/organizationName"
+    },
+    "org_id": {
+      "$ref": "#/$defs/orgId"
+    },
+    "contact_info": {
+      "$ref": "#/$defs/contactInfo"
+    },
+    "address": {
+      "$ref": "#/$defs/address"
+    },
+    "timezone": {
+      "$ref": "#/$defs/timezone"
+    },
+    "org_type": {
+      "$ref": "#/$defs/orgType"
+    },
+    "production_org_id": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/orgId"
+        }
+      ],
+      "description": "The org_id of the paired production organization. Only set when\norg_type is sandbox and the sandbox is paired to a production org.\n"
+    }
+  },
+  "$defs": {
+    "address": {
+      "type": "object",
+      "properties": {
+        "street_address": {
+          "type": "string",
+          "description": "The first line of a street address",
+          "maxLength": 250
+        },
+        "street_address_line_two": {
+          "type": "string",
+          "description": "The optional second line of a street address",
+          "maxLength": 250
+        },
+        "city": {
+          "type": "string",
+          "description": "A city that the address relates to",
+          "maxLength": 100
+        },
+        "state": {
+          "type": "string",
+          "description": "A state that the address relates to",
+          "maxLength": 100
+        },
+        "country": {
+          "type": "number",
+          "description": "A country code defined by [ISO-3166](https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes)."
+        }
+      }
+    },
+    "contactInfo": {
+      "type": "object",
+      "properties": {
+        "phoneNumber": {
+          "type": "string",
+          "description": "A phone number matching the [E.164](https://en.wikipedia.org/wiki/E.164) specification"
+        },
+        "email": {
+          "type": "string",
+          "description": "An email address"
+        }
+      }
+    },
+    "orgId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The ID for an organization"
+    },
+    "orgType": {
+      "type": "string",
+      "enum": [
+        "sandbox",
+        "production"
+      ],
+      "description": "Whether this organization is a sandbox or production organization"
+    },
+    "organizationName": {
+      "type": "string",
+      "description": "The name of the organization"
+    },
+    "timezone": {
+      "type": "string",
+      "description": "A timezone string defined in the [IANA Time Zone](https://www.iana.org/time-zones) database."
+    }
+  }
+}

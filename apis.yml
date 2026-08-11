@@ -32,66 +32,243 @@ tags:
 - Telemetry
 - Logistics
 apis:
-- aid: hubble-network:hubble-platform-api
-  name: Hubble Platform API
-  description: 'The Hubble Cloud API is the API-first control plane for the Hubble
-    Network platform. It manages devices (register, list, get, update, batch update,
-    batch delete), retrieves and streams decrypted Bluetooth packet data with continuation-token
-    pagination, configures packet webhooks (create, list, update, delete, test), reports
-    platform metrics for API, packet, webhook and device activity, administers organizations,
-    users and invitations, provisions scoped API keys, and exposes billing usage, invoices,
-    subscription and payment methods. Authentication is a JWT bearer API key carrying
-    up to 16 granular authorization scopes; the API is versioned in the URL path (/v1,
-    /v2) with legacy /api aliases supported for a minimum of one year.'
+- aid: hubble-network:hubble-network-api-keys-api
+  name: Hubble Network API Keys API
+  description: The API Keys API from Hubble Network — 4 operation(s) for api keys.
   humanURL: https://hubble.com/docs/api-specification/hubble-platform-api
   baseURL: https://api.hubble.com
-  image: https://hubble.com/favicon.ico
   tags:
-  - IoT
-  - Devices
-  - Bluetooth
-  - Packets
-  - Webhooks
-  - Billing
+  - API Keys
   properties:
   - type: OpenAPI
-    url: openapi/hubble-network-platform-openapi.yml
-  - type: OpenAPI
-    name: Hubble-published OpenAPI (verbatim harvest)
-    url: openapi/_original/hubble-network-platform-openapi-original.yml
+    url: openapi/hubble-network-api-keys-api-openapi.yml
   - type: Documentation
     url: https://hubble.com/docs/api-specification/hubble-platform-api
   - type: APIReference
     url: https://hubble.com/docs/api-specification/hubble-platform-api
   - type: JSONSchema
-    name: Device
     url: json-schema/hubble-network-device.json
   - type: JSONSchema
-    name: Packet
     url: json-schema/hubble-network-packet.json
   - type: JSONSchema
-    name: Packet Batch
     url: json-schema/hubble-network-packet-batch.json
   - type: JSONSchema
-    name: Organization
     url: json-schema/hubble-network-organization.json
   - type: JSONSchema
-    name: API Key
     url: json-schema/hubble-network-api-key.json
   - type: JSONSchema
-    name: Packet Webhook
     url: json-schema/hubble-network-webhook.json
   - type: JSONSchema
-    name: Organization User
     url: json-schema/hubble-network-organization-user.json
   - type: JSONSchema
-    name: Invitation
     url: json-schema/hubble-network-invitation.json
   - type: JSONSchema
-    name: Error Response
     url: json-schema/hubble-network-error.json
   - type: JSONSchema
-    name: Billing Subscription
+    url: json-schema/hubble-network-billing-subscription.json
+- aid: hubble-network:hubble-network-billing-api
+  name: Hubble Network Billing API
+  description: The Billing API from Hubble Network — 6 operation(s) for billing.
+  humanURL: https://hubble.com/docs/api-specification/hubble-platform-api
+  baseURL: https://api.hubble.com
+  tags:
+  - Billing
+  properties:
+  - type: OpenAPI
+    url: openapi/hubble-network-billing-api-openapi.yml
+  - type: Documentation
+    url: https://hubble.com/docs/api-specification/hubble-platform-api
+  - type: APIReference
+    url: https://hubble.com/docs/api-specification/hubble-platform-api
+  - type: JSONSchema
+    url: json-schema/hubble-network-device.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-packet.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-packet-batch.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-organization.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-api-key.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-webhook.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-organization-user.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-invitation.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-error.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-billing-subscription.json
+- aid: hubble-network:hubble-network-devices-api
+  name: Hubble Network Devices API
+  description: The Devices API from Hubble Network — 3 operation(s) for devices.
+  humanURL: https://hubble.com/docs/api-specification/hubble-platform-api
+  baseURL: https://api.hubble.com
+  tags:
+  - Devices
+  properties:
+  - type: OpenAPI
+    url: openapi/hubble-network-devices-api-openapi.yml
+  - type: Documentation
+    url: https://hubble.com/docs/api-specification/hubble-platform-api
+  - type: APIReference
+    url: https://hubble.com/docs/api-specification/hubble-platform-api
+  - type: JSONSchema
+    url: json-schema/hubble-network-device.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-packet.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-packet-batch.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-organization.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-api-key.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-webhook.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-organization-user.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-invitation.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-error.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-billing-subscription.json
+- aid: hubble-network:hubble-network-organizations-api
+  name: Hubble Network Organizations API
+  description: The Organizations API from Hubble Network — 4 operation(s) for organizations.
+  humanURL: https://hubble.com/docs/api-specification/hubble-platform-api
+  baseURL: https://api.hubble.com
+  tags:
+  - Organizations
+  properties:
+  - type: OpenAPI
+    url: openapi/hubble-network-organizations-api-openapi.yml
+  - type: Documentation
+    url: https://hubble.com/docs/api-specification/hubble-platform-api
+  - type: APIReference
+    url: https://hubble.com/docs/api-specification/hubble-platform-api
+  - type: JSONSchema
+    url: json-schema/hubble-network-device.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-packet.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-packet-batch.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-organization.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-api-key.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-webhook.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-organization-user.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-invitation.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-error.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-billing-subscription.json
+- aid: hubble-network:hubble-network-packet-webhooks-api
+  name: Hubble Network Packet Webhooks API
+  description: The Packet Webhooks API from Hubble Network — 3 operation(s) for packet webhooks.
+  humanURL: https://hubble.com/docs/api-specification/hubble-platform-api
+  baseURL: https://api.hubble.com
+  tags:
+  - Packet Webhooks
+  properties:
+  - type: OpenAPI
+    url: openapi/hubble-network-packet-webhooks-api-openapi.yml
+  - type: Documentation
+    url: https://hubble.com/docs/api-specification/hubble-platform-api
+  - type: APIReference
+    url: https://hubble.com/docs/api-specification/hubble-platform-api
+  - type: JSONSchema
+    url: json-schema/hubble-network-device.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-packet.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-packet-batch.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-organization.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-api-key.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-webhook.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-organization-user.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-invitation.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-error.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-billing-subscription.json
+- aid: hubble-network:hubble-network-packets-api
+  name: Hubble Network Packets API
+  description: The Packets API from Hubble Network — 2 operation(s) for packets.
+  humanURL: https://hubble.com/docs/api-specification/hubble-platform-api
+  baseURL: https://api.hubble.com
+  tags:
+  - Packets
+  properties:
+  - type: OpenAPI
+    url: openapi/hubble-network-packets-api-openapi.yml
+  - type: Documentation
+    url: https://hubble.com/docs/api-specification/hubble-platform-api
+  - type: APIReference
+    url: https://hubble.com/docs/api-specification/hubble-platform-api
+  - type: JSONSchema
+    url: json-schema/hubble-network-device.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-packet.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-packet-batch.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-organization.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-api-key.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-webhook.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-organization-user.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-invitation.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-error.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-billing-subscription.json
+- aid: hubble-network:hubble-network-platform-metrics-api
+  name: Hubble Network Platform Metrics API
+  description: The Platform Metrics API from Hubble Network — 4 operation(s) for platform metrics.
+  humanURL: https://hubble.com/docs/api-specification/hubble-platform-api
+  baseURL: https://api.hubble.com
+  tags:
+  - Platform Metrics
+  properties:
+  - type: OpenAPI
+    url: openapi/hubble-network-platform-metrics-api-openapi.yml
+  - type: Documentation
+    url: https://hubble.com/docs/api-specification/hubble-platform-api
+  - type: APIReference
+    url: https://hubble.com/docs/api-specification/hubble-platform-api
+  - type: JSONSchema
+    url: json-schema/hubble-network-device.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-packet.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-packet-batch.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-organization.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-api-key.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-webhook.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-organization-user.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-invitation.json
+  - type: JSONSchema
+    url: json-schema/hubble-network-error.json
+  - type: JSONSchema
     url: json-schema/hubble-network-billing-subscription.json
 maintainers:
 - FN: Kin Lane

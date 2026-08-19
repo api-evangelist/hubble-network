@@ -1,0 +1,504 @@
+openapi: 3.2.0
+info:
+  title: Hubble Platform Billing API
+  description: "The Hubble platform is built API-first. Use our Cloud API to manage your devices\nand access device data programmatically. \nWe've designed our API following RESTful principles. \nEach endpoint returns standard HTTP status codes and may include JSON payloads.\n\n---\n\n## API Access\nUse API Keys to authenticate with the Hubble Cloud API for your organization. \n\n### Generate an API Key\nLog in to your Hubble dashboard. Navigate to **Developer Tools > API Tokens** to create a new API Key. \nProvide a name for the token, and set an appropriate expiration date for temporary access.\n\n### Organization ID\nYou will need `org_id` to make API requests. From your Hubble dashboard, navigate to \n**Developer Tooks > API Tokens**, or **Organization Settings**, to find your Organization ID. \n\n### Authorization Scopes\nAPI endpoints require specific authorization scopes to perform the intended operation. \n**Required Scope** is always provided in the API documentation.\n\nAPI Keys can be created with specific authorization scopes that control what operations the key can perform. \nIf no scopes are specified, the key will be created with all available scopes (admin-level access).\n\n| **Scope**                   | **Access**                                     |\n|------------------------------|-------------------------------------------------|\n| **read-api-keys**            | View API keys and their metadata               |\n| **write-api-keys**           | Create, update, and delete API keys            |\n| **read-users**               | View user information and roles                |\n| **write-users**              | Add, update, and remove users from the organization |\n| **read-organization-metadata** | View organization details and settings       |\n| **write-organization-metadata** | Update organization information            |\n| **read-devices**             | View device information and status             |\n| **write-devices**            | Register and manage devices                    |\n| **read-invitations**         | View pending invitations                       |\n| **write-invitations**        | Create and revoke user invitations             |\n| **read-packets**             | Access packet data and retrieval endpoints     |\n| **read-platform-metrics**    | View platform metrics and analytics            |\n| **read-billing-usage**       | View billing usage information                 |\n| **read-billing-invoices**    | View billing invoices                          |\n| **read-webhooks**            | View webhook configurations                    |\n| **write-webhooks**           | Create and manage webhook endpoints            |\n    \n**Example Scope Combinations**\n- Create a key with read-only access: `[\"read-api-keys\", \"read-users\", \"read-devices\"]`\n- Create a key for device management: `[\"read-devices\", \"write-devices\"]`\n- Create a key for user management: `[\"read-users\", \"write-users\", \"read-invitations\", \"write-invitations\"]`\n    \n**Best Practices for Data Security**\n- Create keys with the minimum required scopes for your use case\n- Regularly review and rotate API keys\n- Use descriptive names for your keys to track their purpose\n- Set appropriate expiration dates for temporary access    \n\n---\n\n## Import API Definition\nYou can quickly import the Hubble Cloud API into your preferred developer environment (such as Postman or Insomnia) using our **public OpenAPI definition**.\nSimply download or import the YAML file directly:\n\n[https://hubble.com/docs/openapi.yaml](https://hubble.com/docs/openapi.yaml)\n\n---\n\n## Pagination\nWhen the number of objects requested exceeds the maximum page size for an endpoint, the API response will be paginated. \nThis means you will receive a subset of the total results, along with a `Continuation-Token` in the Response Header that can be used to fetch subsequent subsets.\n\nTo retrieve the next set of data, you must use the provided `Continuation-Token` in the Request Header of your next API call to the same endpoint. \nContinue using the provided token in each successive request until no `Continuation-Token` is returned, which indicates you have retrieved all available data.\n\n---\n\n## Rate Limits\nThe Hubble Cloud API follows a leaky bucket approach to rate limiting. Endpoints are rate limited to three (3) requests per second. \nYour organization is limited to a total of 15 requests per second. \nIf you exceed this limit, you will receive a 429 status code. \nWe recommend backoff retry logic to stay within the limit.\n\n---\n\n## Request Headers\nAll HTTP responses will include a `X-Request-ID` header that is logged internally and can be used for tracing/debugging a particular API request. \nAll HTTP requests can include a `X-Request-ID` header which will be logged and mapped to the responses' `X-Request-ID` header. \n\nShare Request Headers whenever troubleshooting an API issue with Hubble Support.\n\n---\n\n## Status Codes\nThe Hubble Cloud API returns the following HTTP status codes: `200`, `400`, `401`, `403`, `404`, `429` and `500`. \nUse the tailored message returned with each status code for insight in the specific context of the endpoint you are attempting to access.\n\n---\n\n## Versioning\nOur cloud backend follows a rolling release model. This means:\n- **Continuous Deployment**: New features, security updates, and performance improvements are automatically rolled out.\n- **Backward Compatibility**: Cloud updates are designed to be compatible with devices running firmware/SDK versions within our active or maintained support windows.\n- **Transparent Change Management**: Release notes and changelogs are published regularly so you can track enhancements and understand any adjustments that might affect integrations.\n- **Versioned Public API**: The Cloud API uses basic major versioning in the url paths (`/v1/...`, `/v2/...` etc.). Major backwards incompatible changes will be made by creating a version of the endpoint with a higher version and communicating with customers to migrate. The legacy `/api/...` and `/api/v2/...` paths remain fully supported as aliases for `/v1/...` and `/v2/...` respectively, so previous versions will be supported for a minimum of 1 year.\n\n---\n"
+  version: 1.0.0
+servers:
+- url: https://api.hubble.com
+  description: Production
+security:
+- BearerAuth: []
+tags:
+- name: Billing
+paths:
+  /v1/org/{org_id}/billing/invoices:
+    get:
+      tags:
+      - Billing
+      operationId: get-recent-invoices
+      x-criticality: medium
+      summary: Get Recent Invoices
+      description: 'Retrieve the most recent invoices for your organization.
+
+
+        **Required Scope:** `read-billing-invoices`
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      responses:
+        '200':
+          description: A page of invoices
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  invoices:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        invoice_id:
+                          type: string
+                          description: the primary id for the invoice
+                        invoice_number:
+                          type: string
+                          description: 'Customer-facing invoice number (e.g. Stripe `number`), matching what appears on the PDF.
+
+                            '
+                        issue_timestamp:
+                          $ref: '#/components/schemas/utcTimestampNumber'
+                        due_timestamp:
+                          $ref: '#/components/schemas/utcTimestampNumber'
+                        status:
+                          type: string
+                          enum:
+                          - DRAFT
+                          - PENDING
+                          - COMPLETED
+                          description: "A status for the invoice. \nThe invoice starts as a DRAFT and then transitions to PENDING when it is ready to be paid.\nA fully paid invoice is then COMPLETED.\n"
+                        total_balance:
+                          type: number
+                          format: float
+                          description: 'The total balance amount on the invoice. The value is based on the organization''s currency.
+
+                            '
+                        remaining_balance:
+                          type: number
+                          format: float
+                          description: 'The remaining balance due on the invoice. The value is based on the organization''s currency.
+
+                            '
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+  /v1/org/{org_id}/billing/invoices/{invoice_id}/pdf:
+    get:
+      tags:
+      - Billing
+      operationId: get-invoice-pdf
+      x-criticality: medium
+      summary: Get Invoice PDF
+      description: 'Retrieve an invoice PDF.
+
+
+        **Required Scope:** `read-billing-invoices`
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      - name: invoice_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The primary key for an invoice
+      responses:
+        '200':
+          description: A PDF document for an invoice
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+                description: the PDF contents
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+  /v1/org/{org_id}/billing/usage:
+    get:
+      tags:
+      - Billing
+      operationId: get-billing-usage
+      x-criticality: medium
+      summary: Get Billing Usage
+      description: 'Retrieve the most recent billing usage for your organization.
+
+
+        **Required Scope:** `read-billing-usage`
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      responses:
+        '200':
+          description: A page of usage
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  usage:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        usage_timestamp:
+                          $ref: '#/components/schemas/formattedTimestamp'
+                        usage_type:
+                          type: string
+                          enum:
+                          - Daily Active Devices
+                          - Monthly Active Devices
+                          description: 'The type of usage recorded.
+
+                            '
+                        usage_value:
+                          type: integer
+                          description: 'The usage value for this type and timestamp.
+
+                            '
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+  /v1/org/{org_id}/billing/active-devices:
+    get:
+      tags:
+      - Billing
+      operationId: get-billing-active-devices
+      x-criticality: medium
+      summary: List active devices for the current billing period
+      description: 'Returns the paginated list of devices that were active during the organization''s
+
+        current Stripe billing period. A device is considered active if its most recent
+
+        packet timestamp falls within the period.
+
+
+        Use the `Continuation-Token` header for cursor-based pagination (same pattern as
+
+        `GET /v1/org/{org_id}/devices`).
+
+
+        **Required Scope:** `read-billing-usage`
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      - $ref: '#/components/parameters/continuationTokenHeader'
+      - $ref: '#/components/parameters/limitQueryParam'
+      - name: network_type
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - terrestrial
+          - satellite
+        description: 'Filter devices by network type. Omit to include all network types.
+
+          Requesting `satellite` requires the organization to have satellite access.
+
+          '
+      responses:
+        '200':
+          description: Active devices for the billing period
+          headers:
+            Continuation-Token:
+              $ref: '#/components/headers/ContinuationTokenHeader'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingActiveDevicesResponse'
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '403':
+          $ref: '#/components/responses/ErrorForbidden'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+  /v1/org/{org_id}/billing/subscription:
+    get:
+      tags:
+      - Billing
+      operationId: get-billing-subscription
+      x-criticality: medium
+      summary: Get current subscription / plan
+      description: 'Returns the organization''s current self-serve subscription snapshot from Stripe (plan tier, status, billing period fields).
+
+
+        Timestamps are **Hubble unix-microsecond** integers (not Stripe''s second-precision Unix times).
+
+
+        **Required Scope:** `read-billing-invoices`
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      responses:
+        '200':
+          description: Subscription snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingSubscription'
+        '403':
+          $ref: '#/components/responses/ErrorForbidden'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+  /v1/org/{org_id}/billing/payment-method:
+    get:
+      tags:
+      - Billing
+      operationId: get-billing-payment-method
+      x-criticality: medium
+      summary: List saved card payment methods
+      description: 'Returns every **card** payment method attached to the org''s Stripe customer (self-serve; no manual Dashboard "invoice default" required).
+
+
+        `default_payment_method_id` is the Stripe Customer''s **invoice** default (`pm_...`) when set; it may be empty even when `payment_methods` is non-empty.
+
+
+        **Required Scope:** `read-billing-invoices`
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      responses:
+        '200':
+          description: Saved cards (empty array if none)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingPaymentMethodsResponse'
+        '403':
+          $ref: '#/components/responses/ErrorForbidden'
+        '404':
+          $ref: '#/components/responses/ErrorNotFound'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+components:
+  parameters:
+    orgIdPathParam:
+      name: org_id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/orgId'
+      description: Your organization ID
+    continuationTokenHeader:
+      name: Continuation-Token
+      in: header
+      required: false
+      schema:
+        type: string
+      description: A token to indicate how to continue paging
+    limitQueryParam:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        minimum: 10
+        default: 250
+      description: A limit for the page size of devices
+  schemas:
+    BillingActiveDevicesResponse:
+      type: object
+      required:
+      - devices
+      - period_start
+      - period_end
+      properties:
+        devices:
+          type: array
+          items:
+            $ref: '#/components/schemas/BillingActiveDevice'
+        period_start:
+          type: string
+          format: date-time
+          description: Start of the current billing period (ISO 8601).
+        period_end:
+          type: string
+          format: date-time
+          description: End of the current billing period (ISO 8601).
+    errorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: The HTTP status code
+        description:
+          type: string
+          description: 'A description for the error.
+
+            For user errors, we attempt to be as descriptive as possible to help with diagnosing the issue.
+
+            For internal errors, the error description is only indicates that a retry should occur but we log the full error so that we can diagnose it.
+
+            Error descriptions can change over time and should not be programmed against.
+
+            '
+        name:
+          type: string
+          enum:
+          - Bad Request
+          - Unauthorized
+          - Not Found
+          - Too Many Requests
+          - Internal Server Error
+          description: '`name` is a short name for the error.
+
+            '
+    utcTimestampNumber:
+      type: number
+      format: double
+      description: An UTC second-precision timestamp formatted as a floating point number
+    BillingPaymentMethodCard:
+      type: object
+      required:
+      - id
+      - type
+      properties:
+        id:
+          type: string
+          description: Stripe PaymentMethod id (`pm_...`)
+        type:
+          type: string
+          example: card
+        brand:
+          type: string
+          example: visa
+        last4:
+          type: string
+        exp_month:
+          type: integer
+          format: int64
+        exp_year:
+          type: integer
+          format: int64
+    BillingPaymentMethodsResponse:
+      type: object
+      required:
+      - payment_methods
+      properties:
+        payment_methods:
+          type: array
+          items:
+            $ref: '#/components/schemas/BillingPaymentMethodCard'
+        default_payment_method_id:
+          type: string
+          description: Customer invoice_settings.default_payment_method when set
+    BillingActiveDevice:
+      type: object
+      required:
+      - device_id
+      - name
+      properties:
+        device_id:
+          type: string
+          description: The device identifier.
+        name:
+          type: string
+          description: The device display name.
+        network_type:
+          type: string
+          enum:
+          - terrestrial
+          - satellite
+          description: The network on which the device was most recently active.
+        last_active:
+          type: number
+          format: double
+          description: Unix timestamp (seconds, fractional) of the device's most recent packet.
+    orgId:
+      type: string
+      format: uuid
+      description: The ID for an organization
+    BillingSubscription:
+      type: object
+      required:
+      - plan
+      - status
+      properties:
+        plan:
+          type: string
+          enum:
+          - GROWTH
+          - SCALE
+          - ENTERPRISE
+          - SANDBOX
+        status:
+          type: string
+          description: Stripe subscription status, or `none` when there is no subscription.
+        current_period_start:
+          type: integer
+          format: int64
+          description: Start of the current billing period (Hubble unix-microsecond timestamp), if applicable.
+        current_period_end:
+          type: integer
+          format: int64
+          description: End of the current billing period (Hubble unix-microsecond timestamp), if applicable.
+        next_payment_date:
+          type: integer
+          format: int64
+          description: Approximate next charge date (Hubble unix-microsecond timestamp), if applicable.
+        cancel_at_period_end:
+          type: boolean
+        prepaid_devices:
+          type: integer
+        price_monthly_cents:
+          type: integer
+          format: int64
+        overage_per_device_cents:
+          type: integer
+          format: int64
+    formattedTimestamp:
+      type: string
+      format: date-time
+      description: "Start of the bucket in ISO 8601 format.\nFor example: `2025-04-25T14:01:54Z`. \n"
+  headers:
+    ContinuationTokenHeader:
+      description: A token to indicate how to continue paging
+      schema:
+        type: string
+  responses:
+    ErrorForbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 403
+            description: The authenticated principal is not allowed to perform this operation.
+            name: Forbidden
+    ErrorNotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 404
+            description: The requested resource was not found.
+            name: Not Found
+    ErrorBadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 400
+            description: The request could not be understood by the server due to malformed syntax.
+            name: Bad Request
+    ErrorInternalServer:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 500
+            description: An unknown error has occurred.
+            name: Unknown
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,0 +1,601 @@
+openapi: 3.2.0
+info:
+  title: Hubble Platform Organizations API
+  description: "The Hubble platform is built API-first. Use our Cloud API to manage your devices\nand access device data programmatically. \nWe've designed our API following RESTful principles. \nEach endpoint returns standard HTTP status codes and may include JSON payloads.\n\n---\n\n## API Access\nUse API Keys to authenticate with the Hubble Cloud API for your organization. \n\n### Generate an API Key\nLog in to your Hubble dashboard. Navigate to **Developer Tools > API Tokens** to create a new API Key. \nProvide a name for the token, and set an appropriate expiration date for temporary access.\n\n### Organization ID\nYou will need `org_id` to make API requests. From your Hubble dashboard, navigate to \n**Developer Tooks > API Tokens**, or **Organization Settings**, to find your Organization ID. \n\n### Authorization Scopes\nAPI endpoints require specific authorization scopes to perform the intended operation. \n**Required Scope** is always provided in the API documentation.\n\nAPI Keys can be created with specific authorization scopes that control what operations the key can perform. \nIf no scopes are specified, the key will be created with all available scopes (admin-level access).\n\n| **Scope**                   | **Access**                                     |\n|------------------------------|-------------------------------------------------|\n| **read-api-keys**            | View API keys and their metadata               |\n| **write-api-keys**           | Create, update, and delete API keys            |\n| **read-users**               | View user information and roles                |\n| **write-users**              | Add, update, and remove users from the organization |\n| **read-organization-metadata** | View organization details and settings       |\n| **write-organization-metadata** | Update organization information            |\n| **read-devices**             | View device information and status             |\n| **write-devices**            | Register and manage devices                    |\n| **read-invitations**         | View pending invitations                       |\n| **write-invitations**        | Create and revoke user invitations             |\n| **read-packets**             | Access packet data and retrieval endpoints     |\n| **read-platform-metrics**    | View platform metrics and analytics            |\n| **read-billing-usage**       | View billing usage information                 |\n| **read-billing-invoices**    | View billing invoices                          |\n| **read-webhooks**            | View webhook configurations                    |\n| **write-webhooks**           | Create and manage webhook endpoints            |\n    \n**Example Scope Combinations**\n- Create a key with read-only access: `[\"read-api-keys\", \"read-users\", \"read-devices\"]`\n- Create a key for device management: `[\"read-devices\", \"write-devices\"]`\n- Create a key for user management: `[\"read-users\", \"write-users\", \"read-invitations\", \"write-invitations\"]`\n    \n**Best Practices for Data Security**\n- Create keys with the minimum required scopes for your use case\n- Regularly review and rotate API keys\n- Use descriptive names for your keys to track their purpose\n- Set appropriate expiration dates for temporary access    \n\n---\n\n## Import API Definition\nYou can quickly import the Hubble Cloud API into your preferred developer environment (such as Postman or Insomnia) using our **public OpenAPI definition**.\nSimply download or import the YAML file directly:\n\n[https://hubble.com/docs/openapi.yaml](https://hubble.com/docs/openapi.yaml)\n\n---\n\n## Pagination\nWhen the number of objects requested exceeds the maximum page size for an endpoint, the API response will be paginated. \nThis means you will receive a subset of the total results, along with a `Continuation-Token` in the Response Header that can be used to fetch subsequent subsets.\n\nTo retrieve the next set of data, you must use the provided `Continuation-Token` in the Request Header of your next API call to the same endpoint. \nContinue using the provided token in each successive request until no `Continuation-Token` is returned, which indicates you have retrieved all available data.\n\n---\n\n## Rate Limits\nThe Hubble Cloud API follows a leaky bucket approach to rate limiting. Endpoints are rate limited to three (3) requests per second. \nYour organization is limited to a total of 15 requests per second. \nIf you exceed this limit, you will receive a 429 status code. \nWe recommend backoff retry logic to stay within the limit.\n\n---\n\n## Request Headers\nAll HTTP responses will include a `X-Request-ID` header that is logged internally and can be used for tracing/debugging a particular API request. \nAll HTTP requests can include a `X-Request-ID` header which will be logged and mapped to the responses' `X-Request-ID` header. \n\nShare Request Headers whenever troubleshooting an API issue with Hubble Support.\n\n---\n\n## Status Codes\nThe Hubble Cloud API returns the following HTTP status codes: `200`, `400`, `401`, `403`, `404`, `429` and `500`. \nUse the tailored message returned with each status code for insight in the specific context of the endpoint you are attempting to access.\n\n---\n\n## Versioning\nOur cloud backend follows a rolling release model. This means:\n- **Continuous Deployment**: New features, security updates, and performance improvements are automatically rolled out.\n- **Backward Compatibility**: Cloud updates are designed to be compatible with devices running firmware/SDK versions within our active or maintained support windows.\n- **Transparent Change Management**: Release notes and changelogs are published regularly so you can track enhancements and understand any adjustments that might affect integrations.\n- **Versioned Public API**: The Cloud API uses basic major versioning in the url paths (`/v1/...`, `/v2/...` etc.). Major backwards incompatible changes will be made by creating a version of the endpoint with a higher version and communicating with customers to migrate. The legacy `/api/...` and `/api/v2/...` paths remain fully supported as aliases for `/v1/...` and `/v2/...` respectively, so previous versions will be supported for a minimum of 1 year.\n\n---\n"
+  version: 1.0.0
+servers:
+- url: https://api.hubble.com
+  description: Production
+security:
+- BearerAuth: []
+tags:
+- name: Organizations
+paths:
+  /v1/org/{org_id}:
+    patch:
+      tags:
+      - Organizations
+      operationId: update-organization-metadata
+      x-criticality: medium
+      summary: Update Organization Metadata
+      description: 'Update metadata for an organization.
+
+
+        **Required Scope:** `write-organization-metadata`
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: "All of the potential update operations. \nEach field is optional but the request must have at least one field set to perform an update.\n"
+              properties:
+                set_name:
+                  $ref: '#/components/schemas/organizationName'
+                set_address:
+                  $ref: '#/components/schemas/address'
+                set_contact_info:
+                  $ref: '#/components/schemas/contactInfo'
+                set_timezone:
+                  $ref: '#/components/schemas/timezone'
+      responses:
+        '200':
+          description: Updated Organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/organization'
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+    get:
+      tags:
+      - Organizations
+      operationId: retrieve-organization-metadata
+      x-criticality: medium
+      summary: Retrieve Organization Metadata
+      description: 'Retrieve metadata for an organization.
+
+
+        **Required Scope:** `read-organization-metadata`
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      responses:
+        '200':
+          description: An Organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/organization'
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+  /v1/org/{org_id}/users:
+    get:
+      tags:
+      - Organizations
+      operationId: list-users-in-organization
+      x-criticality: medium
+      summary: List Organization Users
+      description: 'Page through users in an organization.
+
+
+        **Required Scope:** `read-users`
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      - $ref: '#/components/parameters/pageNumberQueryParam'
+      - $ref: '#/components/parameters/pageSizeQueryParam'
+      responses:
+        '200':
+          description: A page of users from an organization
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/organizationUser'
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+    post:
+      tags:
+      - Organizations
+      operationId: add-user-to-organization
+      x-criticality: medium
+      summary: Add User to Organization
+      description: "Add a user to the organization. \nThis endpoint directly adds the user to the organization and does not create an invitation.\n\n**Required Scope:** `write-users`\n"
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      - $ref: '#/components/parameters/contentTypeJsonHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - email
+              - role
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: Email address of the user to add
+                role:
+                  $ref: '#/components/schemas/userRole'
+                  description: Role to assign to the user in the organization
+              example:
+                email: newuser@example.com
+                role: member
+      responses:
+        '200':
+          description: User added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/organizationUser'
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrorUnauthorized'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+  /v1/org/{org_id}/users/{user_id}:
+    patch:
+      tags:
+      - Organizations
+      operationId: update-user-in-organization
+      x-criticality: medium
+      summary: Update User in Organization
+      description: 'Update a user''s metadata and/or role in the organization.
+
+
+        **Required Scope:** `write-users`
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      - $ref: '#/components/parameters/userIdPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Request body for updating a user in an organization
+              properties:
+                set_first_name:
+                  type: string
+                  maxLength: 250
+                  description: Update the user's first name
+                set_last_name:
+                  type: string
+                  maxLength: 250
+                  description: Update the user's last name
+                set_role:
+                  $ref: '#/components/schemas/userRole'
+                  description: Update the user's role in the organization
+              example:
+                set_first_name: John
+                set_last_name: Doe
+                set_role: admin
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/organizationUser'
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrorUnauthorized'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+    delete:
+      tags:
+      - Organizations
+      operationId: delete-user-from-organization
+      x-criticality: medium
+      summary: Delete User from Organization
+      description: 'Remove a user from the organization.
+
+
+        **Required Scope:** `write-users`
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      - $ref: '#/components/parameters/userIdPathParam'
+      responses:
+        '200':
+          description: User successfully deleted from organization
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Empty response object
+                example: {}
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrorUnauthorized'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+  /v1/org/{org_id}/invitations:
+    get:
+      tags:
+      - Organizations
+      operationId: list-pending-invites
+      x-criticality: medium
+      summary: List Pending Invites
+      description: 'Page through pending invites to an organization.
+
+
+        **Required Scope:** `read-invitations`
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      - $ref: '#/components/parameters/pageNumberQueryParam'
+      - $ref: '#/components/parameters/pageSizeQueryParam'
+      responses:
+        '200':
+          description: A page of pending invites from an organization
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  invites:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/invitation'
+                  total_invites:
+                    type: integer
+                    description: Total number of pending invites
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+    post:
+      tags:
+      - Organizations
+      operationId: invite-user-to-organization
+      x-criticality: medium
+      summary: Invite User to Organization
+      description: 'Invite a user to join the organization.
+
+
+        **Required Scope:** `write-invitations`
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      - $ref: '#/components/parameters/contentTypeJsonHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - invitee_email
+              - role
+              properties:
+                invitee_email:
+                  type: string
+                  format: email
+                  description: Email address of the user to invite
+                role:
+                  $ref: '#/components/schemas/userRole'
+                  description: Role to assign to the invited user
+      responses:
+        '200':
+          description: Invitation successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/invitation'
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrorUnauthorized'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+    delete:
+      tags:
+      - Organizations
+      operationId: delete-invitation
+      x-criticality: medium
+      summary: Delete Invitation
+      description: 'Revoke a pending invitation to the organization.
+
+
+        **Required Scope:** `write-invitations`
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      - $ref: '#/components/parameters/contentTypeJsonHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - invitee_email
+              properties:
+                invitee_email:
+                  type: string
+                  format: email
+                  description: Email address of the user whose invitation to revoke
+      responses:
+        '200':
+          description: Invitation successfully revoked
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {}
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '401':
+          $ref: '#/components/responses/ErrorUnauthorized'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+components:
+  schemas:
+    organizationName:
+      type: string
+      description: The name of the organization
+    errorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: The HTTP status code
+        description:
+          type: string
+          description: 'A description for the error.
+
+            For user errors, we attempt to be as descriptive as possible to help with diagnosing the issue.
+
+            For internal errors, the error description is only indicates that a retry should occur but we log the full error so that we can diagnose it.
+
+            Error descriptions can change over time and should not be programmed against.
+
+            '
+        name:
+          type: string
+          enum:
+          - Bad Request
+          - Unauthorized
+          - Not Found
+          - Too Many Requests
+          - Internal Server Error
+          description: '`name` is a short name for the error.
+
+            '
+    userRole:
+      type: string
+      enum:
+      - admin
+      - member
+      description: The role a user is assigned within an organization
+    invitation:
+      type: object
+      description: An invitation to join an organization
+      required:
+      - invitee_email
+      - role
+      - created_at
+      - expires_at
+      properties:
+        invitee_email:
+          type: string
+          format: email
+          description: Email address of the invited user
+        inviter_email:
+          type: string
+          format: email
+          description: Email address of the user who sent the invitation
+        created_at:
+          $ref: '#/components/schemas/utcTimestampInteger'
+          description: Timestamp when the invitation was created
+        expires_at:
+          $ref: '#/components/schemas/utcTimestampInteger'
+          description: Timestamp when the invitation expires
+        role:
+          $ref: '#/components/schemas/userRole'
+          description: Role that will be assigned to the invited user
+    address:
+      type: object
+      properties:
+        street_address:
+          type: string
+          description: The first line of a street address
+          maxLength: 250
+        street_address_line_two:
+          type: string
+          description: The optional second line of a street address
+          maxLength: 250
+        city:
+          type: string
+          description: A city that the address relates to
+          maxLength: 100
+        state:
+          type: string
+          description: A state that the address relates to
+          maxLength: 100
+        country:
+          type: number
+          description: A country code defined by [ISO-3166](https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes).
+    timezone:
+      type: string
+      description: A timezone string defined in the [IANA Time Zone](https://www.iana.org/time-zones) database.
+    organizationUser:
+      type: object
+      description: A user within an organization
+      properties:
+        user_id:
+          type: string
+          description: an id for the user
+        email:
+          type: string
+          format: email
+          description: the user's email address
+        email_confirmed:
+          type: boolean
+          description: whether the user's email has been confirmed
+        first_name:
+          type: string
+          description: the user's first name
+        last_name:
+          type: string
+          description: the user's last name
+        created_at:
+          $ref: '#/components/schemas/utcTimestampInteger'
+        last_active_at:
+          $ref: '#/components/schemas/utcTimestampInteger'
+        role:
+          $ref: '#/components/schemas/userRole'
+    organization:
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/organizationName'
+        org_id:
+          $ref: '#/components/schemas/orgId'
+        contact_info:
+          $ref: '#/components/schemas/contactInfo'
+        address:
+          $ref: '#/components/schemas/address'
+        timezone:
+          $ref: '#/components/schemas/timezone'
+        org_type:
+          $ref: '#/components/schemas/orgType'
+        production_org_id:
+          allOf:
+          - $ref: '#/components/schemas/orgId'
+          description: 'The org_id of the paired production organization. Only set when
+
+            org_type is sandbox and the sandbox is paired to a production org.
+
+            '
+    contactInfo:
+      type: object
+      properties:
+        phoneNumber:
+          type: string
+          description: A phone number matching the [E.164](https://en.wikipedia.org/wiki/E.164) specification
+        email:
+          type: string
+          description: An email address
+    orgType:
+      type: string
+      enum:
+      - sandbox
+      - production
+      description: Whether this organization is a sandbox or production organization
+    orgId:
+      type: string
+      format: uuid
+      description: The ID for an organization
+    utcTimestampInteger:
+      type: integer
+      format: int64
+      description: An UTC second-precision timestamp formatted as an integer
+  parameters:
+    pageNumberQueryParam:
+      name: page_number
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: The page number of items to return
+    userIdPathParam:
+      name: user_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The ID of the user
+    orgIdPathParam:
+      name: org_id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/orgId'
+      description: Your organization ID
+    pageSizeQueryParam:
+      name: page_size
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 5
+        maximum: 100
+        default: 10
+      description: The maximum number of items to return in a single request
+    contentTypeJsonHeader:
+      name: Content-Type
+      in: header
+      schema:
+        type: string
+      description: An indication that the payload is JSON
+      example: application/json
+  responses:
+    ErrorUnauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 401
+            description: Authentication is required and has failed or has not been provided.
+            name: Unauthorized
+    ErrorInternalServer:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 500
+            description: An unknown error has occurred.
+            name: Unknown
+    ErrorBadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 400
+            description: The request could not be understood by the server due to malformed syntax.
+            name: Bad Request
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

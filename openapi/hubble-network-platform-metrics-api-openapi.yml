@@ -1,0 +1,350 @@
+openapi: 3.2.0
+info:
+  title: Hubble Platform Platform Metrics API
+  description: "The Hubble platform is built API-first. Use our Cloud API to manage your devices\nand access device data programmatically. \nWe've designed our API following RESTful principles. \nEach endpoint returns standard HTTP status codes and may include JSON payloads.\n\n---\n\n## API Access\nUse API Keys to authenticate with the Hubble Cloud API for your organization. \n\n### Generate an API Key\nLog in to your Hubble dashboard. Navigate to **Developer Tools > API Tokens** to create a new API Key. \nProvide a name for the token, and set an appropriate expiration date for temporary access.\n\n### Organization ID\nYou will need `org_id` to make API requests. From your Hubble dashboard, navigate to \n**Developer Tooks > API Tokens**, or **Organization Settings**, to find your Organization ID. \n\n### Authorization Scopes\nAPI endpoints require specific authorization scopes to perform the intended operation. \n**Required Scope** is always provided in the API documentation.\n\nAPI Keys can be created with specific authorization scopes that control what operations the key can perform. \nIf no scopes are specified, the key will be created with all available scopes (admin-level access).\n\n| **Scope**                   | **Access**                                     |\n|------------------------------|-------------------------------------------------|\n| **read-api-keys**            | View API keys and their metadata               |\n| **write-api-keys**           | Create, update, and delete API keys            |\n| **read-users**               | View user information and roles                |\n| **write-users**              | Add, update, and remove users from the organization |\n| **read-organization-metadata** | View organization details and settings       |\n| **write-organization-metadata** | Update organization information            |\n| **read-devices**             | View device information and status             |\n| **write-devices**            | Register and manage devices                    |\n| **read-invitations**         | View pending invitations                       |\n| **write-invitations**        | Create and revoke user invitations             |\n| **read-packets**             | Access packet data and retrieval endpoints     |\n| **read-platform-metrics**    | View platform metrics and analytics            |\n| **read-billing-usage**       | View billing usage information                 |\n| **read-billing-invoices**    | View billing invoices                          |\n| **read-webhooks**            | View webhook configurations                    |\n| **write-webhooks**           | Create and manage webhook endpoints            |\n    \n**Example Scope Combinations**\n- Create a key with read-only access: `[\"read-api-keys\", \"read-users\", \"read-devices\"]`\n- Create a key for device management: `[\"read-devices\", \"write-devices\"]`\n- Create a key for user management: `[\"read-users\", \"write-users\", \"read-invitations\", \"write-invitations\"]`\n    \n**Best Practices for Data Security**\n- Create keys with the minimum required scopes for your use case\n- Regularly review and rotate API keys\n- Use descriptive names for your keys to track their purpose\n- Set appropriate expiration dates for temporary access    \n\n---\n\n## Import API Definition\nYou can quickly import the Hubble Cloud API into your preferred developer environment (such as Postman or Insomnia) using our **public OpenAPI definition**.\nSimply download or import the YAML file directly:\n\n[https://hubble.com/docs/openapi.yaml](https://hubble.com/docs/openapi.yaml)\n\n---\n\n## Pagination\nWhen the number of objects requested exceeds the maximum page size for an endpoint, the API response will be paginated. \nThis means you will receive a subset of the total results, along with a `Continuation-Token` in the Response Header that can be used to fetch subsequent subsets.\n\nTo retrieve the next set of data, you must use the provided `Continuation-Token` in the Request Header of your next API call to the same endpoint. \nContinue using the provided token in each successive request until no `Continuation-Token` is returned, which indicates you have retrieved all available data.\n\n---\n\n## Rate Limits\nThe Hubble Cloud API follows a leaky bucket approach to rate limiting. Endpoints are rate limited to three (3) requests per second. \nYour organization is limited to a total of 15 requests per second. \nIf you exceed this limit, you will receive a 429 status code. \nWe recommend backoff retry logic to stay within the limit.\n\n---\n\n## Request Headers\nAll HTTP responses will include a `X-Request-ID` header that is logged internally and can be used for tracing/debugging a particular API request. \nAll HTTP requests can include a `X-Request-ID` header which will be logged and mapped to the responses' `X-Request-ID` header. \n\nShare Request Headers whenever troubleshooting an API issue with Hubble Support.\n\n---\n\n## Status Codes\nThe Hubble Cloud API returns the following HTTP status codes: `200`, `400`, `401`, `403`, `404`, `429` and `500`. \nUse the tailored message returned with each status code for insight in the specific context of the endpoint you are attempting to access.\n\n---\n\n## Versioning\nOur cloud backend follows a rolling release model. This means:\n- **Continuous Deployment**: New features, security updates, and performance improvements are automatically rolled out.\n- **Backward Compatibility**: Cloud updates are designed to be compatible with devices running firmware/SDK versions within our active or maintained support windows.\n- **Transparent Change Management**: Release notes and changelogs are published regularly so you can track enhancements and understand any adjustments that might affect integrations.\n- **Versioned Public API**: The Cloud API uses basic major versioning in the url paths (`/v1/...`, `/v2/...` etc.). Major backwards incompatible changes will be made by creating a version of the endpoint with a higher version and communicating with customers to migrate. The legacy `/api/...` and `/api/v2/...` paths remain fully supported as aliases for `/v1/...` and `/v2/...` respectively, so previous versions will be supported for a minimum of 1 year.\n\n---\n"
+  version: 1.0.0
+servers:
+- url: https://api.hubble.com
+  description: Production
+security:
+- BearerAuth: []
+tags:
+- name: Platform Metrics
+paths:
+  /v1/org/{org_id}/api_metrics:
+    get:
+      tags:
+      - Platform Metrics
+      operationId: get-api-metrics
+      x-criticality: medium
+      summary: Get Organization API Metrics
+      description: 'Retrieves API request metrics including total requests, success rate, and time interval-based breakdowns.
+
+
+        **Required Scope:** `read-platform-metrics`
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      - $ref: '#/components/parameters/metricsDaysBackQueryParam'
+      - $ref: '#/components/parameters/metricsTimeIntervalQueryParam'
+      responses:
+        '200':
+          description: Successfully retrieved API metrics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_requests:
+                    type: integer
+                    description: Total number of API requests in the time period
+                  success_rate:
+                    $ref: '#/components/schemas/metricsSuccessRate'
+                  buckets:
+                    type: array
+                    description: Hourly breakdown of metrics
+                    items:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: string
+                          format: date-time
+                          description: Start of the hour in ISO 8601 format
+                        total_requests:
+                          type: integer
+                          description: Number of requests in this hour
+                        success_rate:
+                          $ref: '#/components/schemas/metricsSuccessRate'
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+  /v1/org/{org_id}/packet_metrics:
+    get:
+      tags:
+      - Platform Metrics
+      operationId: get-packet-metrics
+      x-criticality: medium
+      summary: Get Organization Packet Metrics
+      description: 'Retrieves packet metrics across a time range providing totals and time interval-based breakdowns.
+
+
+        **Required Scope:** `read-platform-metrics`
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      - $ref: '#/components/parameters/metricsDaysBackQueryParam'
+      - $ref: '#/components/parameters/metricsTimeIntervalQueryParam'
+      - $ref: '#/components/parameters/filterTagsQueryParam'
+      responses:
+        '200':
+          description: Successfully retrieved packet metrics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_packets:
+                    type: integer
+                    description: Total number of packets in the time period
+                  buckets:
+                    type: array
+                    description: A breakdown of packet metrics per time_interval
+                    items:
+                      type: object
+                      properties:
+                        timestamp:
+                          $ref: '#/components/schemas/formattedTimestamp'
+                        total_packets:
+                          type: integer
+                          description: Number of packets in this time_interval
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+  /v1/org/{org_id}/webhook_metrics:
+    get:
+      tags:
+      - Platform Metrics
+      operationId: get-webhook-metrics
+      x-criticality: medium
+      summary: Get Organization Webhook Metrics
+      description: 'Retrieves webhook metrics including total requests, success rate, and time interval-based breakdowns for webhook events.
+
+
+        **Required Scope:** `read-platform-metrics`
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      - $ref: '#/components/parameters/metricsDaysBackQueryParam'
+      - $ref: '#/components/parameters/metricsTimeIntervalQueryParam'
+      responses:
+        '200':
+          description: Successfully retrieved webhook metrics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_requests:
+                    type: integer
+                    description: Total number of webhook requests in the time period
+                  success_rate:
+                    $ref: '#/components/schemas/metricsSuccessRate'
+                  buckets:
+                    type: array
+                    description: Hourly breakdown of webhook metrics
+                    items:
+                      type: object
+                      properties:
+                        timestamp:
+                          $ref: '#/components/schemas/formattedTimestamp'
+                        total_requests:
+                          type: integer
+                          description: Number of webhook requests in this hour
+                        success_rate:
+                          $ref: '#/components/schemas/metricsSuccessRate'
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+  /v1/org/{org_id}/device_metrics:
+    get:
+      tags:
+      - Platform Metrics
+      operationId: get-device-metrics
+      x-criticality: medium
+      summary: Get Organization Device Metrics
+      description: "Retrieves metrics for active, never active, and total registered devices over time.\n\n### Most Recent/Partial Bucket \nThe most recent bucket, the partial bucket, is not calculated on this endpoint except for when using the hourly time interval.\nFor parsing/syntax consistency, this bucket is still returned with a timestamp and empty values for the active, registered, and never active devices values.\n\n**Required Scope:** `read-platform-metrics`\n"
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      - $ref: '#/components/parameters/metricsDaysBackQueryParam'
+      - $ref: '#/components/parameters/metricsTimeIntervalQueryParam'
+      - $ref: '#/components/parameters/filterTagsQueryParam'
+      responses:
+        '200':
+          description: Successfully retrieved device metrics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  buckets:
+                    type: array
+                    description: Hourly breakdown of device metrics
+                    items:
+                      type: object
+                      properties:
+                        timestamp:
+                          $ref: '#/components/schemas/formattedTimestamp'
+                        registered_devices:
+                          type: integer
+                          description: 'The total number of registered devices at the end of this interval.
+
+                            '
+                        active_devices:
+                          type: number
+                          description: 'The number of active devices during this interval.
+
+                            Active devices are those that have successfully transmitted a packet.
+
+                            Because of the ingestion delays, recent windows metrics may still be accumulating new active devices.
+
+                            '
+                        never_active_devices:
+                          type: number
+                          description: 'The number of never active devices during this interval.
+
+                            Never active devices are devices registered to your organization awaiting first transmission.
+
+                            '
+                  total_active_devices:
+                    type: number
+                    description: 'The total number of active devices across the queried time range.
+
+                      Active devices are those that have successfully transmitted a packet.
+
+                      '
+                  total_registered_devices:
+                    type: number
+                    description: 'The total number of devices registered for the organization.
+
+                      '
+                  total_never_active_devices:
+                    type: number
+                    description: 'The total number of never active devices across the queried time range.
+
+                      Never active devices are devices registered to your organization awaiting first transmission.
+
+                      '
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+components:
+  parameters:
+    orgIdPathParam:
+      name: org_id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/orgId'
+      description: Your organization ID
+    filterTagsQueryParam:
+      name: filter_tags
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          description: 'A tag to match against. For example: _env:production.
+
+            '
+      description: 'A set of device **platform tags** specifying which packets to include.
+
+        Only platform tags are queryable: `_env:production`, `_env:sandbox`.
+
+        The query param can be used multiple times to form a list of tags.
+
+        Packet matching criteria uses AND logic when different tag keys are used in a list of tags, and OR logic when the same tag key is used more than once.
+
+        '
+    metricsDaysBackQueryParam:
+      name: days
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 365
+        default: 1
+      description: 'The number of days of metrics to include in the request.
+
+
+        The maximum value is further restricted when small `time_interval` values are used.
+
+        The maximum number of total metric buckets is 365.
+
+        '
+    metricsTimeIntervalQueryParam:
+      name: time_interval
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+        - hour
+        - day
+        - month
+      description: "The time interval for the metric buckets.\nIf not provided, a default value is selected based on the `days` parameter:\n\n| days        | time_interval |\n| ----------- | ------------- |\n| [1 => 1)    | hour          |\n| [2 => 31]   | day           |\n| [32 => 365] | month         |\n\n**Partial buckets:** The most recent bucket of metrics is a \"partial\" bucket depending on the interval - partial because it doesn't span a full time_interval yet. \n(e.g. 10:00pm -> 10:36pm for `hour`, June 3rd 12:00am -> June 3rd 10:36pm for `day`, June 1st 12:00am -> June 3rd 10:36pm for `month`).\nThe older buckets are always \"complete\" buckets.\n(e.g. 09:00pm -> 10:00pm for `hour`, June 2nd 12:00am -> June 3rd 12:00am for `day`, May 1st 12:00am -> June 1st 12:00am for `month`).\n\n**Edge cases:** If `days` is not large enough to include a full `month` bucket, days is increased in the backend. \nFor example, querying days=90 with a `month` time_interval on June 13th, 2025 will return \"complete\" March, April, and May buckets and a \"partial\" June bucket.\nSimilarly, when querying for days=7 with a `day` time_interval on June 13th, 2025 at 6:00am will return \"complete\" June 6th, 7th, 8th, 9th, 10th, 11th, and 12th buckets and a \"partial\" June 13th bucket.\n"
+  schemas:
+    errorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: The HTTP status code
+        description:
+          type: string
+          description: 'A description for the error.
+
+            For user errors, we attempt to be as descriptive as possible to help with diagnosing the issue.
+
+            For internal errors, the error description is only indicates that a retry should occur but we log the full error so that we can diagnose it.
+
+            Error descriptions can change over time and should not be programmed against.
+
+            '
+        name:
+          type: string
+          enum:
+          - Bad Request
+          - Unauthorized
+          - Not Found
+          - Too Many Requests
+          - Internal Server Error
+          description: '`name` is a short name for the error.
+
+            '
+    metricsSuccessRate:
+      type: number
+      format: float
+      description: "Success rate of requests (0-1). \nWhen total requests is 0, the success rate defaults to 1.0 or 100%.\n"
+    orgId:
+      type: string
+      format: uuid
+      description: The ID for an organization
+    formattedTimestamp:
+      type: string
+      format: date-time
+      description: "Start of the bucket in ISO 8601 format.\nFor example: `2025-04-25T14:01:54Z`. \n"
+  responses:
+    ErrorBadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 400
+            description: The request could not be understood by the server due to malformed syntax.
+            name: Bad Request
+    ErrorInternalServer:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 500
+            description: An unknown error has occurred.
+            name: Unknown
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

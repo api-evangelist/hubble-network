@@ -1,0 +1,142 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Hubble Platform Packet Webhooks API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Packet Webhooks",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Registered Webhooks",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.hubble.com/v1/org/:org_id/webhooks",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              }
+            ]
+          },
+          "docs": "Retrieve a list of registered webhooks.\n\n**Required Scope:** `read-webhooks`\n"
+        },
+        {
+          "info": {
+            "name": "Create a Webhook Endpoint",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.hubble.com/v1/org/:org_id/webhooks",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Register an endpoint that can receive webhook events for packet data.\n\n**Required Scope:** `write-webhooks`\n"
+        },
+        {
+          "info": {
+            "name": "Update a Webhook Endpoint",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api.hubble.com/v1/org/:org_id/webhooks/:webhook_id",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              },
+              {
+                "name": "webhook_id",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Update certain fields of a webhook endpoint.\n\n**Required Scope:** `write-webhooks`\n"
+        },
+        {
+          "info": {
+            "name": "Delete a Webhook Endpoint",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.hubble.com/v1/org/:org_id/webhooks/:webhook_id",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              },
+              {
+                "name": "webhook_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Delete a webhook endpoint.\n\n**Required Scope:** `write-webhooks`\nDelete a webhook endpoint so that it will stop receiving traffic.\n"
+        },
+        {
+          "info": {
+            "name": "Send a Test Webhook",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.hubble.com/v1/org/:org_id/webhooks/:webhook_id/test",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              },
+              {
+                "name": "webhook_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Send an example packet batch to the configured webhook URL to test webhook delivery\n(connectivity, authentication, and response handling). Uses the same request shape as\nlive delivery (JSON packet batch plus `HTTP-X-HUBBLE-TOKEN` when a secret is configured).\nThe example packet is ephemeral and is not persisted after one attempt.\n\n**Required Scope:** `write-webhooks`\n"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

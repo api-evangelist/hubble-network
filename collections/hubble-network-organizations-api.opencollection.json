@@ -1,0 +1,269 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Hubble Platform Organizations API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Organizations",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Retrieve Organization Metadata",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.hubble.com/v1/org/:org_id",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              }
+            ]
+          },
+          "docs": "Retrieve metadata for an organization.\n\n**Required Scope:** `read-organization-metadata`\n"
+        },
+        {
+          "info": {
+            "name": "Update Organization Metadata",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api.hubble.com/v1/org/:org_id",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Update metadata for an organization.\n\n**Required Scope:** `write-organization-metadata`\n"
+        },
+        {
+          "info": {
+            "name": "List Organization Users",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.hubble.com/v1/org/:org_id/users",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              },
+              {
+                "name": "page_number",
+                "value": "",
+                "type": "query",
+                "description": "The page number of items to return"
+              },
+              {
+                "name": "page_size",
+                "value": "",
+                "type": "query",
+                "description": "The maximum number of items to return in a single request"
+              }
+            ]
+          },
+          "docs": "Page through users in an organization.\n\n**Required Scope:** `read-users`\n"
+        },
+        {
+          "info": {
+            "name": "Add User to Organization",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.hubble.com/v1/org/:org_id/users",
+            "headers": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Add a user to the organization. \nThis endpoint directly adds the user to the organization and does not create an invitation.\n\n**Required Scope:** `write-users`\n"
+        },
+        {
+          "info": {
+            "name": "Update User in Organization",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api.hubble.com/v1/org/:org_id/users/:user_id",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              },
+              {
+                "name": "user_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the user"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Update a user's metadata and/or role in the organization.\n\n**Required Scope:** `write-users`\n"
+        },
+        {
+          "info": {
+            "name": "Delete User from Organization",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.hubble.com/v1/org/:org_id/users/:user_id",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              },
+              {
+                "name": "user_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the user"
+              }
+            ]
+          },
+          "docs": "Remove a user from the organization.\n\n**Required Scope:** `write-users`\n"
+        },
+        {
+          "info": {
+            "name": "List Pending Invites",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.hubble.com/v1/org/:org_id/invitations",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              },
+              {
+                "name": "page_number",
+                "value": "",
+                "type": "query",
+                "description": "The page number of items to return"
+              },
+              {
+                "name": "page_size",
+                "value": "",
+                "type": "query",
+                "description": "The maximum number of items to return in a single request"
+              }
+            ]
+          },
+          "docs": "Page through pending invites to an organization.\n\n**Required Scope:** `read-invitations`\n"
+        },
+        {
+          "info": {
+            "name": "Invite User to Organization",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.hubble.com/v1/org/:org_id/invitations",
+            "headers": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Invite a user to join the organization.\n\n**Required Scope:** `write-invitations`\n"
+        },
+        {
+          "info": {
+            "name": "Delete Invitation",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.hubble.com/v1/org/:org_id/invitations",
+            "headers": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Revoke a pending invitation to the organization.\n\n**Required Scope:** `write-invitations`\n"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

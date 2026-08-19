@@ -1,0 +1,162 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Hubble Platform Billing API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Billing",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get Recent Invoices",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.hubble.com/v1/org/:org_id/billing/invoices",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              }
+            ]
+          },
+          "docs": "Retrieve the most recent invoices for your organization.\n\n**Required Scope:** `read-billing-invoices`\n"
+        },
+        {
+          "info": {
+            "name": "Get Invoice PDF",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.hubble.com/v1/org/:org_id/billing/invoices/:invoice_id/pdf",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              },
+              {
+                "name": "invoice_id",
+                "value": "",
+                "type": "path",
+                "description": "The primary key for an invoice"
+              }
+            ]
+          },
+          "docs": "Retrieve an invoice PDF.\n\n**Required Scope:** `read-billing-invoices`\n"
+        },
+        {
+          "info": {
+            "name": "Get Billing Usage",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.hubble.com/v1/org/:org_id/billing/usage",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              }
+            ]
+          },
+          "docs": "Retrieve the most recent billing usage for your organization.\n\n**Required Scope:** `read-billing-usage`\n"
+        },
+        {
+          "info": {
+            "name": "List active devices for the current billing period",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.hubble.com/v1/org/:org_id/billing/active-devices",
+            "headers": [
+              {
+                "name": "Continuation-Token",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "A limit for the page size of devices"
+              },
+              {
+                "name": "network_type",
+                "value": "",
+                "type": "query",
+                "description": "Filter devices by network type. Omit to include all network types.\nRequesting `satellite` requires the organization to have satellite access.\n"
+              }
+            ]
+          },
+          "docs": "Returns the paginated list of devices that were active during the organization's\ncurrent Stripe billing period. A device is considered active if its most recent\npacket timestamp falls within the period.\n\nUse the `Continuation-Token` header for cursor-based pagination (same pattern as\n`GET /v1/org/{org_id}/devices`).\n\n**Required Scope:** `read-billing-usage`\n"
+        },
+        {
+          "info": {
+            "name": "Get current subscription / plan",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.hubble.com/v1/org/:org_id/billing/subscription",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              }
+            ]
+          },
+          "docs": "Returns the organization's current self-serve subscription snapshot from Stripe (plan tier, status, billing period fields).\n\nTimestamps are **Hubble unix-microsecond** integers (not Stripe's second-precision Unix times).\n\n**Required Scope:** `read-billing-invoices`\n"
+        },
+        {
+          "info": {
+            "name": "List saved card payment methods",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.hubble.com/v1/org/:org_id/billing/payment-method",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              }
+            ]
+          },
+          "docs": "Returns every **card** payment method attached to the org's Stripe customer (self-serve; no manual Dashboard \"invoice default\" required).\n\n`default_payment_method_id` is the Stripe Customer's **invoice** default (`pm_...`) when set; it may be empty even when `payment_methods` is non-empty.\n\n**Required Scope:** `read-billing-invoices`\n"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

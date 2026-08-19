@@ -1,0 +1,35 @@
+{
+  "provider": "hubble-network",
+  "sources": [
+    "hubble-network-api-keys-api-openapi.yml",
+    "hubble-network-billing-api-openapi.yml",
+    "hubble-network-devices-api-openapi.yml",
+    "hubble-network-organizations-api-openapi.yml",
+    "hubble-network-packet-webhooks-api-openapi.yml",
+    "hubble-network-packets-api-openapi.yml",
+    "hubble-network-platform-metrics-api-openapi.yml"
+  ],
+  "outputs": [
+    "hubble-network-api-keys-api-openapi.yml",
+    "hubble-network-billing-api-openapi.yml",
+    "hubble-network-devices-api-openapi.yml",
+    "hubble-network-organizations-api-openapi.yml",
+    "hubble-network-packet-webhooks-api-openapi.yml",
+    "hubble-network-packets-api-openapi.yml",
+    "hubble-network-platform-metrics-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "hubble-network-api-keys-api-openapi.yml: upgraded openapi 3.0.3 -> OpenAPI 3.2.0",
+    "hubble-network-billing-api-openapi.yml: upgraded openapi 3.0.3 -> OpenAPI 3.2.0",
+    "hubble-network-devices-api-openapi.yml: upgraded openapi 3.0.3 -> OpenAPI 3.2.0",
+    "hubble-network-organizations-api-openapi.yml: upgraded openapi 3.0.3 -> OpenAPI 3.2.0",
+    "hubble-network-packet-webhooks-api-openapi.yml: upgraded openapi 3.0.3 -> OpenAPI 3.2.0",
+    "hubble-network-packets-api-openapi.yml: upgraded openapi 3.0.3 -> OpenAPI 3.2.0",
+    "hubble-network-platform-metrics-api-openapi.yml: upgraded openapi 3.0.3 -> OpenAPI 3.2.0",
+    "apis.yml register: already-registered"
+  ],
+  "skipped": []
+}

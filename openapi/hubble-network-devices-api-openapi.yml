@@ -1,0 +1,891 @@
+openapi: 3.2.0
+info:
+  title: Hubble Platform Devices API
+  description: "The Hubble platform is built API-first. Use our Cloud API to manage your devices\nand access device data programmatically. \nWe've designed our API following RESTful principles. \nEach endpoint returns standard HTTP status codes and may include JSON payloads.\n\n---\n\n## API Access\nUse API Keys to authenticate with the Hubble Cloud API for your organization. \n\n### Generate an API Key\nLog in to your Hubble dashboard. Navigate to **Developer Tools > API Tokens** to create a new API Key. \nProvide a name for the token, and set an appropriate expiration date for temporary access.\n\n### Organization ID\nYou will need `org_id` to make API requests. From your Hubble dashboard, navigate to \n**Developer Tooks > API Tokens**, or **Organization Settings**, to find your Organization ID. \n\n### Authorization Scopes\nAPI endpoints require specific authorization scopes to perform the intended operation. \n**Required Scope** is always provided in the API documentation.\n\nAPI Keys can be created with specific authorization scopes that control what operations the key can perform. \nIf no scopes are specified, the key will be created with all available scopes (admin-level access).\n\n| **Scope**                   | **Access**                                     |\n|------------------------------|-------------------------------------------------|\n| **read-api-keys**            | View API keys and their metadata               |\n| **write-api-keys**           | Create, update, and delete API keys            |\n| **read-users**               | View user information and roles                |\n| **write-users**              | Add, update, and remove users from the organization |\n| **read-organization-metadata** | View organization details and settings       |\n| **write-organization-metadata** | Update organization information            |\n| **read-devices**             | View device information and status             |\n| **write-devices**            | Register and manage devices                    |\n| **read-invitations**         | View pending invitations                       |\n| **write-invitations**        | Create and revoke user invitations             |\n| **read-packets**             | Access packet data and retrieval endpoints     |\n| **read-platform-metrics**    | View platform metrics and analytics            |\n| **read-billing-usage**       | View billing usage information                 |\n| **read-billing-invoices**    | View billing invoices                          |\n| **read-webhooks**            | View webhook configurations                    |\n| **write-webhooks**           | Create and manage webhook endpoints            |\n    \n**Example Scope Combinations**\n- Create a key with read-only access: `[\"read-api-keys\", \"read-users\", \"read-devices\"]`\n- Create a key for device management: `[\"read-devices\", \"write-devices\"]`\n- Create a key for user management: `[\"read-users\", \"write-users\", \"read-invitations\", \"write-invitations\"]`\n    \n**Best Practices for Data Security**\n- Create keys with the minimum required scopes for your use case\n- Regularly review and rotate API keys\n- Use descriptive names for your keys to track their purpose\n- Set appropriate expiration dates for temporary access    \n\n---\n\n## Import API Definition\nYou can quickly import the Hubble Cloud API into your preferred developer environment (such as Postman or Insomnia) using our **public OpenAPI definition**.\nSimply download or import the YAML file directly:\n\n[https://hubble.com/docs/openapi.yaml](https://hubble.com/docs/openapi.yaml)\n\n---\n\n## Pagination\nWhen the number of objects requested exceeds the maximum page size for an endpoint, the API response will be paginated. \nThis means you will receive a subset of the total results, along with a `Continuation-Token` in the Response Header that can be used to fetch subsequent subsets.\n\nTo retrieve the next set of data, you must use the provided `Continuation-Token` in the Request Header of your next API call to the same endpoint. \nContinue using the provided token in each successive request until no `Continuation-Token` is returned, which indicates you have retrieved all available data.\n\n---\n\n## Rate Limits\nThe Hubble Cloud API follows a leaky bucket approach to rate limiting. Endpoints are rate limited to three (3) requests per second. \nYour organization is limited to a total of 15 requests per second. \nIf you exceed this limit, you will receive a 429 status code. \nWe recommend backoff retry logic to stay within the limit.\n\n---\n\n## Request Headers\nAll HTTP responses will include a `X-Request-ID` header that is logged internally and can be used for tracing/debugging a particular API request. \nAll HTTP requests can include a `X-Request-ID` header which will be logged and mapped to the responses' `X-Request-ID` header. \n\nShare Request Headers whenever troubleshooting an API issue with Hubble Support.\n\n---\n\n## Status Codes\nThe Hubble Cloud API returns the following HTTP status codes: `200`, `400`, `401`, `403`, `404`, `429` and `500`. \nUse the tailored message returned with each status code for insight in the specific context of the endpoint you are attempting to access.\n\n---\n\n## Versioning\nOur cloud backend follows a rolling release model. This means:\n- **Continuous Deployment**: New features, security updates, and performance improvements are automatically rolled out.\n- **Backward Compatibility**: Cloud updates are designed to be compatible with devices running firmware/SDK versions within our active or maintained support windows.\n- **Transparent Change Management**: Release notes and changelogs are published regularly so you can track enhancements and understand any adjustments that might affect integrations.\n- **Versioned Public API**: The Cloud API uses basic major versioning in the url paths (`/v1/...`, `/v2/...` etc.). Major backwards incompatible changes will be made by creating a version of the endpoint with a higher version and communicating with customers to migrate. The legacy `/api/...` and `/api/v2/...` paths remain fully supported as aliases for `/v1/...` and `/v2/...` respectively, so previous versions will be supported for a minimum of 1 year.\n\n---\n"
+  version: 1.0.0
+servers:
+- url: https://api.hubble.com
+  description: Production
+security:
+- BearerAuth: []
+tags:
+- name: Devices
+paths:
+  /v2/org/{org_id}/devices:
+    post:
+      tags:
+      - Devices
+      operationId: register-new-devices
+      x-criticality: high
+      summary: Register New Devices
+      description: "Register one or more devices to your organization.\n\n**Required Scope:** `write-devices`\n\n## Overview\nThis endpoint supports bulk device registration with specified encryption mode, and custom naming and tagging.\n\n## Device Encryption Modes\n\n### Set Key Length\nSet encryption key length to match your device firmware's encryption library requirement:\n* **256-bit key** (32 bytes): set `encryption` to \"AES-256-CTR\"\n* **128-bit key** (16 bytes): set `encryption` to \"AES-128-CTR\"\n* **128-bit key, IN100 protocol** (16 bytes): set `encryption` to \"AES-128-EAX\"\n\n### Set Counter Source for EID Rotation\nThe Hubble Device SDK rotates through ephemeral IDs (EID) so that devices are anonymous on the network.\nSpecify the `counter_source` based on your hardware capabilities:      \n* Use \"UNIX_TIME\" for **time-based encryption**, e.g. for devices with a real time clock (RTC). **This is the default value.**\n* Use \"DEVICE_UPTIME\" for **timeless encryption**, e.g. using the device uptime counter to rotate EIDs.\n\n### Set EID Rotation Period (AES-128-EAX only)\nFor the IN100 protocol (`encryption` of \"AES-128-EAX\"), you may optionally override the EID rotation period with `eid_rotation.period_exponent`: the base-2 exponent of the rotation period in seconds (matches the IN100 configuration field). \nMust be between 10 and 15 inclusive. \nThe period defaults to `period_exponent: 15`, corresponding to 32,768 seconds (~9 hours).\n\n## Device Metadata\nYou can optionally provide `names` and `tags` for each device being provisioned:\n* `names`: An array of device names.\n* `tags`: An array of device tags.\n\n## Device Key\nBy default `device.key` is returned encoded in standard Base64 format, and is automatically compatible with the Hubble Device SDK. \nPass `key_format=hex` to receive device.key as a lowercase hexadecimal string instead.\n"
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      - $ref: '#/components/parameters/deviceKeyFormatQueryParam'
+      - $ref: '#/components/parameters/contentTypeJsonHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - encryption
+              properties:
+                n_devices:
+                  type: integer
+                  minimum: 1
+                  maximum: 1000
+                  default: 1
+                  description: Number of devices to provision
+                encryption:
+                  $ref: '#/components/schemas/deviceEncryption'
+                names:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/deviceName'
+                  description: "Optional array of device names. \nIf provided, the length must match the number of devices being provisioned.\n"
+                tags:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/deviceTags'
+                  description: "Optional array of tag maps for each device. \nIf provided, the length must match the number of devices being provisioned.\n"
+                eid_rotation:
+                  $ref: '#/components/schemas/eidRotation'
+                  description: 'Ephemeral ID (EID) rotation configuration for provisioned devices.
+
+                    `counter_source` default is "UNIX_TIME".
+
+                    '
+                install_locations:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/installLocation'
+                  description: 'Optional array of install locations for each provisioned device.
+
+                    If provided, the length must match the number of devices being provisioned.
+
+                    '
+              example:
+                n_devices: 1
+                encryption: AES-256-CTR
+                names:
+                - my-device
+            examples:
+              encryptedProtocolUnixTime:
+                summary: AES-CTR + UNIX_TIME eid_rotation
+                description: 'Default-style encrypted device. Omit `eid_rotation` or set only `counter_source` to `UNIX_TIME`.
+
+                  '
+                value:
+                  n_devices: 1
+                  encryption: AES-256-CTR
+                  names:
+                  - sensor-001
+              encryptedProtocolDeviceUptime:
+                summary: AES-CTR + DEVICE_UPTIME eid_rotation
+                description: 'Configure a device to leverage its uptime as the EID rotation counter source used for encryption.
+
+                  '
+                value:
+                  n_devices: 1
+                  encryption: AES-128-CTR
+                  names:
+                  - uptime-sensor
+                  eid_rotation:
+                    counter_source: DEVICE_UPTIME
+              encryptedProtocolIN100:
+                summary: AES-128-EAX (IN100 protocol) with DEVICE_UPTIME
+                description: 'Provision a device using the IN100 protocol (AES-EAX authenticated encryption).
+
+                  '
+                value:
+                  n_devices: 1
+                  encryption: AES-128-EAX
+                  names:
+                  - in100-sensor
+                  eid_rotation:
+                    counter_source: DEVICE_UPTIME
+                    period_exponent: 15
+      responses:
+        '200':
+          description: Devices provisioned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  devices:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        device_id:
+                          $ref: '#/components/schemas/deviceId'
+                        name:
+                          $ref: '#/components/schemas/deviceName'
+                        created_ts:
+                          type: integer
+                          format: int64
+                          description: Unix timestamp (in seconds) when the device was created
+                        tags:
+                          $ref: '#/components/schemas/deviceTags'
+                        protocol:
+                          type: object
+                          description: Protocol configuration for the device
+                          properties:
+                            terrestrial:
+                              type: object
+                              properties:
+                                version:
+                                  type: integer
+                                  format: uint8
+                                  description: Protocol version number
+                        eid_rotation:
+                          $ref: '#/components/schemas/eidRotation'
+                          description: EID rotation configuration for the device
+                        network_id:
+                          type: integer
+                          description: Network ID for the device, if applicable
+                        key:
+                          type: string
+                          description: 'Encryption key for the device, when applicable.
+
+                            Default Base64-encoded bytes (when key_format omitted or key_format=base64).
+
+                            With key_format=hex: lowercase hexadecimal string.
+
+                            '
+                        install_location:
+                          $ref: '#/components/schemas/installLocation'
+              examples:
+                encryptedProtocolUnixTime:
+                  summary: Matches AES-CTR + UNIX_TIME eid_rotation
+                  value:
+                    devices:
+                    - device_id: 6ea53e36-b7fb-429f-8c2e-d536cab71089
+                      name: sensor-001
+                      created_ts: 1734567890
+                      tags:
+                        _env: production
+                      protocol:
+                        terrestrial:
+                          version: 0
+                      eid_rotation:
+                        counter_source: UNIX_TIME
+                      key: YWJjZGVmZw==
+                encryptedProtocolDeviceUptime:
+                  summary: Matches AES-CTR + DEVICE_UPTIME eid_rotation
+                  value:
+                    devices:
+                    - device_id: 7fb53e36-b7fb-429f-8c2e-d536cab71090
+                      name: uptime-sensor
+                      created_ts: 1734567891
+                      tags:
+                        _env: production
+                      protocol:
+                        terrestrial:
+                          version: 0
+                      eid_rotation:
+                        counter_source: DEVICE_UPTIME
+                      key: YWJjZGVmZw==
+                encryptedProtocolIN100:
+                  summary: Matches AES-128-EAX (IN100 protocol) with DEVICE_UPTIME
+                  value:
+                    devices:
+                    - device_id: 8ab53e36-b7fb-429f-8c2e-d536cab71091
+                      name: in100-sensor
+                      created_ts: 1734567892
+                      tags:
+                        _env: production
+                      protocol:
+                        terrestrial:
+                          version: 2
+                      eid_rotation:
+                        counter_source: DEVICE_UPTIME
+                        period_exponent: 15
+                      key: YWJjZGVmZw==
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+  /v1/org/{org_id}/devices:
+    get:
+      tags:
+      - Devices
+      operationId: list-devices
+      x-criticality: high
+      summary: List Devices
+      description: "Returns all devices for your organization.\n\n**Required Scope:** `read-devices`\n\n## Overview\nUse this endpoint to manage your device inventory and map Hubble-registered devices to your system. \n(To consume a stream of incoming data, use the **Retrieve Organization Packets** endpoint.)\n\n## Query Parameters\n\n### Timestamp Filters\nUse timestamp filters to trim down the search results.\n* For simpliticy, we support the `between:{after_timestamp}:{before_timestamp}` operator.\n* The `after_timestamp` value is inclusive and the `before_timestamp` value is exclusive.\n\n### Recent Packet\nEach device may return a `most_recent_packet` object. This is a sample packet that is periodically refreshed.\n* **Latency:** provided data is not updated in real-time or atomically with packet data.\n* **Availability:** registered devices that have never sent a packet will have an empty `most_recent_packet` field.\n\n:::warning\n**This endpoint should not be used to request packet data.** See \"Retrieve Organization Packets\". \n:::\n\nWhen sorting by `most_recent_packet`,\n- Devices that have never sent a packet are included in results and sort to the beginning (ascending) or end (descending) of the page.\n- If `sort_ascending` is true, the pagination may return duplicate values since a device with a new `most_recent_packet` could be returned in subsequent pages.\n- If `sort_ascending` is false, the pagination may skip devices that receive new `most_recent_packet` data during the pagination.\n\n## Example Queries\n- **Unused devices:** `filter_most_recent_packet_ts=between:0:1`\n- **Recently Active Devices:** `filter_most_recent_packet_ts=between:{timestamp_one_day_ago}:{timestamp_now}`\n- **Inactive Devices:** `filter_most_recent_packet_ts=between:1:{timestamp_one_week_ago}`\n- **Recently Registered Devices:** `filter_created_ts=between:{timestamp_one_day_ago}:{timestamp_now}`\n"
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      - $ref: '#/components/parameters/limitQueryParam'
+      - $ref: '#/components/parameters/filterTagsQueryParam'
+      - $ref: '#/components/parameters/filterCreatedTSQueryParam'
+      - $ref: '#/components/parameters/filterMostRecentPacketTSQueryParam'
+      - $ref: '#/components/parameters/sortFieldQueryParam'
+      - $ref: '#/components/parameters/sortAscendingQueryParam'
+      - $ref: '#/components/parameters/continuationTokenHeader'
+      responses:
+        '200':
+          description: Device Pages
+          headers:
+            Continuation-Token:
+              $ref: '#/components/headers/ContinuationTokenHeader'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  devices:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/organizationDevice'
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+    patch:
+      tags:
+      - Devices
+      operationId: batch-update-devices
+      x-criticality: high
+      summary: Batch Update Devices
+      description: 'Update multiple registered devices belonging to your organization in a single request.
+
+
+        **Required Scope:** `write-devices`
+
+
+        ## Overview
+
+        - A maximum of 1000 devices can be updated in a single request.
+
+        - Each update is idempotent. In the event of an internal error (i.e. `5xx`) some updates may be applied and others may not. Each update is idempotent and the whole request can be retried again to ensure a consistent update across the batch.
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - updates
+              properties:
+                updates:
+                  type: array
+                  description: Array of device update operations, up to 1000.
+                  items:
+                    type: object
+                    required:
+                    - device_id
+                    properties:
+                      device_id:
+                        $ref: '#/components/schemas/deviceId'
+                      set_name:
+                        $ref: '#/components/schemas/deviceName'
+                        description: Set the device name
+                      set_tags:
+                        $ref: '#/components/schemas/deviceTags'
+                        description: Set the device tags
+                      set_install_location:
+                        $ref: '#/components/schemas/installLocation'
+                      set_destination_org_id:
+                        type: string
+                        format: uuid
+                        description: 'Reassign this device to another organization. The destination
+
+                          must be this organization''s paired sandbox/production partner
+
+                          (created via the create-sandbox-org flow) - reassignment
+
+                          between unpaired orgs is rejected.
+
+
+                          Cannot be combined with `set_name`, `set_tags`,
+
+                          `set_install_location`, or `set_deploy` on the same update
+
+                          item. Other items in the same batch request may still be
+
+                          ordinary field updates.
+
+
+                          This moves the device''s encryption keys and network-ID
+
+                          lookups to the destination org and updates its `_env` tag to
+
+                          match (`sandbox` or `production`). Packet history and device
+
+                          history are **not** moved - they remain associated with the
+
+                          device in the source organization. If the destination is
+
+                          the sandbox org, its device-count cap is enforced across all
+
+                          reassignments targeting it within the same batch request.
+
+                          '
+                        example: 123e4567-e89b-12d3-a456-426614174000
+            examples:
+              updateNames:
+                value:
+                  updates:
+                  - device_id: 6ea53e36-b7fb-429f-8c2e-d536cab71089
+                    set_name: Device 1
+                  - device_id: 7fb64f47-c8gc-530g-9d3f-e647dbc8219a
+                    set_name: Device 2
+              updateTags:
+                value:
+                  updates:
+                  - device_id: 6ea53e36-b7fb-429f-8c2e-d536cab71089
+                    set_tags:
+                      location: warehouse-a
+                  - device_id: 7fb64f47-c8gc-530g-9d3f-e647dbc8219a
+                    set_tags:
+                      location: warehouse-b
+      responses:
+        '200':
+          description: Updated Devices
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - devices
+                properties:
+                  devices:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/organizationDevice'
+              examples:
+                success:
+                  value:
+                    devices:
+                    - id: 6ea53e36-b7fb-429f-8c2e-d536cab71089
+                      name: Device 1
+                      created_ts: 1609459200
+                      tags:
+                        location: warehouse-a
+                      most_recent_packet: {}
+                    - id: 7fb64f47-c8gc-530g-9d3f-e647dbc8219a
+                      name: Device 2
+                      created_ts: 1609459200
+                      tags:
+                        location: warehouse-b
+                      most_recent_packet: {}
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+    delete:
+      tags:
+      - Devices
+      operationId: batch-delete-devices
+      x-criticality: high
+      summary: Batch Delete Devices
+      description: 'Delete multiple registered devices from your organization in a single request.
+
+
+        **Required Scope:** `write-devices`
+
+
+        ## Overview
+
+        - A maximum of 1000 devices can be deleted in a single request.
+
+        - Each delete is idempotent. In the event of an internal error (i.e. `5xx`) some deletions may be applied and others may not. The whole request can be retried again to ensure a consistent deletion across the batch.
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - device_ids
+              properties:
+                device_ids:
+                  type: array
+                  description: Array of device IDs to delete, up to 1000.
+                  items:
+                    $ref: '#/components/schemas/deviceId'
+            examples:
+              deleteMultipleDevices:
+                value:
+                  device_ids:
+                  - 6ea53e36-b7fb-429f-8c2e-d536cab71089
+                  - 7fb64f47-c8gc-530g-9d3f-e647dbc8219a
+                  - 8gc75g58-d9hd-641h-0e4g-f758ecd932b0
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+  /v1/org/{org_id}/devices/{device_id}:
+    get:
+      tags:
+      - Devices
+      operationId: get-device
+      x-criticality: high
+      summary: Get Device
+      description: 'Return a specific registered device belonging to your organization.
+
+
+        **Required Scope:** `read-devices`
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      - $ref: '#/components/parameters/deviceIdPathParam'
+      responses:
+        '200':
+          description: Device
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/organizationDevice'
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+    patch:
+      tags:
+      - Devices
+      operationId: update-device
+      x-criticality: high
+      summary: Update Device
+      description: 'Update a registered device belonging to your organization.
+
+
+        **Required Scope:** `write-devices`
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      - $ref: '#/components/parameters/deviceIdPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                set_name:
+                  $ref: '#/components/schemas/deviceName'
+                set_tags:
+                  $ref: '#/components/schemas/deviceTags'
+                set_install_location:
+                  $ref: '#/components/schemas/installLocation'
+                set_destination_org_id:
+                  type: string
+                  format: uuid
+                  description: 'Reassign this device to another organization. The destination
+
+                    must be this organization''s paired sandbox/production partner
+
+                    (created via the create-sandbox-org flow) - reassignment
+
+                    between unpaired orgs is rejected.
+
+
+                    Cannot be combined with `set_name`, `set_tags`,
+
+                    `set_install_location`, or `set_deploy` in the same request.
+
+
+                    This moves the device''s encryption keys and network-ID
+
+                    lookups to the destination org and updates its `_env` tag to
+
+                    match (`sandbox` or `production`). Packet history and device
+
+                    history are **not** moved - they remain associated with the
+
+                    device in the source organization. If the destination is
+
+                    the sandbox org, its device-count cap is enforced.
+
+                    '
+                  example: 123e4567-e89b-12d3-a456-426614174000
+      responses:
+        '200':
+          description: Updated Device
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/organizationDevice'
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+    delete:
+      tags:
+      - Devices
+      operationId: delete-device
+      x-criticality: high
+      summary: Delete Device
+      description: 'Delete a registered device from your organization.
+
+
+        **Required Scope:** `write-devices`
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      - $ref: '#/components/parameters/deviceIdPathParam'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+components:
+  parameters:
+    sortFieldQueryParam:
+      name: sort_field
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+        - created_ts
+        - most_recent_packet_ts
+      description: Field to sort devices by
+    continuationTokenHeader:
+      name: Continuation-Token
+      in: header
+      required: false
+      schema:
+        type: string
+      description: A token to indicate how to continue paging
+    deviceKeyFormatQueryParam:
+      name: key_format
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+        - base64
+        - hex
+        default: base64
+      description: 'Encoding for `device.key` in the response. `base64` (default) returns standard Base64;
+
+        `hex` returns a lowercase hexadecimal string.
+
+        '
+    filterMostRecentPacketTSQueryParam:
+      name: filter_most_recent_packet_ts
+      in: query
+      required: false
+      schema:
+        type: string
+      description: "Filter devices by most recent packet timestamp (e.g., filter_most_recent_packet_ts=between:1000:2000)\nTimestamps are in seconds since the Unix epoch.\nThe most recent packet value is only updated periodically.\nThe only supported filtering operator currently is `between`. \n"
+    orgIdPathParam:
+      name: org_id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/orgId'
+      description: Your organization ID
+    sortAscendingQueryParam:
+      name: sort_ascending
+      in: query
+      required: false
+      schema:
+        type: boolean
+        default: true
+      description: Sort order (true for ascending, false for descending)
+    filterTagsQueryParam:
+      name: filter_tags
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          description: 'A tag to match against. For example: _env:production.
+
+            '
+      description: 'A set of device **platform tags** specifying which packets to include.
+
+        Only platform tags are queryable: `_env:production`, `_env:sandbox`.
+
+        The query param can be used multiple times to form a list of tags.
+
+        Packet matching criteria uses AND logic when different tag keys are used in a list of tags, and OR logic when the same tag key is used more than once.
+
+        '
+    deviceIdPathParam:
+      name: device_id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/deviceId'
+    filterCreatedTSQueryParam:
+      name: filter_created_ts
+      in: query
+      required: false
+      schema:
+        type: string
+      description: "Filter devices by creation timestamp (e.g., filter_created_ts=between:1000:2000)\nTimestamps are in seconds since the Unix epoch.\nThe only supported filtering operator currently is `between`. \n"
+    contentTypeJsonHeader:
+      name: Content-Type
+      in: header
+      schema:
+        type: string
+      description: An indication that the payload is JSON
+      example: application/json
+    limitQueryParam:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        minimum: 10
+        default: 250
+      description: A limit for the page size of devices
+  schemas:
+    eidRotation:
+      type: object
+      description: 'Configuration for EID (Ephemeral ID) rotation on a device.
+
+        EID rotation allows devices to use rotating ephemeral identifiers based on the specified counter source.
+
+        When not specified, devices will use the UNIX_TIME counter source which relies on the device knowing an accurate epoch time.
+
+        The DEVICE_UPTIME counter source enables EID rotation without requiring a real-time clock.
+
+        '
+      properties:
+        counter_source:
+          type: string
+          enum:
+          - UNIX_TIME
+          - DEVICE_UPTIME
+          description: 'The counter source used for EID rotation.
+
+            * `UNIX_TIME` - Counter is based on the current Unix (epoch) time.
+
+            * `DEVICE_UPTIME` - Counter is based on the device''s uptime.
+
+            '
+        period_exponent:
+          type: integer
+          minimum: 10
+          maximum: 15
+          default: 15
+          description: 'Base-2 exponent of the EID rotation period in seconds, used only with `encryption` of "AES-128-EAX" (IN100 protocol).
+
+            Matches the IN100 hardware''s configuration field. Must be between 10 (~17 minutes) and 15 (~9 hours) inclusive.
+
+            '
+    deviceTags:
+      type: object
+      additionalProperties:
+        type: string
+      description: "Tags are user-defined key/value pairs that can be attributed to a device. \nA device may have up to 10 tags.\n**Custom tags:** create your own tags with `key` length up to 32 characters and `value` length up to 128 characters.\n**Platform tags:** use Hubble-defined tags to organize devices.\n- `_env` tag: `production` indicates if a device belongs to the live environment, and `sandbox` for the test environment. A device will always have an `_env` tag assigned.\n"
+      example:
+        _env: production
+    errorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: The HTTP status code
+        description:
+          type: string
+          description: 'A description for the error.
+
+            For user errors, we attempt to be as descriptive as possible to help with diagnosing the issue.
+
+            For internal errors, the error description is only indicates that a retry should occur but we log the full error so that we can diagnose it.
+
+            Error descriptions can change over time and should not be programmed against.
+
+            '
+        name:
+          type: string
+          enum:
+          - Bad Request
+          - Unauthorized
+          - Not Found
+          - Too Many Requests
+          - Internal Server Error
+          description: '`name` is a short name for the error.
+
+            '
+    installLocation:
+      type: object
+      description: 'Fixed installation location of a device.
+
+        To clear a previously set location, send lat/long of 0,0.
+
+        '
+      required:
+      - lat
+      - long
+      properties:
+        lat:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+          description: Latitude in Decimal Degrees DDD.DDDDD°
+        long:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+          description: Longitude in Decimal Degrees DDD.DDDDD°
+        location_name:
+          type: string
+          maxLength: 500
+          description: Human-readable label for the location.
+    deviceName:
+      type: string
+      description: Assigned name for the device
+      maxLength: 250
+    deviceId:
+      type: string
+      format: uuid
+      description: Primary UUID identifier for a registered device
+    deviceEncryption:
+      type: string
+      enum:
+      - AES-256-CTR
+      - AES-128-CTR
+      - AES-128-EAX
+      - NONE
+      description: Encryption mode configured for the device at registration.
+    orgId:
+      type: string
+      format: uuid
+      description: The ID for an organization
+    utcTimestampInteger:
+      type: integer
+      format: int64
+      description: An UTC second-precision timestamp formatted as an integer
+    organizationDevice:
+      type: object
+      required:
+      - name
+      - id
+      - created_ts
+      - tags
+      properties:
+        name:
+          $ref: '#/components/schemas/deviceName'
+        id:
+          $ref: '#/components/schemas/deviceId'
+        created_ts:
+          $ref: '#/components/schemas/utcTimestampInteger'
+        tags:
+          $ref: '#/components/schemas/deviceTags'
+        encryption:
+          $ref: '#/components/schemas/deviceEncryption'
+        eid_rotation:
+          $ref: '#/components/schemas/eidRotation'
+        install_location:
+          $ref: '#/components/schemas/installLocation'
+        most_recent_packet:
+          type: object
+          description: 'Most recent packet metadata for different network types.
+
+            The most recent packet value is only updated periodically.
+
+            '
+          properties:
+            satellite:
+              type:
+              - object
+              - 'null'
+              properties:
+                timestamp:
+                  $ref: '#/components/schemas/utcTimestampNumber'
+                  description: Unix timestamp of a recent satellite packet
+                location:
+                  $ref: '#/components/schemas/latLongLocation'
+                  description: Location data from a recent satellite packet
+            terrestrial:
+              type:
+              - object
+              - 'null'
+              properties:
+                timestamp:
+                  $ref: '#/components/schemas/utcTimestampNumber'
+                  description: Unix timestamp of a recent terrestrial packet
+                location:
+                  $ref: '#/components/schemas/latLongLocation'
+                  description: Location data from a recent terrestrial packet
+    utcTimestampNumber:
+      type: number
+      format: double
+      description: An UTC second-precision timestamp formatted as a floating point number
+    latLongLocation:
+      type: object
+      required:
+      - latitude
+      - longitude
+      properties:
+        latitude:
+          type: number
+          description: Latitude in Decimal Degrees DDD.DDDDD°
+          format: double
+          minimum: -90
+          maximum: 90
+        longitude:
+          type: number
+          description: Longitude in Decimal Degrees DDD.DDDDD°
+          format: double
+          minimum: -180
+          maximum: 180
+  headers:
+    ContinuationTokenHeader:
+      description: A token to indicate how to continue paging
+      schema:
+        type: string
+  responses:
+    ErrorBadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 400
+            description: The request could not be understood by the server due to malformed syntax.
+            name: Bad Request
+    ErrorInternalServer:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 500
+            description: An unknown error has occurred.
+            name: Unknown
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

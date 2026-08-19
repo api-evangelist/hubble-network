@@ -1,0 +1,242 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Hubble Platform Devices API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Devices",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Register New Devices",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.hubble.com/v2/org/:org_id/devices",
+            "headers": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              },
+              {
+                "name": "key_format",
+                "value": "",
+                "type": "query",
+                "description": "Encoding for `device.key` in the response. `base64` (default) returns standard Base64;\n`hex` returns a lowercase hexadecimal string.\n"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Register one or more devices to your organization.\n\n**Required Scope:** `write-devices`\n\n## Overview\nThis endpoint supports bulk device registration with specified encryption mode, and custom naming and tagging.\n\n## Device Encryption Modes\n\n### Set Key Length\nSet encryption key length to match your device firmware's encryption library requirement:\n* **256-bit key** (32 bytes): set `encryption` to \"AES-256-CTR\"\n* **128-bit key** (16 bytes): set `encryption` to \"AES-128-CTR\"\n* **128-bit key, IN100"
+        },
+        {
+          "info": {
+            "name": "List Devices",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.hubble.com/v1/org/:org_id/devices",
+            "headers": [
+              {
+                "name": "Continuation-Token",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "A limit for the page size of devices"
+              },
+              {
+                "name": "filter_tags",
+                "value": "",
+                "type": "query",
+                "description": "A set of device **platform tags** specifying which packets to include.\nOnly platform tags are queryable: `_env:production`, `_env:sandbox`.\nThe query param can be used multiple times to form a list of tags.\nPacket matching criteria uses AND logic when different tag keys are used in a list of tags, and OR logic when the same tag key is used more than once.\n"
+              },
+              {
+                "name": "filter_created_ts",
+                "value": "",
+                "type": "query",
+                "description": "Filter devices by creation timestamp (e.g., filter_created_ts=between:1000:2000)\nTimestamps are in seconds since the Unix epoch.\nThe only supported filtering operator currently is `between`. \n"
+              },
+              {
+                "name": "filter_most_recent_packet_ts",
+                "value": "",
+                "type": "query",
+                "description": "Filter devices by most recent packet timestamp (e.g., filter_most_recent_packet_ts=between:1000:2000)\nTimestamps are in seconds since the Unix epoch.\nThe most recent packet value is only updated periodically.\nThe only supported filtering operator currently is `between`. \n"
+              },
+              {
+                "name": "sort_field",
+                "value": "",
+                "type": "query",
+                "description": "Field to sort devices by"
+              },
+              {
+                "name": "sort_ascending",
+                "value": "",
+                "type": "query",
+                "description": "Sort order (true for ascending, false for descending)"
+              }
+            ]
+          },
+          "docs": "Returns all devices for your organization.\n\n**Required Scope:** `read-devices`\n\n## Overview\nUse this endpoint to manage your device inventory and map Hubble-registered devices to your system. \n(To consume a stream of incoming data, use the **Retrieve Organization Packets** endpoint.)\n\n## Query Parameters\n\n### Timestamp Filters\nUse timestamp filters to trim down the search results.\n* For simpliticy, we support the `between:{after_timestamp}:{before_timestamp}` operator.\n* The `after_timestamp` va"
+        },
+        {
+          "info": {
+            "name": "Batch Update Devices",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api.hubble.com/v1/org/:org_id/devices",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Update multiple registered devices belonging to your organization in a single request.\n\n**Required Scope:** `write-devices`\n\n## Overview\n- A maximum of 1000 devices can be updated in a single request.\n- Each update is idempotent. In the event of an internal error (i.e. `5xx`) some updates may be applied and others may not. Each update is idempotent and the whole request can be retried again to ensure a consistent update across the batch.\n"
+        },
+        {
+          "info": {
+            "name": "Batch Delete Devices",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.hubble.com/v1/org/:org_id/devices",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Delete multiple registered devices from your organization in a single request.\n\n**Required Scope:** `write-devices`\n\n## Overview\n- A maximum of 1000 devices can be deleted in a single request.\n- Each delete is idempotent. In the event of an internal error (i.e. `5xx`) some deletions may be applied and others may not. The whole request can be retried again to ensure a consistent deletion across the batch.\n"
+        },
+        {
+          "info": {
+            "name": "Get Device",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.hubble.com/v1/org/:org_id/devices/:device_id",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              },
+              {
+                "name": "device_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Return a specific registered device belonging to your organization.\n\n**Required Scope:** `read-devices`\n"
+        },
+        {
+          "info": {
+            "name": "Update Device",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api.hubble.com/v1/org/:org_id/devices/:device_id",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              },
+              {
+                "name": "device_id",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Update a registered device belonging to your organization.\n\n**Required Scope:** `write-devices`\n"
+        },
+        {
+          "info": {
+            "name": "Delete Device",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.hubble.com/v1/org/:org_id/devices/:device_id",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              },
+              {
+                "name": "device_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Delete a registered device from your organization.\n\n**Required Scope:** `write-devices`\n"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

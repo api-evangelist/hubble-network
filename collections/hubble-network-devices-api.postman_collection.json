@@ -1,0 +1,1941 @@
+{
+  "item": [
+    {
+      "id": "c1c94a61-901d-46bd-bb20-d7378cd9cff5",
+      "name": "Devices",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "99543524-2f1b-494c-87ab-6979bd27b857",
+          "name": "Register New Devices",
+          "request": {
+            "name": "Register New Devices",
+            "description": {
+              "content": "Register one or more devices to your organization.\n\n**Required Scope:** `write-devices`\n\n## Overview\nThis endpoint supports bulk device registration with specified encryption mode, and custom naming and tagging.\n\n## Device Encryption Modes\n\n### Set Key Length\nSet encryption key length to match your device firmware's encryption library requirement:\n* **256-bit key** (32 bytes): set `encryption` to \"AES-256-CTR\"\n* **128-bit key** (16 bytes): set `encryption` to \"AES-128-CTR\"\n* **128-bit key, IN100 protocol** (16 bytes): set `encryption` to \"AES-128-EAX\"\n\n### Set Counter Source for EID Rotation\nThe Hubble Device SDK rotates through ephemeral IDs (EID) so that devices are anonymous on the network.\nSpecify the `counter_source` based on your hardware capabilities:      \n* Use \"UNIX_TIME\" for **time-based encryption**, e.g. for devices with a real time clock (RTC). **This is the default value.**\n* Use \"DEVICE_UPTIME\" for **timeless encryption**, e.g. using the device uptime counter to rotate EIDs.\n\n### Set EID Rotation Period (AES-128-EAX only)\nFor the IN100 protocol (`encryption` of \"AES-128-EAX\"), you may optionally override the EID rotation period with `eid_rotation.period_exponent`: the base-2 exponent of the rotation period in seconds (matches the IN100 configuration field). \nMust be between 10 and 15 inclusive. \nThe period defaults to `period_exponent: 15`, corresponding to 32,768 seconds (~9 hours).\n\n## Device Metadata\nYou can optionally provide `names` and `tags` for each device being provisioned:\n* `names`: An array of device names.\n* `tags`: An array of device tags.\n\n## Device Key\nBy default `device.key` is returned encoded in standard Base64 format, and is automatically compatible with the Hubble Device SDK. \nPass `key_format=hex` to receive device.key as a lowercase hexadecimal string instead.\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "org",
+                ":org_id",
+                "devices"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "key_format",
+                  "value": "base64",
+                  "description": "Encoding for `device.key` in the response. `base64` (default) returns standard Base64;\n`hex` returns a lowercase hexadecimal string.\n"
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<uuid>",
+                  "key": "org_id",
+                  "description": "(Required) Your organization ID"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"encryption\": \"<string>\",\n  \"n_devices\": 1,\n  \"names\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"tags\": [\n    {\n      \"key_0\": \"<string>\",\n      \"key_1\": \"<string>\"\n    },\n    {\n      \"key_0\": \"<string>\"\n    }\n  ],\n  \"eid_rotation\": {\n    \"counter_source\": \"<string>\",\n    \"period_exponent\": 15\n  },\n  \"install_locations\": [\n    {\n      \"lat\": \"<double>\",\n      \"long\": \"<double>\",\n      \"location_name\": \"<string>\"\n    },\n    {\n      \"lat\": \"<double>\",\n      \"long\": \"<double>\",\n      \"location_name\": \"<string>\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "308003e7-4c34-4ca5-9e4e-182e7090f260",
+              "name": "Devices provisioned",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "org",
+                    ":org_id",
+                    "devices"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "key_format",
+                      "value": "base64"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "An indication that the payload is JSON",
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"n_devices\": 1,\n  \"encryption\": \"AES-256-CTR\",\n  \"names\": [\n    \"sensor-001\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"devices\": [\n    {\n      \"device_id\": \"6ea53e36-b7fb-429f-8c2e-d536cab71089\",\n      \"name\": \"sensor-001\",\n      \"created_ts\": 1734567890,\n      \"tags\": {\n        \"_env\": \"production\"\n      },\n      \"protocol\": {\n        \"terrestrial\": {\n          \"version\": 0\n        }\n      },\n      \"eid_rotation\": {\n        \"counter_source\": \"UNIX_TIME\"\n      },\n      \"key\": \"YWJjZGVmZw==\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "8709c21a-aa3f-4354-b108-71bc57734eaa",
+              "name": "Bad Request",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "org",
+                    ":org_id",
+                    "devices"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "key_format",
+                      "value": "base64"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "An indication that the payload is JSON",
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"n_devices\": 1,\n  \"encryption\": \"AES-256-CTR\",\n  \"names\": [\n    \"sensor-001\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 400,\n  \"description\": \"The request could not be understood by the server due to malformed syntax.\",\n  \"name\": \"Bad Request\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "5978bb6f-cbb0-47e4-87e4-5b29c442e9c3",
+              "name": "Internal Server Error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "org",
+                    ":org_id",
+                    "devices"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "key_format",
+                      "value": "base64"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "An indication that the payload is JSON",
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"n_devices\": 1,\n  \"encryption\": \"AES-256-CTR\",\n  \"names\": [\n    \"sensor-001\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 500,\n  \"description\": \"An unknown error has occurred.\",\n  \"name\": \"Unknown\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "3f122bc1-89cf-4ea8-9310-c59a730b4fcf",
+          "name": "List Devices",
+          "request": {
+            "name": "List Devices",
+            "description": {
+              "content": "Returns all devices for your organization.\n\n**Required Scope:** `read-devices`\n\n## Overview\nUse this endpoint to manage your device inventory and map Hubble-registered devices to your system. \n(To consume a stream of incoming data, use the **Retrieve Organization Packets** endpoint.)\n\n## Query Parameters\n\n### Timestamp Filters\nUse timestamp filters to trim down the search results.\n* For simpliticy, we support the `between:{after_timestamp}:{before_timestamp}` operator.\n* The `after_timestamp` value is inclusive and the `before_timestamp` value is exclusive.\n\n### Recent Packet\nEach device may return a `most_recent_packet` object. This is a sample packet that is periodically refreshed.\n* **Latency:** provided data is not updated in real-time or atomically with packet data.\n* **Availability:** registered devices that have never sent a packet will have an empty `most_recent_packet` field.\n\n:::warning\n**This endpoint should not be used to request packet data.** See \"Retrieve Organization Packets\". \n:::\n\nWhen sorting by `most_recent_packet`,\n- Devices that have never sent a packet are included in results and sort to the beginning (ascending) or end (descending) of the page.\n- If `sort_ascending` is true, the pagination may return duplicate values since a device with a new `most_recent_packet` could be returned in subsequent pages.\n- If `sort_ascending` is false, the pagination may skip devices that receive new `most_recent_packet` data during the pagination.\n\n## Example Queries\n- **Unused devices:** `filter_most_recent_packet_ts=between:0:1`\n- **Recently Active Devices:** `filter_most_recent_packet_ts=between:{timestamp_one_day_ago}:{timestamp_now}`\n- **Inactive Devices:** `filter_most_recent_packet_ts=between:1:{timestamp_one_week_ago}`\n- **Recently Registered Devices:** `filter_created_ts=between:{timestamp_one_day_ago}:{timestamp_now}`\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "org",
+                ":org_id",
+                "devices"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "limit",
+                  "value": "250",
+                  "description": "A limit for the page size of devices"
+                },
+                {
+                  "disabled": false,
+                  "key": "filter_tags",
+                  "value": "<string>",
+                  "description": "A set of device **platform tags** specifying which packets to include.\nOnly platform tags are queryable: `_env:production`, `_env:sandbox`.\nThe query param can be used multiple times to form a list of tags.\nPacket matching criteria uses AND logic when different tag keys are used in a list of tags, and OR logic when the same tag key is used more than once.\n"
+                },
+                {
+                  "disabled": false,
+                  "key": "filter_tags",
+                  "value": "<string>",
+                  "description": "A set of device **platform tags** specifying which packets to include.\nOnly platform tags are queryable: `_env:production`, `_env:sandbox`.\nThe query param can be used multiple times to form a list of tags.\nPacket matching criteria uses AND logic when different tag keys are used in a list of tags, and OR logic when the same tag key is used more than once.\n"
+                },
+                {
+                  "disabled": false,
+                  "key": "filter_created_ts",
+                  "value": "<string>",
+                  "description": "Filter devices by creation timestamp (e.g., filter_created_ts=between:1000:2000)\nTimestamps are in seconds since the Unix epoch.\nThe only supported filtering operator currently is `between`. \n"
+                },
+                {
+                  "disabled": false,
+                  "key": "filter_most_recent_packet_ts",
+                  "value": "<string>",
+                  "description": "Filter devices by most recent packet timestamp (e.g., filter_most_recent_packet_ts=between:1000:2000)\nTimestamps are in seconds since the Unix epoch.\nThe most recent packet value is only updated periodically.\nThe only supported filtering operator currently is `between`. \n"
+                },
+                {
+                  "disabled": false,
+                  "key": "sort_field",
+                  "value": "<string>",
+                  "description": "Field to sort devices by"
+                },
+                {
+                  "disabled": false,
+                  "key": "sort_ascending",
+                  "value": "true",
+                  "description": "Sort order (true for ascending, false for descending)"
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<uuid>",
+                  "key": "org_id",
+                  "description": "(Required) Your organization ID"
+                }
+              ]
+            },
+            "header": [
+              {
+                "disabled": false,
+                "description": "A token to indicate how to continue paging",
+                "key": "Continuation-Token",
+                "value": "<string>"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "2cded090-4fb4-4894-ba06-8dea8bc63d97",
+              "name": "Device Pages",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "devices"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "250"
+                    },
+                    {
+                      "key": "filter_tags",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "filter_tags",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "filter_created_ts",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "filter_most_recent_packet_ts",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "sort_field",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "sort_ascending",
+                      "value": "true"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "A token to indicate how to continue paging",
+                    "key": "Continuation-Token",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "disabled": false,
+                  "description": "A token to indicate how to continue paging",
+                  "key": "Continuation-Token",
+                  "value": "string"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"devices\": [\n    {\n      \"name\": \"<string>\",\n      \"id\": \"eb0dc1d9-19ea-5044-7b13-e957e31b53e2\",\n      \"created_ts\": 6823,\n      \"tags\": {\n        \"_env\": \"production\"\n      },\n      \"encryption\": \"<string>\",\n      \"eid_rotation\": {\n        \"counter_source\": \"<string>\",\n        \"period_exponent\": 15\n      },\n      \"install_location\": {\n        \"lat\": \"<double>\",\n        \"long\": \"<double>\",\n        \"location_name\": \"<string>\"\n      },\n      \"most_recent_packet\": {\n        \"satellite\": {\n          \"timestamp\": 3042.773635113083,\n          \"location\": {\n            \"latitude\": 55.10846049363832,\n            \"longitude\": 14.153568936421493\n          }\n        },\n        \"terrestrial\": {\n          \"timestamp\": 965.0546633708612,\n          \"location\": {\n            \"latitude\": -68.60554558815848,\n            \"longitude\": 102.77634876425151\n          }\n        }\n      }\n    },\n    {\n      \"name\": \"<string>\",\n      \"id\": \"20c16f6a-1c84-1eea-452b-c1c8073e469d\",\n      \"created_ts\": 751,\n      \"tags\": {\n        \"_env\": \"production\"\n      },\n      \"encryption\": \"<string>\",\n      \"eid_rotation\": {\n        \"counter_source\": \"<string>\",\n        \"period_exponent\": 15\n      },\n      \"install_location\": {\n        \"lat\": \"<double>\",\n        \"long\": \"<double>\",\n        \"location_name\": \"<string>\"\n      },\n      \"most_recent_packet\": {\n        \"satellite\": {\n          \"timestamp\": 6485.905141312197,\n          \"location\": {\n            \"latitude\": -89.13986439216644,\n            \"longitude\": -112.28177036246906\n          }\n        },\n        \"terrestrial\": {\n          \"timestamp\": 1033.793032579957,\n          \"location\": {\n            \"latitude\": 80.2216180522756,\n            \"longitude\": 111.72446108546251\n          }\n        }\n      }\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "4f7a0b72-fb8c-44f0-ba2d-7f7c499260d0",
+              "name": "Bad Request",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "devices"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "250"
+                    },
+                    {
+                      "key": "filter_tags",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "filter_tags",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "filter_created_ts",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "filter_most_recent_packet_ts",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "sort_field",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "sort_ascending",
+                      "value": "true"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "A token to indicate how to continue paging",
+                    "key": "Continuation-Token",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 400,\n  \"description\": \"The request could not be understood by the server due to malformed syntax.\",\n  \"name\": \"Bad Request\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "d5cc14c4-b72c-49c7-a8e8-5fe5b2c9de51",
+              "name": "Internal Server Error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "devices"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "250"
+                    },
+                    {
+                      "key": "filter_tags",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "filter_tags",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "filter_created_ts",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "filter_most_recent_packet_ts",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "sort_field",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "sort_ascending",
+                      "value": "true"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "A token to indicate how to continue paging",
+                    "key": "Continuation-Token",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 500,\n  \"description\": \"An unknown error has occurred.\",\n  \"name\": \"Unknown\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "c5c50589-b484-4828-a59b-1938a7de9e8d",
+          "name": "Batch Update Devices",
+          "request": {
+            "name": "Batch Update Devices",
+            "description": {
+              "content": "Update multiple registered devices belonging to your organization in a single request.\n\n**Required Scope:** `write-devices`\n\n## Overview\n- A maximum of 1000 devices can be updated in a single request.\n- Each update is idempotent. In the event of an internal error (i.e. `5xx`) some updates may be applied and others may not. Each update is idempotent and the whole request can be retried again to ensure a consistent update across the batch.\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "org",
+                ":org_id",
+                "devices"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<uuid>",
+                  "key": "org_id",
+                  "description": "(Required) Your organization ID"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "PATCH",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"updates\": [\n    {\n      \"device_id\": \"<uuid>\",\n      \"set_name\": \"<string>\",\n      \"set_tags\": {\n        \"key_0\": \"<string>\",\n        \"key_1\": \"<string>\"\n      },\n      \"set_install_location\": {\n        \"lat\": \"<double>\",\n        \"long\": \"<double>\",\n        \"location_name\": \"<string>\"\n      },\n      \"set_destination_org_id\": \"<uuid>\"\n    },\n    {\n      \"device_id\": \"<uuid>\",\n      \"set_name\": \"<string>\",\n      \"set_tags\": {\n        \"key_0\": \"<string>\"\n      },\n      \"set_install_location\": {\n        \"lat\": \"<double>\",\n        \"long\": \"<double>\",\n        \"location_name\": \"<string>\"\n      },\n      \"set_destination_org_id\": \"<uuid>\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "d0f901a6-c574-4139-be50-10adba99d946",
+              "name": "Updated Devices",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "devices"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"updates\": [\n    {\n      \"device_id\": \"6ea53e36-b7fb-429f-8c2e-d536cab71089\",\n      \"set_name\": \"Device 1\"\n    },\n    {\n      \"device_id\": \"7fb64f47-c8gc-530g-9d3f-e647dbc8219a\",\n      \"set_name\": \"Device 2\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"devices\": [\n    {\n      \"id\": \"6ea53e36-b7fb-429f-8c2e-d536cab71089\",\n      \"name\": \"Device 1\",\n      \"created_ts\": 1609459200,\n      \"tags\": {\n        \"location\": \"warehouse-a\"\n      },\n      \"most_recent_packet\": {}\n    },\n    {\n      \"id\": \"7fb64f47-c8gc-530g-9d3f-e647dbc8219a\",\n      \"name\": \"Device 2\",\n      \"created_ts\": 1609459200,\n      \"tags\": {\n        \"location\": \"warehouse-b\"\n      },\n      \"most_recent_packet\": {}\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "70a5c82d-8d1f-4702-a29f-c72568d9a39c",
+              "name": "Bad Request",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "devices"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"updates\": [\n    {\n      \"device_id\": \"6ea53e36-b7fb-429f-8c2e-d536cab71089\",\n      \"set_name\": \"Device 1\"\n    },\n    {\n      \"device_id\": \"7fb64f47-c8gc-530g-9d3f-e647dbc8219a\",\n      \"set_name\": \"Device 2\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 400,\n  \"description\": \"The request could not be understood by the server due to malformed syntax.\",\n  \"name\": \"Bad Request\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "de5d4e00-5053-4199-bfb2-e7bb0e66dd7f",
+              "name": "Internal Server Error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "devices"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"updates\": [\n    {\n      \"device_id\": \"6ea53e36-b7fb-429f-8c2e-d536cab71089\",\n      \"set_name\": \"Device 1\"\n    },\n    {\n      \"device_id\": \"7fb64f47-c8gc-530g-9d3f-e647dbc8219a\",\n      \"set_name\": \"Device 2\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 500,\n  \"description\": \"An unknown error has occurred.\",\n  \"name\": \"Unknown\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "0c352d28-1aa2-4349-aeee-18cf44c8530d",
+          "name": "Batch Delete Devices",
+          "request": {
+            "name": "Batch Delete Devices",
+            "description": {
+              "content": "Delete multiple registered devices from your organization in a single request.\n\n**Required Scope:** `write-devices`\n\n## Overview\n- A maximum of 1000 devices can be deleted in a single request.\n- Each delete is idempotent. In the event of an internal error (i.e. `5xx`) some deletions may be applied and others may not. The whole request can be retried again to ensure a consistent deletion across the batch.\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "org",
+                ":org_id",
+                "devices"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<uuid>",
+                  "key": "org_id",
+                  "description": "(Required) Your organization ID"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "DELETE",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"device_ids\": [\n    \"<uuid>\",\n    \"<uuid>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "a43fef91-ed80-4cfa-b145-075860f9731d",
+              "name": "Success",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "devices"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"device_ids\": [\n    \"6ea53e36-b7fb-429f-8c2e-d536cab71089\",\n    \"7fb64f47-c8gc-530g-9d3f-e647dbc8219a\",\n    \"8gc75g58-d9hd-641h-0e4g-f758ecd932b0\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "4f1eb0bd-ac71-4dcf-b3c8-8903e8a8747b",
+              "name": "Bad Request",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "devices"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"device_ids\": [\n    \"6ea53e36-b7fb-429f-8c2e-d536cab71089\",\n    \"7fb64f47-c8gc-530g-9d3f-e647dbc8219a\",\n    \"8gc75g58-d9hd-641h-0e4g-f758ecd932b0\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 400,\n  \"description\": \"The request could not be understood by the server due to malformed syntax.\",\n  \"name\": \"Bad Request\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "c2bb2e13-92b6-47ae-8199-8909964613f0",
+              "name": "Internal Server Error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "devices"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"device_ids\": [\n    \"6ea53e36-b7fb-429f-8c2e-d536cab71089\",\n    \"7fb64f47-c8gc-530g-9d3f-e647dbc8219a\",\n    \"8gc75g58-d9hd-641h-0e4g-f758ecd932b0\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 500,\n  \"description\": \"An unknown error has occurred.\",\n  \"name\": \"Unknown\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "7de0d22d-c580-4100-8641-90a98c3ef9f8",
+          "name": "Get Device",
+          "request": {
+            "name": "Get Device",
+            "description": {
+              "content": "Return a specific registered device belonging to your organization.\n\n**Required Scope:** `read-devices`\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "org",
+                ":org_id",
+                "devices",
+                ":device_id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<uuid>",
+                  "key": "org_id",
+                  "description": "(Required) Your organization ID"
+                },
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<uuid>",
+                  "key": "device_id",
+                  "description": "(Required) "
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "325593ed-030d-4144-9a05-e3e0412bc22f",
+              "name": "Device",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "devices",
+                    ":device_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "device_id",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"name\": \"<string>\",\n  \"id\": \"<uuid>\",\n  \"created_ts\": 3347,\n  \"tags\": {\n    \"_env\": \"production\"\n  },\n  \"encryption\": \"<string>\",\n  \"eid_rotation\": {\n    \"counter_source\": \"<string>\",\n    \"period_exponent\": 15\n  },\n  \"install_location\": {\n    \"lat\": \"<double>\",\n    \"long\": \"<double>\",\n    \"location_name\": \"<string>\"\n  },\n  \"most_recent_packet\": {\n    \"satellite\": {\n      \"timestamp\": 6848.918036247539,\n      \"location\": {\n        \"latitude\": 35.402051980023,\n        \"longitude\": -168.36160689822492\n      }\n    },\n    \"terrestrial\": {\n      \"timestamp\": 9736.772132866756,\n      \"location\": {\n        \"latitude\": 19.269292235971264,\n        \"longitude\": 92.1214236123779\n      }\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "7d7b0a6e-2479-46ed-bc9f-c578e0f89af9",
+              "name": "Bad Request",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "devices",
+                    ":device_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "device_id",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 400,\n  \"description\": \"The request could not be understood by the server due to malformed syntax.\",\n  \"name\": \"Bad Request\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "4eaeeb5a-b6e1-439f-b116-6e655ab37739",
+              "name": "Internal Server Error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "devices",
+                    ":device_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "device_id",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 500,\n  \"description\": \"An unknown error has occurred.\",\n  \"name\": \"Unknown\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "57486537-d677-4b38-9154-f324132f8cdc",
+          "name": "Update Device",
+          "request": {
+            "name": "Update Device",
+            "description": {
+              "content": "Update a registered device belonging to your organization.\n\n**Required Scope:** `write-devices`\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "org",
+                ":org_id",
+                "devices",
+                ":device_id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<uuid>",
+                  "key": "org_id",
+                  "description": "(Required) Your organization ID"
+                },
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<uuid>",
+                  "key": "device_id",
+                  "description": "(Required) "
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "PATCH",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"set_name\": \"<string>\",\n  \"set_tags\": {\n    \"key_0\": \"<string>\",\n    \"key_1\": \"<string>\",\n    \"key_2\": \"<string>\"\n  },\n  \"set_install_location\": {\n    \"lat\": \"<double>\",\n    \"long\": \"<double>\",\n    \"location_name\": \"<string>\"\n  },\n  \"set_destination_org_id\": \"<uuid>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "324c8484-c75a-49cf-9e98-485da9f09198",
+              "name": "Updated Device",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "devices",
+                    ":device_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "device_id",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"set_name\": \"<string>\",\n  \"set_tags\": {\n    \"_env\": \"production\"\n  },\n  \"set_install_location\": {\n    \"lat\": \"<double>\",\n    \"long\": \"<double>\",\n    \"location_name\": \"<string>\"\n  },\n  \"set_destination_org_id\": \"123e4567-e89b-12d3-a456-426614174000\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"name\": \"<string>\",\n  \"id\": \"<uuid>\",\n  \"created_ts\": 3347,\n  \"tags\": {\n    \"_env\": \"production\"\n  },\n  \"encryption\": \"<string>\",\n  \"eid_rotation\": {\n    \"counter_source\": \"<string>\",\n    \"period_exponent\": 15\n  },\n  \"install_location\": {\n    \"lat\": \"<double>\",\n    \"long\": \"<double>\",\n    \"location_name\": \"<string>\"\n  },\n  \"most_recent_packet\": {\n    \"satellite\": {\n      \"timestamp\": 6848.918036247539,\n      \"location\": {\n        \"latitude\": 35.402051980023,\n        \"longitude\": -168.36160689822492\n      }\n    },\n    \"terrestrial\": {\n      \"timestamp\": 9736.772132866756,\n      \"location\": {\n        \"latitude\": 19.269292235971264,\n        \"longitude\": 92.1214236123779\n      }\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "0079d89d-ea74-425f-b70d-657c985ca23c",
+              "name": "Bad Request",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "devices",
+                    ":device_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "device_id",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"set_name\": \"<string>\",\n  \"set_tags\": {\n    \"_env\": \"production\"\n  },\n  \"set_install_location\": {\n    \"lat\": \"<double>\",\n    \"long\": \"<double>\",\n    \"location_name\": \"<string>\"\n  },\n  \"set_destination_org_id\": \"123e4567-e89b-12d3-a456-426614174000\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 400,\n  \"description\": \"The request could not be understood by the server due to malformed syntax.\",\n  \"name\": \"Bad Request\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "c2cefaca-d147-4528-a9b0-03418e33e45e",
+              "name": "Internal Server Error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "devices",
+                    ":device_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "device_id",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"set_name\": \"<string>\",\n  \"set_tags\": {\n    \"_env\": \"production\"\n  },\n  \"set_install_location\": {\n    \"lat\": \"<double>\",\n    \"long\": \"<double>\",\n    \"location_name\": \"<string>\"\n  },\n  \"set_destination_org_id\": \"123e4567-e89b-12d3-a456-426614174000\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 500,\n  \"description\": \"An unknown error has occurred.\",\n  \"name\": \"Unknown\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "1eb597f4-6f03-49fd-bb90-e10e8d6deaf4",
+          "name": "Delete Device",
+          "request": {
+            "name": "Delete Device",
+            "description": {
+              "content": "Delete a registered device from your organization.\n\n**Required Scope:** `write-devices`\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "org",
+                ":org_id",
+                "devices",
+                ":device_id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<uuid>",
+                  "key": "org_id",
+                  "description": "(Required) Your organization ID"
+                },
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<uuid>",
+                  "key": "device_id",
+                  "description": "(Required) "
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "DELETE",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "b40465cc-ff7d-4310-96a1-f903fbd24b0a",
+              "name": "Success",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "devices",
+                    ":device_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "device_id",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f38bbeb8-51d7-447f-8cc5-d853bc22ccf1",
+              "name": "Bad Request",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "devices",
+                    ":device_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "device_id",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 400,\n  \"description\": \"The request could not be understood by the server due to malformed syntax.\",\n  \"name\": \"Bad Request\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "959c64db-8d63-4ef0-b3ee-5a57f6ec6ed5",
+              "name": "Internal Server Error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "devices",
+                    ":device_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "device_id",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 500,\n  \"description\": \"An unknown error has occurred.\",\n  \"name\": \"Unknown\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://api.hubble.com",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "280f9a90-0a02-41be-9ed5-9d01617407d7",
+    "name": "Hubble Platform Devices API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "The Hubble platform is built API-first. Use our Cloud API to manage your devices\nand access device data programmatically. \nWe've designed our API following RESTful principles. \nEach endpoint returns standard HTTP status codes and may include JSON payloads.\n\n---\n\n## API Access\nUse API Keys to authenticate with the Hubble Cloud API for your organization. \n\n### Generate an API Key\nLog in to your Hubble dashboard. Navigate to **Developer Tools > API Tokens** to create a new API Key. \nProvide a name for the token, and set an appropriate expiration date for temporary access.\n\n### Organization ID\nYou will need `org_id` to make API requests. From your Hubble dashboard, navigate to \n**Developer Tooks > API Tokens**, or **Organization Settings**, to find your Organization ID. \n\n### Authorization Scopes\nAPI endpoints require specific authorization scopes to perform the intended operation. \n**Required Scope** is always provided in the API documentation.\n\nAPI Keys can be created with specific authorization scopes that control what operations the key can perform. \nIf no scopes are specified, the key will be created with all available scopes (admin-level access).\n\n| **Scope**                   | **Access**                                     |\n|------------------------------|-------------------------------------------------|\n| **read-api-keys**            | View API keys and their metadata               |\n| **write-api-keys**           | Create, update, and delete API keys            |\n| **read-users**               | View user information and roles                |\n| **write-users**              | Add, update, and remove users from the organization |\n| **read-organization-metadata** | View organization details and settings       |\n| **write-organization-metadata** | Update organization information            |\n| **read-devices**             | View device information and status             |\n| **write-devices**            | Register and manage devices                    |\n| **read-invitations**         | View pending invitations                       |\n| **write-invitations**        | Create and revoke user invitations             |\n| **read-packets**             | Access packet data and retrieval endpoints     |\n| **read-platform-metrics**    | View platform metrics and analytics            |\n| **read-billing-usage**       | View billing usage information                 |\n| **read-billing-invoices**    | View billing invoices                          |\n| **read-webhooks**            | View webhook configurations                    |\n| **write-webhooks**           | Create and manage webhook endpoints            |\n    \n**Example Scope Combinations**\n- Create a key with read-only access: `[\"read-api-keys\", \"read-users\", \"read-devices\"]`\n- Create a key for device management: `[\"read-devices\", \"write-devices\"]`\n- Create a key for user management: `[\"read-users\", \"write-users\", \"read-invitations\", \"write-invitations\"]`\n    \n**Best Practices for Data Security**\n- Create keys with the minimum required scopes for your use case\n- Regularly review and rotate API keys\n- Use descriptive names for your keys to track their purpose\n- Set appropriate expiration dates for temporary access    \n\n---\n\n## Import API Definition\nYou can quickly import the Hubble Cloud API into your preferred developer environment (such as Postman or Insomnia) using our **public OpenAPI definition**.\nSimply download or import the YAML file directly:\n\n[https://hubble.com/docs/openapi.yaml](https://hubble.com/docs/openapi.yaml)\n\n---\n\n## Pagination\nWhen the number of objects requested exceeds the maximum page size for an endpoint, the API response will be paginated. \nThis means you will receive a subset of the total results, along with a `Continuation-Token` in the Response Header that can be used to fetch subsequent subsets.\n\nTo retrieve the next set of data, you must use the provided `Continuation-Token` in the Request Header of your next API call to the same endpoint. \nContinue using the provided token in each successive request until no `Continuation-Token` is returned, which indicates you have retrieved all available data.\n\n---\n\n## Rate Limits\nThe Hubble Cloud API follows a leaky bucket approach to rate limiting. Endpoints are rate limited to three (3) requests per second. \nYour organization is limited to a total of 15 requests per second. \nIf you exceed this limit, you will receive a 429 status code. \nWe recommend backoff retry logic to stay within the limit.\n\n---\n\n## Request Headers\nAll HTTP responses will include a `X-Request-ID` header that is logged internally and can be used for tracing/debugging a particular API request. \nAll HTTP requests can include a `X-Request-ID` header which will be logged and mapped to the responses' `X-Request-ID` header. \n\nShare Request Headers whenever troubleshooting an API issue with Hubble Support.\n\n---\n\n## Status Codes\nThe Hubble Cloud API returns the following HTTP status codes: `200`, `400`, `401`, `403`, `404`, `429` and `500`. \nUse the tailored message returned with each status code for insight in the specific context of the endpoint you are attempting to access.\n\n---\n\n## Versioning\nOur cloud backend follows a rolling release model. This means:\n- **Continuous Deployment**: New features, security updates, and performance improvements are automatically rolled out.\n- **Backward Compatibility**: Cloud updates are designed to be compatible with devices running firmware/SDK versions within our active or maintained support windows.\n- **Transparent Change Management**: Release notes and changelogs are published regularly so you can track enhancements and understand any adjustments that might affect integrations.\n- **Versioned Public API**: The Cloud API uses basic major versioning in the url paths (`/v1/...`, `/v2/...` etc.). Major backwards incompatible changes will be made by creating a version of the endpoint with a higher version and communicating with customers to migrate. The legacy `/api/...` and `/api/v2/...` paths remain fully supported as aliases for `/v1/...` and `/v2/...` respectively, so previous versions will be supported for a minimum of 1 year.\n\n---\n",
+      "type": "text/plain"
+    }
+  }
+}

@@ -172,3 +172,9 @@ tools:
   description: List saved card payment methods
   category: Billing
   source_operation: openapi/hubble-network-platform-openapi.yml#get-billing-payment-method
+deployment:
+  mode: none
+  verified: derived
+  tools: 39
+  checked: '2026-08-12'
+  source: catalog MCP census

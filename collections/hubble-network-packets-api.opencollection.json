@@ -1,0 +1,98 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Hubble Platform Packets API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Packets",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Retrieve Organization Packets",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.hubble.com/v1/org/:org_id/packets",
+            "headers": [
+              {
+                "name": "Continuation-Token",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              },
+              {
+                "name": "start",
+                "value": "",
+                "type": "query",
+                "description": "UTC timestamp (in seconds) indicating when to start retrieving packets. \nThis timestamp corresponds to when the packet was received by the network.\nIf omitted, defaults to 7 days before the current UTC time.\n"
+              },
+              {
+                "name": "end",
+                "value": "",
+                "type": "query",
+                "description": "UTC timestamp (in seconds) indicating when to end retrieving packets.\nThis timestamp corresponds to when the packet was received by the network.\nIf omitted, defaults to empty (meaning the pagination will continue indefinitely).\nIf specified, pagination will continue until all packets received prior to the timestamp have been returned.\n"
+              },
+              {
+                "name": "device_id",
+                "value": "",
+                "type": "query",
+                "description": "Filter packets to a specific device\n"
+              },
+              {
+                "name": "filter_tags",
+                "value": "",
+                "type": "query",
+                "description": "A set of device **platform tags** specifying which packets to include.\nOnly platform tags are queryable: `_env:production`, `_env:sandbox`.\nThe query param can be used multiple times to form a list of tags.\nPacket matching criteria uses AND logic when different tag keys are used in a list of tags, and OR logic when the same tag key is used more than once.\n"
+              }
+            ]
+          },
+          "docs": "Stream or query packets for your organization.\n\n**Required Scope:** `read-packets`\n\n## Overview\nThis endpoint acts as a data stream. Use the `Continuation-Token` to track your consumer's position in the stream and ingest incrementally.\nPackets are returned in ascending order based on when they were detected by Hubble Network.\n\n## Pagination and Streaming\nUse the `Continuation-Token` to capture new packets incrementally. \nIf provided, all other query parameters are ignored, as the token persists "
+        },
+        {
+          "info": {
+            "name": "Packet Webhook Example",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.hubble.com/v1/webhook/testBatch",
+            "headers": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "HTTP-X-HUBBLE-TOKEN",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "This endpoint is an example webhook endpoint that each organization can implement in order to receive packet data.\nPacket data that has been decrypted for your organization will be forwarded to these webhooks.\n\n### Batching\nPackets are sent in batches to minimize HTTP overhead from sending packets individually.\nBatch sizes are configurable per webhook endpoint. \nThe actual number of packets per request will range between 1 and the configured `max_batch_size`.\n"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

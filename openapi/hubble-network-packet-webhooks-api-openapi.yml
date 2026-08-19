@@ -1,0 +1,333 @@
+openapi: 3.2.0
+info:
+  title: Hubble Platform Packet Webhooks API
+  description: "The Hubble platform is built API-first. Use our Cloud API to manage your devices\nand access device data programmatically. \nWe've designed our API following RESTful principles. \nEach endpoint returns standard HTTP status codes and may include JSON payloads.\n\n---\n\n## API Access\nUse API Keys to authenticate with the Hubble Cloud API for your organization. \n\n### Generate an API Key\nLog in to your Hubble dashboard. Navigate to **Developer Tools > API Tokens** to create a new API Key. \nProvide a name for the token, and set an appropriate expiration date for temporary access.\n\n### Organization ID\nYou will need `org_id` to make API requests. From your Hubble dashboard, navigate to \n**Developer Tooks > API Tokens**, or **Organization Settings**, to find your Organization ID. \n\n### Authorization Scopes\nAPI endpoints require specific authorization scopes to perform the intended operation. \n**Required Scope** is always provided in the API documentation.\n\nAPI Keys can be created with specific authorization scopes that control what operations the key can perform. \nIf no scopes are specified, the key will be created with all available scopes (admin-level access).\n\n| **Scope**                   | **Access**                                     |\n|------------------------------|-------------------------------------------------|\n| **read-api-keys**            | View API keys and their metadata               |\n| **write-api-keys**           | Create, update, and delete API keys            |\n| **read-users**               | View user information and roles                |\n| **write-users**              | Add, update, and remove users from the organization |\n| **read-organization-metadata** | View organization details and settings       |\n| **write-organization-metadata** | Update organization information            |\n| **read-devices**             | View device information and status             |\n| **write-devices**            | Register and manage devices                    |\n| **read-invitations**         | View pending invitations                       |\n| **write-invitations**        | Create and revoke user invitations             |\n| **read-packets**             | Access packet data and retrieval endpoints     |\n| **read-platform-metrics**    | View platform metrics and analytics            |\n| **read-billing-usage**       | View billing usage information                 |\n| **read-billing-invoices**    | View billing invoices                          |\n| **read-webhooks**            | View webhook configurations                    |\n| **write-webhooks**           | Create and manage webhook endpoints            |\n    \n**Example Scope Combinations**\n- Create a key with read-only access: `[\"read-api-keys\", \"read-users\", \"read-devices\"]`\n- Create a key for device management: `[\"read-devices\", \"write-devices\"]`\n- Create a key for user management: `[\"read-users\", \"write-users\", \"read-invitations\", \"write-invitations\"]`\n    \n**Best Practices for Data Security**\n- Create keys with the minimum required scopes for your use case\n- Regularly review and rotate API keys\n- Use descriptive names for your keys to track their purpose\n- Set appropriate expiration dates for temporary access    \n\n---\n\n## Import API Definition\nYou can quickly import the Hubble Cloud API into your preferred developer environment (such as Postman or Insomnia) using our **public OpenAPI definition**.\nSimply download or import the YAML file directly:\n\n[https://hubble.com/docs/openapi.yaml](https://hubble.com/docs/openapi.yaml)\n\n---\n\n## Pagination\nWhen the number of objects requested exceeds the maximum page size for an endpoint, the API response will be paginated. \nThis means you will receive a subset of the total results, along with a `Continuation-Token` in the Response Header that can be used to fetch subsequent subsets.\n\nTo retrieve the next set of data, you must use the provided `Continuation-Token` in the Request Header of your next API call to the same endpoint. \nContinue using the provided token in each successive request until no `Continuation-Token` is returned, which indicates you have retrieved all available data.\n\n---\n\n## Rate Limits\nThe Hubble Cloud API follows a leaky bucket approach to rate limiting. Endpoints are rate limited to three (3) requests per second. \nYour organization is limited to a total of 15 requests per second. \nIf you exceed this limit, you will receive a 429 status code. \nWe recommend backoff retry logic to stay within the limit.\n\n---\n\n## Request Headers\nAll HTTP responses will include a `X-Request-ID` header that is logged internally and can be used for tracing/debugging a particular API request. \nAll HTTP requests can include a `X-Request-ID` header which will be logged and mapped to the responses' `X-Request-ID` header. \n\nShare Request Headers whenever troubleshooting an API issue with Hubble Support.\n\n---\n\n## Status Codes\nThe Hubble Cloud API returns the following HTTP status codes: `200`, `400`, `401`, `403`, `404`, `429` and `500`. \nUse the tailored message returned with each status code for insight in the specific context of the endpoint you are attempting to access.\n\n---\n\n## Versioning\nOur cloud backend follows a rolling release model. This means:\n- **Continuous Deployment**: New features, security updates, and performance improvements are automatically rolled out.\n- **Backward Compatibility**: Cloud updates are designed to be compatible with devices running firmware/SDK versions within our active or maintained support windows.\n- **Transparent Change Management**: Release notes and changelogs are published regularly so you can track enhancements and understand any adjustments that might affect integrations.\n- **Versioned Public API**: The Cloud API uses basic major versioning in the url paths (`/v1/...`, `/v2/...` etc.). Major backwards incompatible changes will be made by creating a version of the endpoint with a higher version and communicating with customers to migrate. The legacy `/api/...` and `/api/v2/...` paths remain fully supported as aliases for `/v1/...` and `/v2/...` respectively, so previous versions will be supported for a minimum of 1 year.\n\n---\n"
+  version: 1.0.0
+servers:
+- url: https://api.hubble.com
+  description: Production
+security:
+- BearerAuth: []
+tags:
+- name: Packet Webhooks
+paths:
+  /v1/org/{org_id}/webhooks:
+    post:
+      tags:
+      - Packet Webhooks
+      operationId: create-webhook-endpoint
+      x-criticality: high
+      summary: Create a Webhook Endpoint
+      description: 'Register an endpoint that can receive webhook events for packet data.
+
+
+        **Required Scope:** `write-webhooks`
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  $ref: '#/components/schemas/webhookURL'
+                max_batch_size:
+                  $ref: '#/components/schemas/webhookMaxBatchSize'
+                name:
+                  $ref: '#/components/schemas/webhookName'
+      responses:
+        '200':
+          description: A registered webhook endpoint
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhookWithSecret'
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+    get:
+      tags:
+      - Packet Webhooks
+      operationId: list-registered-webhooks
+      x-criticality: high
+      summary: List Registered Webhooks
+      description: 'Retrieve a list of registered webhooks.
+
+
+        **Required Scope:** `read-webhooks`
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      responses:
+        '200':
+          description: A list of registered webhook endpoints
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  webhooks:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/basicWebhook'
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+  /v1/org/{org_id}/webhooks/{webhook_id}:
+    patch:
+      tags:
+      - Packet Webhooks
+      operationId: update-webhook-endpoint
+      x-criticality: high
+      summary: Update a Webhook Endpoint
+      description: 'Update certain fields of a webhook endpoint.
+
+
+        **Required Scope:** `write-webhooks`
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      - $ref: '#/components/parameters/webhookIdPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                set_name:
+                  $ref: '#/components/schemas/webhookName'
+                set_max_batch_size:
+                  $ref: '#/components/schemas/webhookMaxBatchSize'
+                set_url:
+                  $ref: '#/components/schemas/webhookURL'
+      responses:
+        '200':
+          description: The updated webhook endpoint
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/basicWebhook'
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+    delete:
+      tags:
+      - Packet Webhooks
+      operationId: delete-webhook-endpoint
+      x-criticality: high
+      summary: Delete a Webhook Endpoint
+      description: 'Delete a webhook endpoint.
+
+
+        **Required Scope:** `write-webhooks`
+
+        Delete a webhook endpoint so that it will stop receiving traffic.
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      - $ref: '#/components/parameters/webhookIdPathParam'
+      responses:
+        '200':
+          description: The webhook has been deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                description: an empty object for now
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+  /v1/org/{org_id}/webhooks/{webhook_id}/test:
+    post:
+      tags:
+      - Packet Webhooks
+      operationId: test-webhook-endpoint
+      x-criticality: high
+      summary: Send a Test Webhook
+      description: 'Send an example packet batch to the configured webhook URL to test webhook delivery
+
+        (connectivity, authentication, and response handling). Uses the same request shape as
+
+        live delivery (JSON packet batch plus `HTTP-X-HUBBLE-TOKEN` when a secret is configured).
+
+        The example packet is ephemeral and is not persisted after one attempt.
+
+
+        **Required Scope:** `write-webhooks`
+
+        '
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      - $ref: '#/components/parameters/webhookIdPathParam'
+      responses:
+        '200':
+          description: Result of the test webhook delivery attempt
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/testWebhookResponse'
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '404':
+          $ref: '#/components/responses/ErrorNotFound'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+components:
+  parameters:
+    orgIdPathParam:
+      name: org_id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/orgId'
+      description: Your organization ID
+    webhookIdPathParam:
+      name: webhook_id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/webhookId'
+  schemas:
+    webhookName:
+      type: string
+      description: A name/description for a webhook
+      maxLength: 250
+    legacyWebhook:
+      type: object
+      properties:
+        url:
+          $ref: '#/components/schemas/webhookURL'
+        max_batch_size:
+          $ref: '#/components/schemas/webhookMaxBatchSize'
+    errorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: The HTTP status code
+        description:
+          type: string
+          description: 'A description for the error.
+
+            For user errors, we attempt to be as descriptive as possible to help with diagnosing the issue.
+
+            For internal errors, the error description is only indicates that a retry should occur but we log the full error so that we can diagnose it.
+
+            Error descriptions can change over time and should not be programmed against.
+
+            '
+        name:
+          type: string
+          enum:
+          - Bad Request
+          - Unauthorized
+          - Not Found
+          - Too Many Requests
+          - Internal Server Error
+          description: '`name` is a short name for the error.
+
+            '
+    testWebhookResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Whether the webhook endpoint returned a successful HTTP status code
+        status_code:
+          type: integer
+          description: HTTP status code returned by the webhook endpoint, if a response was received
+        error:
+          type: string
+          description: Error details when the test delivery failed
+    basicWebhook:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/legacyWebhook'
+      - type: object
+        properties:
+          webhook_id:
+            $ref: '#/components/schemas/webhookId'
+          org_id:
+            $ref: '#/components/schemas/orgId'
+          name:
+            $ref: '#/components/schemas/webhookName'
+    webhookSecret:
+      type: string
+      description: 'A confidential, unique string generated for your webhook endpoint to validate that the request came from Hubble.
+
+        Hubble will send this token in the HTTP header `HTTP-X-HUBBLE-TOKEN` when making HTTPS requests to your endpoint.
+
+        '
+    webhookWithSecret:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/basicWebhook'
+      - type: object
+        properties:
+          secret:
+            $ref: '#/components/schemas/webhookSecret'
+    orgId:
+      type: string
+      format: uuid
+      description: The ID for an organization
+    webhookId:
+      type: string
+      description: An identifier for a webhook
+    webhookMaxBatchSize:
+      type: integer
+      description: The maximum number of packets that Hubble will batch into one webhook request
+      default: 100
+      minimum: 10
+      maximum: 1000
+    webhookURL:
+      type: string
+      description: A webhook url
+      maxLength: 2000
+  responses:
+    ErrorNotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 404
+            description: The requested resource was not found.
+            name: Not Found
+    ErrorBadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 400
+            description: The request could not be understood by the server due to malformed syntax.
+            name: Bad Request
+    ErrorInternalServer:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 500
+            description: An unknown error has occurred.
+            name: Unknown
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,0 +1,160 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Hubble Platform Platform Metrics API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Platform Metrics",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get Organization API Metrics",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.hubble.com/v1/org/:org_id/api_metrics",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              },
+              {
+                "name": "days",
+                "value": "",
+                "type": "query",
+                "description": "The number of days of metrics to include in the request.\n\nThe maximum value is further restricted when small `time_interval` values are used.\nThe maximum number of total metric buckets is 365.\n"
+              },
+              {
+                "name": "time_interval",
+                "value": "",
+                "type": "query",
+                "description": "The time interval for the metric buckets.\nIf not provided, a default value is selected based on the `days` parameter:\n\n| days        | time_interval |\n| ----------- | ------------- |\n| [1 => 1)    | hour          |\n| [2 => 31]   | day           |\n| [32 => 365] | month         |\n\n**Partial buckets:** The most recent bucket of metrics is a \"partial\" bucket depending on the interval - partial because it doesn't span a full time_interval yet. \n(e.g. 10:00pm -> 10:36pm for `hour`, June 3rd 12:00am -> June 3rd 10:36pm for `day`, June 1st 12:00am -> June 3rd 10:36pm for `month`).\nThe older buckets are always \"complete\" buckets.\n(e.g. 09:00pm -> 10:00pm for `hour`, June 2nd 12:00am -> June 3rd 12:00am for `day`, May 1st 12:00am -> June 1st 12:00am for `month`).\n\n**Edge cases:** If `days` is not large enough to include a full `month` bucket, days is increased in the backend. \nFor example, querying days=90 with a `month` time_interval on June 13th, 2025 will return \"complete\" March, April, and May buckets and a \"partial\" June bucket.\nSimilarly, when querying for days=7 with a `day` time_interval on June 13th, 2025 at 6:00am will return \"complete\" June 6th, 7th, 8th, 9th, 10th, 11th, and 12th buckets and a \"partial\" June 13th bucket.\n"
+              }
+            ]
+          },
+          "docs": "Retrieves API request metrics including total requests, success rate, and time interval-based breakdowns.\n\n**Required Scope:** `read-platform-metrics`\n"
+        },
+        {
+          "info": {
+            "name": "Get Organization Packet Metrics",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.hubble.com/v1/org/:org_id/packet_metrics",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              },
+              {
+                "name": "days",
+                "value": "",
+                "type": "query",
+                "description": "The number of days of metrics to include in the request.\n\nThe maximum value is further restricted when small `time_interval` values are used.\nThe maximum number of total metric buckets is 365.\n"
+              },
+              {
+                "name": "time_interval",
+                "value": "",
+                "type": "query",
+                "description": "The time interval for the metric buckets.\nIf not provided, a default value is selected based on the `days` parameter:\n\n| days        | time_interval |\n| ----------- | ------------- |\n| [1 => 1)    | hour          |\n| [2 => 31]   | day           |\n| [32 => 365] | month         |\n\n**Partial buckets:** The most recent bucket of metrics is a \"partial\" bucket depending on the interval - partial because it doesn't span a full time_interval yet. \n(e.g. 10:00pm -> 10:36pm for `hour`, June 3rd 12:00am -> June 3rd 10:36pm for `day`, June 1st 12:00am -> June 3rd 10:36pm for `month`).\nThe older buckets are always \"complete\" buckets.\n(e.g. 09:00pm -> 10:00pm for `hour`, June 2nd 12:00am -> June 3rd 12:00am for `day`, May 1st 12:00am -> June 1st 12:00am for `month`).\n\n**Edge cases:** If `days` is not large enough to include a full `month` bucket, days is increased in the backend. \nFor example, querying days=90 with a `month` time_interval on June 13th, 2025 will return \"complete\" March, April, and May buckets and a \"partial\" June bucket.\nSimilarly, when querying for days=7 with a `day` time_interval on June 13th, 2025 at 6:00am will return \"complete\" June 6th, 7th, 8th, 9th, 10th, 11th, and 12th buckets and a \"partial\" June 13th bucket.\n"
+              },
+              {
+                "name": "filter_tags",
+                "value": "",
+                "type": "query",
+                "description": "A set of device **platform tags** specifying which packets to include.\nOnly platform tags are queryable: `_env:production`, `_env:sandbox`.\nThe query param can be used multiple times to form a list of tags.\nPacket matching criteria uses AND logic when different tag keys are used in a list of tags, and OR logic when the same tag key is used more than once.\n"
+              }
+            ]
+          },
+          "docs": "Retrieves packet metrics across a time range providing totals and time interval-based breakdowns.\n\n**Required Scope:** `read-platform-metrics`\n"
+        },
+        {
+          "info": {
+            "name": "Get Organization Webhook Metrics",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.hubble.com/v1/org/:org_id/webhook_metrics",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              },
+              {
+                "name": "days",
+                "value": "",
+                "type": "query",
+                "description": "The number of days of metrics to include in the request.\n\nThe maximum value is further restricted when small `time_interval` values are used.\nThe maximum number of total metric buckets is 365.\n"
+              },
+              {
+                "name": "time_interval",
+                "value": "",
+                "type": "query",
+                "description": "The time interval for the metric buckets.\nIf not provided, a default value is selected based on the `days` parameter:\n\n| days        | time_interval |\n| ----------- | ------------- |\n| [1 => 1)    | hour          |\n| [2 => 31]   | day           |\n| [32 => 365] | month         |\n\n**Partial buckets:** The most recent bucket of metrics is a \"partial\" bucket depending on the interval - partial because it doesn't span a full time_interval yet. \n(e.g. 10:00pm -> 10:36pm for `hour`, June 3rd 12:00am -> June 3rd 10:36pm for `day`, June 1st 12:00am -> June 3rd 10:36pm for `month`).\nThe older buckets are always \"complete\" buckets.\n(e.g. 09:00pm -> 10:00pm for `hour`, June 2nd 12:00am -> June 3rd 12:00am for `day`, May 1st 12:00am -> June 1st 12:00am for `month`).\n\n**Edge cases:** If `days` is not large enough to include a full `month` bucket, days is increased in the backend. \nFor example, querying days=90 with a `month` time_interval on June 13th, 2025 will return \"complete\" March, April, and May buckets and a \"partial\" June bucket.\nSimilarly, when querying for days=7 with a `day` time_interval on June 13th, 2025 at 6:00am will return \"complete\" June 6th, 7th, 8th, 9th, 10th, 11th, and 12th buckets and a \"partial\" June 13th bucket.\n"
+              }
+            ]
+          },
+          "docs": "Retrieves webhook metrics including total requests, success rate, and time interval-based breakdowns for webhook events.\n\n**Required Scope:** `read-platform-metrics`\n"
+        },
+        {
+          "info": {
+            "name": "Get Organization Device Metrics",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.hubble.com/v1/org/:org_id/device_metrics",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              },
+              {
+                "name": "days",
+                "value": "",
+                "type": "query",
+                "description": "The number of days of metrics to include in the request.\n\nThe maximum value is further restricted when small `time_interval` values are used.\nThe maximum number of total metric buckets is 365.\n"
+              },
+              {
+                "name": "time_interval",
+                "value": "",
+                "type": "query",
+                "description": "The time interval for the metric buckets.\nIf not provided, a default value is selected based on the `days` parameter:\n\n| days        | time_interval |\n| ----------- | ------------- |\n| [1 => 1)    | hour          |\n| [2 => 31]   | day           |\n| [32 => 365] | month         |\n\n**Partial buckets:** The most recent bucket of metrics is a \"partial\" bucket depending on the interval - partial because it doesn't span a full time_interval yet. \n(e.g. 10:00pm -> 10:36pm for `hour`, June 3rd 12:00am -> June 3rd 10:36pm for `day`, June 1st 12:00am -> June 3rd 10:36pm for `month`).\nThe older buckets are always \"complete\" buckets.\n(e.g. 09:00pm -> 10:00pm for `hour`, June 2nd 12:00am -> June 3rd 12:00am for `day`, May 1st 12:00am -> June 1st 12:00am for `month`).\n\n**Edge cases:** If `days` is not large enough to include a full `month` bucket, days is increased in the backend. \nFor example, querying days=90 with a `month` time_interval on June 13th, 2025 will return \"complete\" March, April, and May buckets and a \"partial\" June bucket.\nSimilarly, when querying for days=7 with a `day` time_interval on June 13th, 2025 at 6:00am will return \"complete\" June 6th, 7th, 8th, 9th, 10th, 11th, and 12th buckets and a \"partial\" June 13th bucket.\n"
+              },
+              {
+                "name": "filter_tags",
+                "value": "",
+                "type": "query",
+                "description": "A set of device **platform tags** specifying which packets to include.\nOnly platform tags are queryable: `_env:production`, `_env:sandbox`.\nThe query param can be used multiple times to form a list of tags.\nPacket matching criteria uses AND logic when different tag keys are used in a list of tags, and OR logic when the same tag key is used more than once.\n"
+              }
+            ]
+          },
+          "docs": "Retrieves metrics for active, never active, and total registered devices over time.\n\n### Most Recent/Partial Bucket \nThe most recent bucket, the partial bucket, is not calculated on this endpoint except for when using the hourly time interval.\nFor parsing/syntax consistency, this bucket is still returned with a timestamp and empty values for the active, registered, and never active devices values.\n\n**Required Scope:** `read-platform-metrics`\n"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

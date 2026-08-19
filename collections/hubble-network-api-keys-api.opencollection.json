@@ -1,0 +1,164 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Hubble Platform API Keys API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "API Keys",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Validate an API Key",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.hubble.com/v1/org/:org_id/check",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              }
+            ]
+          },
+          "docs": "Confirm your API key is valid."
+        },
+        {
+          "info": {
+            "name": "List all API Keys",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.hubble.com/v1/org/:org_id/key",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              }
+            ]
+          },
+          "docs": "List all valid API Keys for your organization.\n\n**Required Scope:** `read-api-keys`\n"
+        },
+        {
+          "info": {
+            "name": "Provision an API Key",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.hubble.com/v1/org/:org_id/key",
+            "headers": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Provision a new API Key for your organization.\n\n**Required Scope:** `write-api-keys`\n\n### Authorization Scopes\nAPI Keys can be created with specific authorization scopes that control what operations the key can perform. \nIf no scopes are specified, the key will be created with all available scopes (admin-level access).\nSee the Cloud API \"Introduction\" for a complete list authorization scopes.\n\n### Expiration Date\nSet an appropriate expiration date for temporary API access. For no expiration, set"
+        },
+        {
+          "info": {
+            "name": "Update an API Key",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://api.hubble.com/v1/org/:org_id/key/:key_id",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              },
+              {
+                "name": "key_id",
+                "value": "",
+                "type": "path",
+                "description": "API key ID"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Update metadata for an API key, including name, authorization scopes, and expiration time.\n\n**Required Scope:** `write-api-keys`\n\n### Authorization Scopes\nYou may update the scopes assigned to an API key to change its permissions. See the Cloud API \"Introduction\" for a complete list authorization scopes.\n\n### Expiration Time\nYou may update the expiration time for an API key. Set to 0 to remove expiration (key will never expire).\n"
+        },
+        {
+          "info": {
+            "name": "Delete an API Key",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://api.hubble.com/v1/org/:org_id/key/:key_id",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              },
+              {
+                "name": "key_id",
+                "value": "",
+                "type": "path",
+                "description": "API key ID"
+              }
+            ]
+          },
+          "docs": "Permanently delete an API Key from your organization.\n\n**Required Scope:** `write-api-keys`\n"
+        },
+        {
+          "info": {
+            "name": "List Key Scopes",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.hubble.com/v1/org/:org_id/key_scopes",
+            "params": [
+              {
+                "name": "org_id",
+                "value": "",
+                "type": "path",
+                "description": "Your organization ID"
+              }
+            ]
+          },
+          "docs": "Retrieve a list of all available authorization scopes that can be assigned to API keys.\nThis endpoint returns scope IDs and human-readable display names.\n\n**Required Scope:** `read-api-keys`\n"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

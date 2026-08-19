@@ -1,0 +1,372 @@
+openapi: 3.2.0
+info:
+  title: Hubble Platform Packets API
+  description: "The Hubble platform is built API-first. Use our Cloud API to manage your devices\nand access device data programmatically. \nWe've designed our API following RESTful principles. \nEach endpoint returns standard HTTP status codes and may include JSON payloads.\n\n---\n\n## API Access\nUse API Keys to authenticate with the Hubble Cloud API for your organization. \n\n### Generate an API Key\nLog in to your Hubble dashboard. Navigate to **Developer Tools > API Tokens** to create a new API Key. \nProvide a name for the token, and set an appropriate expiration date for temporary access.\n\n### Organization ID\nYou will need `org_id` to make API requests. From your Hubble dashboard, navigate to \n**Developer Tooks > API Tokens**, or **Organization Settings**, to find your Organization ID. \n\n### Authorization Scopes\nAPI endpoints require specific authorization scopes to perform the intended operation. \n**Required Scope** is always provided in the API documentation.\n\nAPI Keys can be created with specific authorization scopes that control what operations the key can perform. \nIf no scopes are specified, the key will be created with all available scopes (admin-level access).\n\n| **Scope**                   | **Access**                                     |\n|------------------------------|-------------------------------------------------|\n| **read-api-keys**            | View API keys and their metadata               |\n| **write-api-keys**           | Create, update, and delete API keys            |\n| **read-users**               | View user information and roles                |\n| **write-users**              | Add, update, and remove users from the organization |\n| **read-organization-metadata** | View organization details and settings       |\n| **write-organization-metadata** | Update organization information            |\n| **read-devices**             | View device information and status             |\n| **write-devices**            | Register and manage devices                    |\n| **read-invitations**         | View pending invitations                       |\n| **write-invitations**        | Create and revoke user invitations             |\n| **read-packets**             | Access packet data and retrieval endpoints     |\n| **read-platform-metrics**    | View platform metrics and analytics            |\n| **read-billing-usage**       | View billing usage information                 |\n| **read-billing-invoices**    | View billing invoices                          |\n| **read-webhooks**            | View webhook configurations                    |\n| **write-webhooks**           | Create and manage webhook endpoints            |\n    \n**Example Scope Combinations**\n- Create a key with read-only access: `[\"read-api-keys\", \"read-users\", \"read-devices\"]`\n- Create a key for device management: `[\"read-devices\", \"write-devices\"]`\n- Create a key for user management: `[\"read-users\", \"write-users\", \"read-invitations\", \"write-invitations\"]`\n    \n**Best Practices for Data Security**\n- Create keys with the minimum required scopes for your use case\n- Regularly review and rotate API keys\n- Use descriptive names for your keys to track their purpose\n- Set appropriate expiration dates for temporary access    \n\n---\n\n## Import API Definition\nYou can quickly import the Hubble Cloud API into your preferred developer environment (such as Postman or Insomnia) using our **public OpenAPI definition**.\nSimply download or import the YAML file directly:\n\n[https://hubble.com/docs/openapi.yaml](https://hubble.com/docs/openapi.yaml)\n\n---\n\n## Pagination\nWhen the number of objects requested exceeds the maximum page size for an endpoint, the API response will be paginated. \nThis means you will receive a subset of the total results, along with a `Continuation-Token` in the Response Header that can be used to fetch subsequent subsets.\n\nTo retrieve the next set of data, you must use the provided `Continuation-Token` in the Request Header of your next API call to the same endpoint. \nContinue using the provided token in each successive request until no `Continuation-Token` is returned, which indicates you have retrieved all available data.\n\n---\n\n## Rate Limits\nThe Hubble Cloud API follows a leaky bucket approach to rate limiting. Endpoints are rate limited to three (3) requests per second. \nYour organization is limited to a total of 15 requests per second. \nIf you exceed this limit, you will receive a 429 status code. \nWe recommend backoff retry logic to stay within the limit.\n\n---\n\n## Request Headers\nAll HTTP responses will include a `X-Request-ID` header that is logged internally and can be used for tracing/debugging a particular API request. \nAll HTTP requests can include a `X-Request-ID` header which will be logged and mapped to the responses' `X-Request-ID` header. \n\nShare Request Headers whenever troubleshooting an API issue with Hubble Support.\n\n---\n\n## Status Codes\nThe Hubble Cloud API returns the following HTTP status codes: `200`, `400`, `401`, `403`, `404`, `429` and `500`. \nUse the tailored message returned with each status code for insight in the specific context of the endpoint you are attempting to access.\n\n---\n\n## Versioning\nOur cloud backend follows a rolling release model. This means:\n- **Continuous Deployment**: New features, security updates, and performance improvements are automatically rolled out.\n- **Backward Compatibility**: Cloud updates are designed to be compatible with devices running firmware/SDK versions within our active or maintained support windows.\n- **Transparent Change Management**: Release notes and changelogs are published regularly so you can track enhancements and understand any adjustments that might affect integrations.\n- **Versioned Public API**: The Cloud API uses basic major versioning in the url paths (`/v1/...`, `/v2/...` etc.). Major backwards incompatible changes will be made by creating a version of the endpoint with a higher version and communicating with customers to migrate. The legacy `/api/...` and `/api/v2/...` paths remain fully supported as aliases for `/v1/...` and `/v2/...` respectively, so previous versions will be supported for a minimum of 1 year.\n\n---\n"
+  version: 1.0.0
+servers:
+- url: https://api.hubble.com
+  description: Production
+security:
+- BearerAuth: []
+tags:
+- name: Packets
+paths:
+  /v1/org/{org_id}/packets:
+    get:
+      tags:
+      - Packets
+      operationId: retrieve-organization-packets
+      x-criticality: high
+      summary: Retrieve Organization Packets
+      description: "Stream or query packets for your organization.\n\n**Required Scope:** `read-packets`\n\n## Overview\nThis endpoint acts as a data stream. Use the `Continuation-Token` to track your consumer's position in the stream and ingest incrementally.\nPackets are returned in ascending order based on when they were detected by Hubble Network.\n\n## Pagination and Streaming\nUse the `Continuation-Token` to capture new packets incrementally. \nIf provided, all other query parameters are ignored, as the token persists the initial query's configuration.\n\n### Response Headers\n* `Continuation-Token`: provided if more packets are available. The max page size is 1,000 packets. An empty string indicates there are no new packets in the stream.\n* `Retry-After`: if the stream is empty, this integer provides the recommended number of seconds to wait before your next poll request (max value is 300 seconds).\n        \n## Query Parameters (Initial Request)\nWhen starting a new stream (no `Continuation-Token` exists) or to query for data from a period of time, use these parameters to begin polling:\n\n### Time Period (UTC, in seconds)\n* `start` time defaults to 7 days ago when not specified. \n* Omit `end` time to leave the stream open and poll for new packets as they become available.\n\n:::tip\nGranular packet data is available up to **30 days** in the past.\n:::\n\n### Device Filtering\n* When `device_id` is provided, only packets from that device will be returned. \n* Note: you cannot page indefinitely for single-device queries. The stream closes when it reaches current time.\n\n:::warning\nDevice filtering is provided for troubleshooting. It should not be used for high-volume data retrieval.\n:::\n\n### Tag Filtering\n* You may filter packet data by device **platform tags**: `_env:production`, `_env:sandbox`. \n* **Custom tags are not currently supported.**\n\n---\n\n## Packet Data Definitions (Response)\n\n### Location Object\nFor **TERRESTRIAL** packets, all `location` fields represent the scanning gateway's most recent GPS lock:\n* `location.timestamp` is the timestamp of the location lock.\n* `location.latitude` and `location.longitude` are the location coordinates.\n* `location.horizontal_accuracy` and `location.vertical_accuracy` represent accuracy variance in meters.\n\nFor **SATELLITE** packets, `location.timestamp` and `device.timestamp` are identical: both represent the time the packet was detected by the satellite.\n\n### Device Object\nFor **TERRESTRIAL** packets,\n* `device.timestamp` is the timestamp when the data packet was detected by the gateway.\n* `device.rssi` is the received signal strength measured by the gateway.\n\n### Gateway Object\nFor **self-provided** packets (packets your organization contributed and is also reading back, i.e. `provider_id == org_id`), the response optionally includes a top-level `gateway` object. These fields describe the **scanning gateway** that received the BLE advertisement.\n* `gateway.gateway_id` is the stable gateway UUID issued by Hubble when you register using the Gateway API.\n* `gateway.service_id` is the normalized 16-bit service UUID from the scanned BLE advertisement (e.g. `fca6`).\n\n:::note\nThe `gateway` block is **omitted entirely** for packets sourced from a different organization (e.g. third-party crowdsourced traffic), and is also omitted on self-provided packets when no gateway context was attached at ingest.\n:::\n"
+      parameters:
+      - $ref: '#/components/parameters/orgIdPathParam'
+      - $ref: '#/components/parameters/continuationTokenHeader'
+      - $ref: '#/components/parameters/startQueryParam'
+      - $ref: '#/components/parameters/endQueryParam'
+      - $ref: '#/components/parameters/deviceIdQueryParam'
+      - $ref: '#/components/parameters/filterTagsQueryParam'
+      responses:
+        '200':
+          description: A page of packets
+          headers:
+            Continuation-Token:
+              $ref: '#/components/headers/ContinuationTokenHeader'
+            Retry-After:
+              $ref: '#/components/headers/RetryAfterHeader'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/packetBatch'
+        '429':
+          description: An error when too many requests have been made to retrieve packets
+          headers:
+            Continuation-Token:
+              $ref: '#/components/headers/ContinuationTokenHeader'
+            Retry-After:
+              $ref: '#/components/headers/RetryAfterHeader'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '500':
+          $ref: '#/components/responses/ErrorInternalServer'
+  /v1/webhook/testBatch:
+    post:
+      tags:
+      - Packets
+      operationId: packet-webhook-example
+      x-criticality: high
+      summary: Packet Webhook Example
+      description: "This endpoint is an example webhook endpoint that each organization can implement in order to receive packet data.\nPacket data that has been decrypted for your organization will be forwarded to these webhooks.\n\n### Batching\nPackets are sent in batches to minimize HTTP overhead from sending packets individually.\nBatch sizes are configurable per webhook endpoint. \nThe actual number of packets per request will range between 1 and the configured `max_batch_size`.\n"
+      parameters:
+      - $ref: '#/components/parameters/contentTypeJsonHeader'
+      - $ref: '#/components/parameters/webhookSecretHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/packetBatch'
+      responses:
+        '200':
+          description: Message delivered.
+        '500':
+          description: Internal Server Error. Please Retry.
+components:
+  schemas:
+    location:
+      type: object
+      required:
+      - latitude
+      - longitude
+      - altitude
+      - timestamp
+      properties:
+        latitude:
+          type: number
+          description: Latitude in Decimal Degrees DDD.DDDDD°
+        longitude:
+          type: number
+          description: Longitude in Decimal Degrees DDD.DDDDD°
+        altitude:
+          type: number
+          description: Altitude in meters for the provided gps coordinates
+        horizontal_accuracy:
+          type: number
+          description: Horizontal accuracy in meters for the provided gps coordinates
+        vertical_accuracy:
+          type: number
+          description: Vertical accuracy in meters for the provided gps coordinates
+        timestamp:
+          $ref: '#/components/schemas/utcTimestampNumber'
+    deviceTags:
+      type: object
+      additionalProperties:
+        type: string
+      description: "Tags are user-defined key/value pairs that can be attributed to a device. \nA device may have up to 10 tags.\n**Custom tags:** create your own tags with `key` length up to 32 characters and `value` length up to 128 characters.\n**Platform tags:** use Hubble-defined tags to organize devices.\n- `_env` tag: `production` indicates if a device belongs to the live environment, and `sandbox` for the test environment. A device will always have an `_env` tag assigned.\n"
+      example:
+        _env: production
+    packet:
+      type: object
+      properties:
+        location:
+          $ref: '#/components/schemas/location'
+        device:
+          type: object
+          required:
+          - id
+          - payload
+          - timestamp
+          properties:
+            id:
+              $ref: '#/components/schemas/deviceId'
+            name:
+              $ref: '#/components/schemas/deviceName'
+            tags:
+              $ref: '#/components/schemas/deviceTags'
+            payload:
+              type: string
+              description: A packet's decrypted payload in Base64 format
+            rssi:
+              type: number
+            timestamp:
+              $ref: '#/components/schemas/utcTimestampNumber'
+            counter:
+              type: number
+              description: 'The time-based counter associated with this packet.
+
+                '
+            sequence_number:
+              type: number
+              description: 'The sequence number of this packet
+
+                '
+        network_type:
+          type: string
+          enum:
+          - TERRESTRIAL
+          - SATELLITE
+        gateway:
+          $ref: '#/components/schemas/gateway'
+    errorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: The HTTP status code
+        description:
+          type: string
+          description: 'A description for the error.
+
+            For user errors, we attempt to be as descriptive as possible to help with diagnosing the issue.
+
+            For internal errors, the error description is only indicates that a retry should occur but we log the full error so that we can diagnose it.
+
+            Error descriptions can change over time and should not be programmed against.
+
+            '
+        name:
+          type: string
+          enum:
+          - Bad Request
+          - Unauthorized
+          - Not Found
+          - Too Many Requests
+          - Internal Server Error
+          description: '`name` is a short name for the error.
+
+            '
+    webhookSecret:
+      type: string
+      description: 'A confidential, unique string generated for your webhook endpoint to validate that the request came from Hubble.
+
+        Hubble will send this token in the HTTP header `HTTP-X-HUBBLE-TOKEN` when making HTTPS requests to your endpoint.
+
+        '
+    deviceName:
+      type: string
+      description: Assigned name for the device
+      maxLength: 250
+    deviceId:
+      type: string
+      format: uuid
+      description: Primary UUID identifier for a registered device
+    orgId:
+      type: string
+      format: uuid
+      description: The ID for an organization
+    utcTimestampInteger:
+      type: integer
+      format: int64
+      description: An UTC second-precision timestamp formatted as an integer
+    gateway:
+      type: object
+      description: 'Metadata about the scanning gateway that received this packet — the relay
+
+        that detected the BLE advertisement, not the device that emitted it.
+
+        Only present on self-provided packets (`provider_id == org_id`) where
+
+        gateway context was attached at ingest. Both fields are optional.
+
+        '
+      properties:
+        gateway_id:
+          type: string
+          format: uuid
+          description: 'Stable unique identifier of the gateway device that received the packet.
+
+            This is the gateway UUID issued at registration time and is consistent
+
+            across all packets from the same gateway.
+
+            '
+        service_id:
+          type: string
+          description: 'Normalized 16-bit BLE service UUID that the advertisement was scanned
+
+            under (lowercase hex, e.g. `fca6` for Hubble packets). Identifies which
+
+            BLE service profile the gateway matched when it captured this packet.
+
+            '
+          example: fca6
+    utcTimestampNumber:
+      type: number
+      format: double
+      description: An UTC second-precision timestamp formatted as a floating point number
+    packetBatch:
+      type: object
+      properties:
+        packets:
+          type: array
+          items:
+            $ref: '#/components/schemas/packet'
+  parameters:
+    deviceIdQueryParam:
+      name: device_id
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/deviceId'
+      description: 'Filter packets to a specific device
+
+        '
+    continuationTokenHeader:
+      name: Continuation-Token
+      in: header
+      required: false
+      schema:
+        type: string
+      description: A token to indicate how to continue paging
+    webhookSecretHeader:
+      name: HTTP-X-HUBBLE-TOKEN
+      in: header
+      required: true
+      schema:
+        $ref: '#/components/schemas/webhookSecret'
+      description: 'A confidential, unique string generated for your webhook endpoint to validate that the request came from Hubble.
+
+        '
+    orgIdPathParam:
+      name: org_id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/orgId'
+      description: Your organization ID
+    startQueryParam:
+      name: start
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/utcTimestampInteger'
+      description: "UTC timestamp (in seconds) indicating when to start retrieving packets. \nThis timestamp corresponds to when the packet was received by the network.\nIf omitted, defaults to 7 days before the current UTC time.\n"
+    filterTagsQueryParam:
+      name: filter_tags
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          description: 'A tag to match against. For example: _env:production.
+
+            '
+      description: 'A set of device **platform tags** specifying which packets to include.
+
+        Only platform tags are queryable: `_env:production`, `_env:sandbox`.
+
+        The query param can be used multiple times to form a list of tags.
+
+        Packet matching criteria uses AND logic when different tag keys are used in a list of tags, and OR logic when the same tag key is used more than once.
+
+        '
+    contentTypeJsonHeader:
+      name: Content-Type
+      in: header
+      schema:
+        type: string
+      description: An indication that the payload is JSON
+      example: application/json
+    endQueryParam:
+      name: end
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/utcTimestampInteger'
+      description: 'UTC timestamp (in seconds) indicating when to end retrieving packets.
+
+        This timestamp corresponds to when the packet was received by the network.
+
+        If omitted, defaults to empty (meaning the pagination will continue indefinitely).
+
+        If specified, pagination will continue until all packets received prior to the timestamp have been returned.
+
+        '
+  headers:
+    ContinuationTokenHeader:
+      description: A token to indicate how to continue paging
+      schema:
+        type: string
+    RetryAfterHeader:
+      description: 'The number of seconds to wait to attempt a retry.
+
+        When attached to a 200, this is a suggestion because the most recent data has been retrieved already.
+
+        When attached to a 429, this delay is a recommendation to reduce repeat 429s.
+
+        '
+      schema:
+        type: integer
+        minimum: 0
+        maximum: 300
+  responses:
+    ErrorInternalServer:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 500
+            description: An unknown error has occurred.
+            name: Unknown
+    ErrorBadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 400
+            description: The request could not be understood by the server due to malformed syntax.
+            name: Bad Request
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

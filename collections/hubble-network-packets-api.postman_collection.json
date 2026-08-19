@@ -1,0 +1,646 @@
+{
+  "item": [
+    {
+      "id": "9f1fc797-db2a-4ec3-9e99-01de1dafd8e8",
+      "name": "Packets",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "88d00296-c7a4-4601-a09f-d0b6337633b5",
+          "name": "Retrieve Organization Packets",
+          "request": {
+            "name": "Retrieve Organization Packets",
+            "description": {
+              "content": "Stream or query packets for your organization.\n\n**Required Scope:** `read-packets`\n\n## Overview\nThis endpoint acts as a data stream. Use the `Continuation-Token` to track your consumer's position in the stream and ingest incrementally.\nPackets are returned in ascending order based on when they were detected by Hubble Network.\n\n## Pagination and Streaming\nUse the `Continuation-Token` to capture new packets incrementally. \nIf provided, all other query parameters are ignored, as the token persists the initial query's configuration.\n\n### Response Headers\n* `Continuation-Token`: provided if more packets are available. The max page size is 1,000 packets. An empty string indicates there are no new packets in the stream.\n* `Retry-After`: if the stream is empty, this integer provides the recommended number of seconds to wait before your next poll request (max value is 300 seconds).\n        \n## Query Parameters (Initial Request)\nWhen starting a new stream (no `Continuation-Token` exists) or to query for data from a period of time, use these parameters to begin polling:\n\n### Time Period (UTC, in seconds)\n* `start` time defaults to 7 days ago when not specified. \n* Omit `end` time to leave the stream open and poll for new packets as they become available.\n\n:::tip\nGranular packet data is available up to **30 days** in the past.\n:::\n\n### Device Filtering\n* When `device_id` is provided, only packets from that device will be returned. \n* Note: you cannot page indefinitely for single-device queries. The stream closes when it reaches current time.\n\n:::warning\nDevice filtering is provided for troubleshooting. It should not be used for high-volume data retrieval.\n:::\n\n### Tag Filtering\n* You may filter packet data by device **platform tags**: `_env:production`, `_env:sandbox`. \n* **Custom tags are not currently supported.**\n\n---\n\n## Packet Data Definitions (Response)\n\n### Location Object\nFor **TERRESTRIAL** packets, all `location` fields represent the scanning gateway's most recent GPS lock:\n* `location.timestamp` is the timestamp of the location lock.\n* `location.latitude` and `location.longitude` are the location coordinates.\n* `location.horizontal_accuracy` and `location.vertical_accuracy` represent accuracy variance in meters.\n\nFor **SATELLITE** packets, `location.timestamp` and `device.timestamp` are identical: both represent the time the packet was detected by the satellite.\n\n### Device Object\nFor **TERRESTRIAL** packets,\n* `device.timestamp` is the timestamp when the data packet was detected by the gateway.\n* `device.rssi` is the received signal strength measured by the gateway.\n\n### Gateway Object\nFor **self-provided** packets (packets your organization contributed and is also reading back, i.e. `provider_id == org_id`), the response optionally includes a top-level `gateway` object. These fields describe the **scanning gateway** that received the BLE advertisement.\n* `gateway.gateway_id` is the stable gateway UUID issued by Hubble when you register using the Gateway API.\n* `gateway.service_id` is the normalized 16-bit service UUID from the scanned BLE advertisement (e.g. `fca6`).\n\n:::note\nThe `gateway` block is **omitted entirely** for packets sourced from a different organization (e.g. third-party crowdsourced traffic), and is also omitted on self-provided packets when no gateway context was attached at ingest.\n:::\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "org",
+                ":org_id",
+                "packets"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "start",
+                  "value": "<long>",
+                  "description": "UTC timestamp (in seconds) indicating when to start retrieving packets. \nThis timestamp corresponds to when the packet was received by the network.\nIf omitted, defaults to 7 days before the current UTC time.\n"
+                },
+                {
+                  "disabled": false,
+                  "key": "end",
+                  "value": "<long>",
+                  "description": "UTC timestamp (in seconds) indicating when to end retrieving packets.\nThis timestamp corresponds to when the packet was received by the network.\nIf omitted, defaults to empty (meaning the pagination will continue indefinitely).\nIf specified, pagination will continue until all packets received prior to the timestamp have been returned.\n"
+                },
+                {
+                  "disabled": false,
+                  "key": "device_id",
+                  "value": "<uuid>",
+                  "description": "Filter packets to a specific device\n"
+                },
+                {
+                  "disabled": false,
+                  "key": "filter_tags",
+                  "value": "<string>",
+                  "description": "A set of device **platform tags** specifying which packets to include.\nOnly platform tags are queryable: `_env:production`, `_env:sandbox`.\nThe query param can be used multiple times to form a list of tags.\nPacket matching criteria uses AND logic when different tag keys are used in a list of tags, and OR logic when the same tag key is used more than once.\n"
+                },
+                {
+                  "disabled": false,
+                  "key": "filter_tags",
+                  "value": "<string>",
+                  "description": "A set of device **platform tags** specifying which packets to include.\nOnly platform tags are queryable: `_env:production`, `_env:sandbox`.\nThe query param can be used multiple times to form a list of tags.\nPacket matching criteria uses AND logic when different tag keys are used in a list of tags, and OR logic when the same tag key is used more than once.\n"
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<uuid>",
+                  "key": "org_id",
+                  "description": "(Required) Your organization ID"
+                }
+              ]
+            },
+            "header": [
+              {
+                "disabled": false,
+                "description": "A token to indicate how to continue paging",
+                "key": "Continuation-Token",
+                "value": "<string>"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "b04e0d6d-69d1-4bb7-8c8e-7cf4674b104e",
+              "name": "A page of packets",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "packets"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "start",
+                      "value": "<long>"
+                    },
+                    {
+                      "key": "end",
+                      "value": "<long>"
+                    },
+                    {
+                      "key": "device_id",
+                      "value": "<uuid>"
+                    },
+                    {
+                      "key": "filter_tags",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "filter_tags",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "A token to indicate how to continue paging",
+                    "key": "Continuation-Token",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "disabled": false,
+                  "description": "A token to indicate how to continue paging",
+                  "key": "Continuation-Token",
+                  "value": "string"
+                },
+                {
+                  "disabled": false,
+                  "description": "The number of seconds to wait to attempt a retry.\nWhen attached to a 200, this is a suggestion because the most recent data has been retrieved already.\nWhen attached to a 429, this delay is a recommendation to reduce repeat 429s.\n",
+                  "key": "Retry-After",
+                  "value": "71"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"packets\": [\n    {\n      \"location\": {\n        \"latitude\": 5958.525244942988,\n        \"longitude\": 5488.064591521127,\n        \"altitude\": 2216.4247236731117,\n        \"timestamp\": 7963.046529802079,\n        \"horizontal_accuracy\": 4488.817963090168,\n        \"vertical_accuracy\": 602.7189984234471\n      },\n      \"device\": {\n        \"id\": \"<uuid>\",\n        \"payload\": \"string\",\n        \"timestamp\": 5898.483035672246,\n        \"name\": \"string\",\n        \"tags\": {\n          \"_env\": \"production\"\n        },\n        \"rssi\": 5892.49353545906,\n        \"counter\": 1516.2909812702997,\n        \"sequence_number\": 8554.054616333899\n      },\n      \"network_type\": \"SATELLITE\",\n      \"gateway\": {\n        \"gateway_id\": \"97562e24-c259-ac8a-c19c-a42973b8d4c5\",\n        \"service_id\": \"fca6\"\n      }\n    },\n    {\n      \"location\": {\n        \"latitude\": 6451.865780687933,\n        \"longitude\": 9860.708176961842,\n        \"altitude\": 5725.232305650475,\n        \"timestamp\": 3349.6719767527793,\n        \"horizontal_accuracy\": 9928.206947657603,\n        \"vertical_accuracy\": 6657.503387823742\n      },\n      \"device\": {\n        \"id\": \"<uuid>\",\n        \"payload\": \"string\",\n        \"timestamp\": 6788.240808607703,\n        \"name\": \"string\",\n        \"tags\": {\n          \"_env\": \"production\"\n        },\n        \"rssi\": 1881.1984677175708,\n        \"counter\": 2232.0167346684816,\n        \"sequence_number\": 7367.306575009339\n      },\n      \"network_type\": \"TERRESTRIAL\",\n      \"gateway\": {\n        \"gateway_id\": \"5440b9b3-558b-e8b2-698e-ca44a9009ebe\",\n        \"service_id\": \"fca6\"\n      }\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "16984c4d-647e-41c7-957d-e67588b14c28",
+              "name": "Bad Request",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "packets"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "start",
+                      "value": "<long>"
+                    },
+                    {
+                      "key": "end",
+                      "value": "<long>"
+                    },
+                    {
+                      "key": "device_id",
+                      "value": "<uuid>"
+                    },
+                    {
+                      "key": "filter_tags",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "filter_tags",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "A token to indicate how to continue paging",
+                    "key": "Continuation-Token",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 400,\n  \"description\": \"The request could not be understood by the server due to malformed syntax.\",\n  \"name\": \"Bad Request\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "3de90217-b392-4abf-81fb-9a65277e6367",
+              "name": "An error when too many requests have been made to retrieve packets",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "packets"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "start",
+                      "value": "<long>"
+                    },
+                    {
+                      "key": "end",
+                      "value": "<long>"
+                    },
+                    {
+                      "key": "device_id",
+                      "value": "<uuid>"
+                    },
+                    {
+                      "key": "filter_tags",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "filter_tags",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "A token to indicate how to continue paging",
+                    "key": "Continuation-Token",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "header": [
+                {
+                  "disabled": false,
+                  "description": "A token to indicate how to continue paging",
+                  "key": "Continuation-Token",
+                  "value": "string"
+                },
+                {
+                  "disabled": false,
+                  "description": "The number of seconds to wait to attempt a retry.\nWhen attached to a 200, this is a suggestion because the most recent data has been retrieved already.\nWhen attached to a 429, this delay is a recommendation to reduce repeat 429s.\n",
+                  "key": "Retry-After",
+                  "value": "71"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 9316,\n  \"description\": \"string\",\n  \"name\": \"Unauthorized\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "c622aa24-4246-41d2-84a4-51f3f2f7b2dc",
+              "name": "Internal Server Error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "packets"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "start",
+                      "value": "<long>"
+                    },
+                    {
+                      "key": "end",
+                      "value": "<long>"
+                    },
+                    {
+                      "key": "device_id",
+                      "value": "<uuid>"
+                    },
+                    {
+                      "key": "filter_tags",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "filter_tags",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "A token to indicate how to continue paging",
+                    "key": "Continuation-Token",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 500,\n  \"description\": \"An unknown error has occurred.\",\n  \"name\": \"Unknown\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "cc0b4df8-5785-4acc-b3c4-7cdb95d8c9de",
+          "name": "Packet Webhook Example",
+          "request": {
+            "name": "Packet Webhook Example",
+            "description": {
+              "content": "This endpoint is an example webhook endpoint that each organization can implement in order to receive packet data.\nPacket data that has been decrypted for your organization will be forwarded to these webhooks.\n\n### Batching\nPackets are sent in batches to minimize HTTP overhead from sending packets individually.\nBatch sizes are configurable per webhook endpoint. \nThe actual number of packets per request will range between 1 and the configured `max_batch_size`.\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "webhook",
+                "testBatch"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "disabled": false,
+                "description": "(Required) A confidential, unique string generated for your webhook endpoint to validate that the request came from Hubble.\n",
+                "key": "HTTP-X-HUBBLE-TOKEN",
+                "value": "<string>"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"packets\": [\n    {\n      \"location\": {\n        \"latitude\": \"<number>\",\n        \"longitude\": \"<number>\",\n        \"altitude\": \"<number>\",\n        \"timestamp\": \"<double>\",\n        \"horizontal_accuracy\": \"<number>\",\n        \"vertical_accuracy\": \"<number>\"\n      },\n      \"device\": {\n        \"id\": \"<uuid>\",\n        \"payload\": \"<string>\",\n        \"timestamp\": \"<double>\",\n        \"name\": \"<string>\",\n        \"tags\": {\n          \"key_0\": \"<string>\",\n          \"key_1\": \"<string>\"\n        },\n        \"rssi\": \"<number>\",\n        \"counter\": \"<number>\",\n        \"sequence_number\": \"<number>\"\n      },\n      \"network_type\": \"<string>\",\n      \"gateway\": {\n        \"gateway_id\": \"<uuid>\",\n        \"service_id\": \"<string>\"\n      }\n    },\n    {\n      \"location\": {\n        \"latitude\": \"<number>\",\n        \"longitude\": \"<number>\",\n        \"altitude\": \"<number>\",\n        \"timestamp\": \"<double>\",\n        \"horizontal_accuracy\": \"<number>\",\n        \"vertical_accuracy\": \"<number>\"\n      },\n      \"device\": {\n        \"id\": \"<uuid>\",\n        \"payload\": \"<string>\",\n        \"timestamp\": \"<double>\",\n        \"name\": \"<string>\",\n        \"tags\": {\n          \"key_0\": \"<string>\",\n          \"key_1\": \"<string>\"\n        },\n        \"rssi\": \"<number>\",\n        \"counter\": \"<number>\",\n        \"sequence_number\": \"<number>\"\n      },\n      \"network_type\": \"<string>\",\n      \"gateway\": {\n        \"gateway_id\": \"<uuid>\",\n        \"service_id\": \"<string>\"\n      }\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "1e820fd6-3d21-4a7b-9246-78b06a072e29",
+              "name": "Message delivered.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "webhook",
+                    "testBatch"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "An indication that the payload is JSON",
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "(Required) A confidential, unique string generated for your webhook endpoint to validate that the request came from Hubble.\n",
+                    "key": "HTTP-X-HUBBLE-TOKEN",
+                    "value": "<string>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"packets\": [\n    {\n      \"location\": {\n        \"latitude\": \"<number>\",\n        \"longitude\": \"<number>\",\n        \"altitude\": \"<number>\",\n        \"timestamp\": \"<double>\",\n        \"horizontal_accuracy\": \"<number>\",\n        \"vertical_accuracy\": \"<number>\"\n      },\n      \"device\": {\n        \"id\": \"<uuid>\",\n        \"payload\": \"<string>\",\n        \"timestamp\": \"<double>\",\n        \"name\": \"<string>\",\n        \"tags\": {\n          \"_env\": \"production\"\n        },\n        \"rssi\": \"<number>\",\n        \"counter\": \"<number>\",\n        \"sequence_number\": \"<number>\"\n      },\n      \"network_type\": \"<string>\",\n      \"gateway\": {\n        \"gateway_id\": \"<uuid>\",\n        \"service_id\": \"fca6\"\n      }\n    },\n    {\n      \"location\": {\n        \"latitude\": \"<number>\",\n        \"longitude\": \"<number>\",\n        \"altitude\": \"<number>\",\n        \"timestamp\": \"<double>\",\n        \"horizontal_accuracy\": \"<number>\",\n        \"vertical_accuracy\": \"<number>\"\n      },\n      \"device\": {\n        \"id\": \"<uuid>\",\n        \"payload\": \"<string>\",\n        \"timestamp\": \"<double>\",\n        \"name\": \"<string>\",\n        \"tags\": {\n          \"_env\": \"production\"\n        },\n        \"rssi\": \"<number>\",\n        \"counter\": \"<number>\",\n        \"sequence_number\": \"<number>\"\n      },\n      \"network_type\": \"<string>\",\n      \"gateway\": {\n        \"gateway_id\": \"<uuid>\",\n        \"service_id\": \"fca6\"\n      }\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "1ab120d5-3b6a-4f63-83e8-5f6d8f12fe8c",
+              "name": "Internal Server Error. Please Retry.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "webhook",
+                    "testBatch"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "An indication that the payload is JSON",
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "(Required) A confidential, unique string generated for your webhook endpoint to validate that the request came from Hubble.\n",
+                    "key": "HTTP-X-HUBBLE-TOKEN",
+                    "value": "<string>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"packets\": [\n    {\n      \"location\": {\n        \"latitude\": \"<number>\",\n        \"longitude\": \"<number>\",\n        \"altitude\": \"<number>\",\n        \"timestamp\": \"<double>\",\n        \"horizontal_accuracy\": \"<number>\",\n        \"vertical_accuracy\": \"<number>\"\n      },\n      \"device\": {\n        \"id\": \"<uuid>\",\n        \"payload\": \"<string>\",\n        \"timestamp\": \"<double>\",\n        \"name\": \"<string>\",\n        \"tags\": {\n          \"_env\": \"production\"\n        },\n        \"rssi\": \"<number>\",\n        \"counter\": \"<number>\",\n        \"sequence_number\": \"<number>\"\n      },\n      \"network_type\": \"<string>\",\n      \"gateway\": {\n        \"gateway_id\": \"<uuid>\",\n        \"service_id\": \"fca6\"\n      }\n    },\n    {\n      \"location\": {\n        \"latitude\": \"<number>\",\n        \"longitude\": \"<number>\",\n        \"altitude\": \"<number>\",\n        \"timestamp\": \"<double>\",\n        \"horizontal_accuracy\": \"<number>\",\n        \"vertical_accuracy\": \"<number>\"\n      },\n      \"device\": {\n        \"id\": \"<uuid>\",\n        \"payload\": \"<string>\",\n        \"timestamp\": \"<double>\",\n        \"name\": \"<string>\",\n        \"tags\": {\n          \"_env\": \"production\"\n        },\n        \"rssi\": \"<number>\",\n        \"counter\": \"<number>\",\n        \"sequence_number\": \"<number>\"\n      },\n      \"network_type\": \"<string>\",\n      \"gateway\": {\n        \"gateway_id\": \"<uuid>\",\n        \"service_id\": \"fca6\"\n      }\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://api.hubble.com",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "1a4df127-d792-458e-8e6a-4fdaab6db4c2",
+    "name": "Hubble Platform Packets API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "The Hubble platform is built API-first. Use our Cloud API to manage your devices\nand access device data programmatically. \nWe've designed our API following RESTful principles. \nEach endpoint returns standard HTTP status codes and may include JSON payloads.\n\n---\n\n## API Access\nUse API Keys to authenticate with the Hubble Cloud API for your organization. \n\n### Generate an API Key\nLog in to your Hubble dashboard. Navigate to **Developer Tools > API Tokens** to create a new API Key. \nProvide a name for the token, and set an appropriate expiration date for temporary access.\n\n### Organization ID\nYou will need `org_id` to make API requests. From your Hubble dashboard, navigate to \n**Developer Tooks > API Tokens**, or **Organization Settings**, to find your Organization ID. \n\n### Authorization Scopes\nAPI endpoints require specific authorization scopes to perform the intended operation. \n**Required Scope** is always provided in the API documentation.\n\nAPI Keys can be created with specific authorization scopes that control what operations the key can perform. \nIf no scopes are specified, the key will be created with all available scopes (admin-level access).\n\n| **Scope**                   | **Access**                                     |\n|------------------------------|-------------------------------------------------|\n| **read-api-keys**            | View API keys and their metadata               |\n| **write-api-keys**           | Create, update, and delete API keys            |\n| **read-users**               | View user information and roles                |\n| **write-users**              | Add, update, and remove users from the organization |\n| **read-organization-metadata** | View organization details and settings       |\n| **write-organization-metadata** | Update organization information            |\n| **read-devices**             | View device information and status             |\n| **write-devices**            | Register and manage devices                    |\n| **read-invitations**         | View pending invitations                       |\n| **write-invitations**        | Create and revoke user invitations             |\n| **read-packets**             | Access packet data and retrieval endpoints     |\n| **read-platform-metrics**    | View platform metrics and analytics            |\n| **read-billing-usage**       | View billing usage information                 |\n| **read-billing-invoices**    | View billing invoices                          |\n| **read-webhooks**            | View webhook configurations                    |\n| **write-webhooks**           | Create and manage webhook endpoints            |\n    \n**Example Scope Combinations**\n- Create a key with read-only access: `[\"read-api-keys\", \"read-users\", \"read-devices\"]`\n- Create a key for device management: `[\"read-devices\", \"write-devices\"]`\n- Create a key for user management: `[\"read-users\", \"write-users\", \"read-invitations\", \"write-invitations\"]`\n    \n**Best Practices for Data Security**\n- Create keys with the minimum required scopes for your use case\n- Regularly review and rotate API keys\n- Use descriptive names for your keys to track their purpose\n- Set appropriate expiration dates for temporary access    \n\n---\n\n## Import API Definition\nYou can quickly import the Hubble Cloud API into your preferred developer environment (such as Postman or Insomnia) using our **public OpenAPI definition**.\nSimply download or import the YAML file directly:\n\n[https://hubble.com/docs/openapi.yaml](https://hubble.com/docs/openapi.yaml)\n\n---\n\n## Pagination\nWhen the number of objects requested exceeds the maximum page size for an endpoint, the API response will be paginated. \nThis means you will receive a subset of the total results, along with a `Continuation-Token` in the Response Header that can be used to fetch subsequent subsets.\n\nTo retrieve the next set of data, you must use the provided `Continuation-Token` in the Request Header of your next API call to the same endpoint. \nContinue using the provided token in each successive request until no `Continuation-Token` is returned, which indicates you have retrieved all available data.\n\n---\n\n## Rate Limits\nThe Hubble Cloud API follows a leaky bucket approach to rate limiting. Endpoints are rate limited to three (3) requests per second. \nYour organization is limited to a total of 15 requests per second. \nIf you exceed this limit, you will receive a 429 status code. \nWe recommend backoff retry logic to stay within the limit.\n\n---\n\n## Request Headers\nAll HTTP responses will include a `X-Request-ID` header that is logged internally and can be used for tracing/debugging a particular API request. \nAll HTTP requests can include a `X-Request-ID` header which will be logged and mapped to the responses' `X-Request-ID` header. \n\nShare Request Headers whenever troubleshooting an API issue with Hubble Support.\n\n---\n\n## Status Codes\nThe Hubble Cloud API returns the following HTTP status codes: `200`, `400`, `401`, `403`, `404`, `429` and `500`. \nUse the tailored message returned with each status code for insight in the specific context of the endpoint you are attempting to access.\n\n---\n\n## Versioning\nOur cloud backend follows a rolling release model. This means:\n- **Continuous Deployment**: New features, security updates, and performance improvements are automatically rolled out.\n- **Backward Compatibility**: Cloud updates are designed to be compatible with devices running firmware/SDK versions within our active or maintained support windows.\n- **Transparent Change Management**: Release notes and changelogs are published regularly so you can track enhancements and understand any adjustments that might affect integrations.\n- **Versioned Public API**: The Cloud API uses basic major versioning in the url paths (`/v1/...`, `/v2/...` etc.). Major backwards incompatible changes will be made by creating a version of the endpoint with a higher version and communicating with customers to migrate. The legacy `/api/...` and `/api/v2/...` paths remain fully supported as aliases for `/v1/...` and `/v2/...` respectively, so previous versions will be supported for a minimum of 1 year.\n\n---\n",
+      "type": "text/plain"
+    }
+  }
+}

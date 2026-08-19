@@ -1,0 +1,1105 @@
+{
+  "item": [
+    {
+      "id": "3c81abb2-0a30-47d7-b797-ee9cc17bc5e6",
+      "name": "Platform Metrics",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "21a14d81-7b08-485b-9be5-4c16d21d888f",
+          "name": "Get Organization API Metrics",
+          "request": {
+            "name": "Get Organization API Metrics",
+            "description": {
+              "content": "Retrieves API request metrics including total requests, success rate, and time interval-based breakdowns.\n\n**Required Scope:** `read-platform-metrics`\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "org",
+                ":org_id",
+                "api_metrics"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "days",
+                  "value": "1",
+                  "description": "The number of days of metrics to include in the request.\n\nThe maximum value is further restricted when small `time_interval` values are used.\nThe maximum number of total metric buckets is 365.\n"
+                },
+                {
+                  "disabled": false,
+                  "key": "time_interval",
+                  "value": "<string>",
+                  "description": "The time interval for the metric buckets.\nIf not provided, a default value is selected based on the `days` parameter:\n\n| days        | time_interval |\n| ----------- | ------------- |\n| [1 => 1)    | hour          |\n| [2 => 31]   | day           |\n| [32 => 365] | month         |\n\n**Partial buckets:** The most recent bucket of metrics is a \"partial\" bucket depending on the interval - partial because it doesn't span a full time_interval yet. \n(e.g. 10:00pm -> 10:36pm for `hour`, June 3rd 12:00am -> June 3rd 10:36pm for `day`, June 1st 12:00am -> June 3rd 10:36pm for `month`).\nThe older buckets are always \"complete\" buckets.\n(e.g. 09:00pm -> 10:00pm for `hour`, June 2nd 12:00am -> June 3rd 12:00am for `day`, May 1st 12:00am -> June 1st 12:00am for `month`).\n\n**Edge cases:** If `days` is not large enough to include a full `month` bucket, days is increased in the backend. \nFor example, querying days=90 with a `month` time_interval on June 13th, 2025 will return \"complete\" March, April, and May buckets and a \"partial\" June bucket.\nSimilarly, when querying for days=7 with a `day` time_interval on June 13th, 2025 at 6:00am will return \"complete\" June 6th, 7th, 8th, 9th, 10th, 11th, and 12th buckets and a \"partial\" June 13th bucket.\n"
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<uuid>",
+                  "key": "org_id",
+                  "description": "(Required) Your organization ID"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "16836f5e-b012-4f87-b7e6-3515a930413c",
+              "name": "Successfully retrieved API metrics",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "api_metrics"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "days",
+                      "value": "1"
+                    },
+                    {
+                      "key": "time_interval",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"total_requests\": 4859,\n  \"success_rate\": 48.836596409863596,\n  \"buckets\": [\n    {\n      \"timestamp\": \"1963-02-13T00:18:05.495Z\",\n      \"total_requests\": 6595,\n      \"success_rate\": 5670.021830214388\n    },\n    {\n      \"timestamp\": \"1957-11-25T11:46:34.514Z\",\n      \"total_requests\": 912,\n      \"success_rate\": 6096.176927501909\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "1fa6a71b-33ba-4436-9963-da38814841b7",
+              "name": "Bad Request",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "api_metrics"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "days",
+                      "value": "1"
+                    },
+                    {
+                      "key": "time_interval",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 400,\n  \"description\": \"The request could not be understood by the server due to malformed syntax.\",\n  \"name\": \"Bad Request\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "68b6183e-df71-4198-81f4-ecf66b69a16e",
+              "name": "Internal Server Error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "api_metrics"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "days",
+                      "value": "1"
+                    },
+                    {
+                      "key": "time_interval",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 500,\n  \"description\": \"An unknown error has occurred.\",\n  \"name\": \"Unknown\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "d2eecff1-6c31-4e7e-ba9f-156a6f90bca7",
+          "name": "Get Organization Packet Metrics",
+          "request": {
+            "name": "Get Organization Packet Metrics",
+            "description": {
+              "content": "Retrieves packet metrics across a time range providing totals and time interval-based breakdowns.\n\n**Required Scope:** `read-platform-metrics`\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "org",
+                ":org_id",
+                "packet_metrics"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "days",
+                  "value": "1",
+                  "description": "The number of days of metrics to include in the request.\n\nThe maximum value is further restricted when small `time_interval` values are used.\nThe maximum number of total metric buckets is 365.\n"
+                },
+                {
+                  "disabled": false,
+                  "key": "time_interval",
+                  "value": "<string>",
+                  "description": "The time interval for the metric buckets.\nIf not provided, a default value is selected based on the `days` parameter:\n\n| days        | time_interval |\n| ----------- | ------------- |\n| [1 => 1)    | hour          |\n| [2 => 31]   | day           |\n| [32 => 365] | month         |\n\n**Partial buckets:** The most recent bucket of metrics is a \"partial\" bucket depending on the interval - partial because it doesn't span a full time_interval yet. \n(e.g. 10:00pm -> 10:36pm for `hour`, June 3rd 12:00am -> June 3rd 10:36pm for `day`, June 1st 12:00am -> June 3rd 10:36pm for `month`).\nThe older buckets are always \"complete\" buckets.\n(e.g. 09:00pm -> 10:00pm for `hour`, June 2nd 12:00am -> June 3rd 12:00am for `day`, May 1st 12:00am -> June 1st 12:00am for `month`).\n\n**Edge cases:** If `days` is not large enough to include a full `month` bucket, days is increased in the backend. \nFor example, querying days=90 with a `month` time_interval on June 13th, 2025 will return \"complete\" March, April, and May buckets and a \"partial\" June bucket.\nSimilarly, when querying for days=7 with a `day` time_interval on June 13th, 2025 at 6:00am will return \"complete\" June 6th, 7th, 8th, 9th, 10th, 11th, and 12th buckets and a \"partial\" June 13th bucket.\n"
+                },
+                {
+                  "disabled": false,
+                  "key": "filter_tags",
+                  "value": "<string>",
+                  "description": "A set of device **platform tags** specifying which packets to include.\nOnly platform tags are queryable: `_env:production`, `_env:sandbox`.\nThe query param can be used multiple times to form a list of tags.\nPacket matching criteria uses AND logic when different tag keys are used in a list of tags, and OR logic when the same tag key is used more than once.\n"
+                },
+                {
+                  "disabled": false,
+                  "key": "filter_tags",
+                  "value": "<string>",
+                  "description": "A set of device **platform tags** specifying which packets to include.\nOnly platform tags are queryable: `_env:production`, `_env:sandbox`.\nThe query param can be used multiple times to form a list of tags.\nPacket matching criteria uses AND logic when different tag keys are used in a list of tags, and OR logic when the same tag key is used more than once.\n"
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<uuid>",
+                  "key": "org_id",
+                  "description": "(Required) Your organization ID"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "0baec651-9895-422b-80a3-3710d9ade7f8",
+              "name": "Successfully retrieved packet metrics",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "packet_metrics"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "days",
+                      "value": "1"
+                    },
+                    {
+                      "key": "time_interval",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "filter_tags",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "filter_tags",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"total_packets\": 4821,\n  \"buckets\": [\n    {\n      \"timestamp\": \"1987-11-02T17:47:15.992Z\",\n      \"total_packets\": 9798\n    },\n    {\n      \"timestamp\": \"1950-01-24T08:03:56.328Z\",\n      \"total_packets\": 8085\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "128b364d-304a-47ce-b4ec-f1c284d13385",
+              "name": "Bad Request",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "packet_metrics"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "days",
+                      "value": "1"
+                    },
+                    {
+                      "key": "time_interval",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "filter_tags",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "filter_tags",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 400,\n  \"description\": \"The request could not be understood by the server due to malformed syntax.\",\n  \"name\": \"Bad Request\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "56015bd2-55be-4926-bc99-3f6a40617a9d",
+              "name": "Internal Server Error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "packet_metrics"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "days",
+                      "value": "1"
+                    },
+                    {
+                      "key": "time_interval",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "filter_tags",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "filter_tags",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 500,\n  \"description\": \"An unknown error has occurred.\",\n  \"name\": \"Unknown\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "f9d4c944-355d-4fe0-9664-545cbcc93dfd",
+          "name": "Get Organization Webhook Metrics",
+          "request": {
+            "name": "Get Organization Webhook Metrics",
+            "description": {
+              "content": "Retrieves webhook metrics including total requests, success rate, and time interval-based breakdowns for webhook events.\n\n**Required Scope:** `read-platform-metrics`\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "org",
+                ":org_id",
+                "webhook_metrics"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "days",
+                  "value": "1",
+                  "description": "The number of days of metrics to include in the request.\n\nThe maximum value is further restricted when small `time_interval` values are used.\nThe maximum number of total metric buckets is 365.\n"
+                },
+                {
+                  "disabled": false,
+                  "key": "time_interval",
+                  "value": "<string>",
+                  "description": "The time interval for the metric buckets.\nIf not provided, a default value is selected based on the `days` parameter:\n\n| days        | time_interval |\n| ----------- | ------------- |\n| [1 => 1)    | hour          |\n| [2 => 31]   | day           |\n| [32 => 365] | month         |\n\n**Partial buckets:** The most recent bucket of metrics is a \"partial\" bucket depending on the interval - partial because it doesn't span a full time_interval yet. \n(e.g. 10:00pm -> 10:36pm for `hour`, June 3rd 12:00am -> June 3rd 10:36pm for `day`, June 1st 12:00am -> June 3rd 10:36pm for `month`).\nThe older buckets are always \"complete\" buckets.\n(e.g. 09:00pm -> 10:00pm for `hour`, June 2nd 12:00am -> June 3rd 12:00am for `day`, May 1st 12:00am -> June 1st 12:00am for `month`).\n\n**Edge cases:** If `days` is not large enough to include a full `month` bucket, days is increased in the backend. \nFor example, querying days=90 with a `month` time_interval on June 13th, 2025 will return \"complete\" March, April, and May buckets and a \"partial\" June bucket.\nSimilarly, when querying for days=7 with a `day` time_interval on June 13th, 2025 at 6:00am will return \"complete\" June 6th, 7th, 8th, 9th, 10th, 11th, and 12th buckets and a \"partial\" June 13th bucket.\n"
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<uuid>",
+                  "key": "org_id",
+                  "description": "(Required) Your organization ID"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "7c009924-30a1-4d16-bc58-01573781e633",
+              "name": "Successfully retrieved webhook metrics",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "webhook_metrics"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "days",
+                      "value": "1"
+                    },
+                    {
+                      "key": "time_interval",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"total_requests\": 1811,\n  \"success_rate\": 2732.3584614081633,\n  \"buckets\": [\n    {\n      \"timestamp\": \"1972-02-07T06:27:07.012Z\",\n      \"total_requests\": 8574,\n      \"success_rate\": 7861.6730500134045\n    },\n    {\n      \"timestamp\": \"1958-01-27T03:06:39.261Z\",\n      \"total_requests\": 6933,\n      \"success_rate\": 8969.024286319633\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "fda7ad05-2f12-4941-89a9-f204e08498c6",
+              "name": "Bad Request",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "webhook_metrics"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "days",
+                      "value": "1"
+                    },
+                    {
+                      "key": "time_interval",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 400,\n  \"description\": \"The request could not be understood by the server due to malformed syntax.\",\n  \"name\": \"Bad Request\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f01dee78-6f68-45f7-bc05-74ea1a8ce449",
+              "name": "Internal Server Error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "webhook_metrics"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "days",
+                      "value": "1"
+                    },
+                    {
+                      "key": "time_interval",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 500,\n  \"description\": \"An unknown error has occurred.\",\n  \"name\": \"Unknown\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "80ccad26-b154-4535-bc18-8fe78f1f8450",
+          "name": "Get Organization Device Metrics",
+          "request": {
+            "name": "Get Organization Device Metrics",
+            "description": {
+              "content": "Retrieves metrics for active, never active, and total registered devices over time.\n\n### Most Recent/Partial Bucket \nThe most recent bucket, the partial bucket, is not calculated on this endpoint except for when using the hourly time interval.\nFor parsing/syntax consistency, this bucket is still returned with a timestamp and empty values for the active, registered, and never active devices values.\n\n**Required Scope:** `read-platform-metrics`\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "org",
+                ":org_id",
+                "device_metrics"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "days",
+                  "value": "1",
+                  "description": "The number of days of metrics to include in the request.\n\nThe maximum value is further restricted when small `time_interval` values are used.\nThe maximum number of total metric buckets is 365.\n"
+                },
+                {
+                  "disabled": false,
+                  "key": "time_interval",
+                  "value": "<string>",
+                  "description": "The time interval for the metric buckets.\nIf not provided, a default value is selected based on the `days` parameter:\n\n| days        | time_interval |\n| ----------- | ------------- |\n| [1 => 1)    | hour          |\n| [2 => 31]   | day           |\n| [32 => 365] | month         |\n\n**Partial buckets:** The most recent bucket of metrics is a \"partial\" bucket depending on the interval - partial because it doesn't span a full time_interval yet. \n(e.g. 10:00pm -> 10:36pm for `hour`, June 3rd 12:00am -> June 3rd 10:36pm for `day`, June 1st 12:00am -> June 3rd 10:36pm for `month`).\nThe older buckets are always \"complete\" buckets.\n(e.g. 09:00pm -> 10:00pm for `hour`, June 2nd 12:00am -> June 3rd 12:00am for `day`, May 1st 12:00am -> June 1st 12:00am for `month`).\n\n**Edge cases:** If `days` is not large enough to include a full `month` bucket, days is increased in the backend. \nFor example, querying days=90 with a `month` time_interval on June 13th, 2025 will return \"complete\" March, April, and May buckets and a \"partial\" June bucket.\nSimilarly, when querying for days=7 with a `day` time_interval on June 13th, 2025 at 6:00am will return \"complete\" June 6th, 7th, 8th, 9th, 10th, 11th, and 12th buckets and a \"partial\" June 13th bucket.\n"
+                },
+                {
+                  "disabled": false,
+                  "key": "filter_tags",
+                  "value": "<string>",
+                  "description": "A set of device **platform tags** specifying which packets to include.\nOnly platform tags are queryable: `_env:production`, `_env:sandbox`.\nThe query param can be used multiple times to form a list of tags.\nPacket matching criteria uses AND logic when different tag keys are used in a list of tags, and OR logic when the same tag key is used more than once.\n"
+                },
+                {
+                  "disabled": false,
+                  "key": "filter_tags",
+                  "value": "<string>",
+                  "description": "A set of device **platform tags** specifying which packets to include.\nOnly platform tags are queryable: `_env:production`, `_env:sandbox`.\nThe query param can be used multiple times to form a list of tags.\nPacket matching criteria uses AND logic when different tag keys are used in a list of tags, and OR logic when the same tag key is used more than once.\n"
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<uuid>",
+                  "key": "org_id",
+                  "description": "(Required) Your organization ID"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "12e06bb2-7e0f-4ad3-849a-4c7491e586b1",
+              "name": "Successfully retrieved device metrics",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "device_metrics"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "days",
+                      "value": "1"
+                    },
+                    {
+                      "key": "time_interval",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "filter_tags",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "filter_tags",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"buckets\": [\n    {\n      \"timestamp\": \"2001-11-15T01:54:08.452Z\",\n      \"registered_devices\": 3641,\n      \"active_devices\": 2463.351252202227,\n      \"never_active_devices\": 4699.830623983313\n    },\n    {\n      \"timestamp\": \"1964-07-28T02:06:09.080Z\",\n      \"registered_devices\": 4071,\n      \"active_devices\": 6957.139762888064,\n      \"never_active_devices\": 6400.365129124864\n    }\n  ],\n  \"total_active_devices\": 824.9155678115084,\n  \"total_registered_devices\": 3267.7486630189546,\n  \"total_never_active_devices\": 6609.920286829548\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "e0365afa-a5b9-4e7b-a5e8-f6388ec5e641",
+              "name": "Bad Request",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "device_metrics"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "days",
+                      "value": "1"
+                    },
+                    {
+                      "key": "time_interval",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "filter_tags",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "filter_tags",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 400,\n  \"description\": \"The request could not be understood by the server due to malformed syntax.\",\n  \"name\": \"Bad Request\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "7ed7ef5b-fe44-4ea9-8211-8acb0f791ae0",
+              "name": "Internal Server Error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "org",
+                    ":org_id",
+                    "device_metrics"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "days",
+                      "value": "1"
+                    },
+                    {
+                      "key": "time_interval",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "filter_tags",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "filter_tags",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "org_id",
+                      "description": "(Required) Your organization ID"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 500,\n  \"description\": \"An unknown error has occurred.\",\n  \"name\": \"Unknown\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://api.hubble.com",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "cff4857b-a1cc-4a23-92f6-2f7c4f8efdd6",
+    "name": "Hubble Platform Platform Metrics API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "The Hubble platform is built API-first. Use our Cloud API to manage your devices\nand access device data programmatically. \nWe've designed our API following RESTful principles. \nEach endpoint returns standard HTTP status codes and may include JSON payloads.\n\n---\n\n## API Access\nUse API Keys to authenticate with the Hubble Cloud API for your organization. \n\n### Generate an API Key\nLog in to your Hubble dashboard. Navigate to **Developer Tools > API Tokens** to create a new API Key. \nProvide a name for the token, and set an appropriate expiration date for temporary access.\n\n### Organization ID\nYou will need `org_id` to make API requests. From your Hubble dashboard, navigate to \n**Developer Tooks > API Tokens**, or **Organization Settings**, to find your Organization ID. \n\n### Authorization Scopes\nAPI endpoints require specific authorization scopes to perform the intended operation. \n**Required Scope** is always provided in the API documentation.\n\nAPI Keys can be created with specific authorization scopes that control what operations the key can perform. \nIf no scopes are specified, the key will be created with all available scopes (admin-level access).\n\n| **Scope**                   | **Access**                                     |\n|------------------------------|-------------------------------------------------|\n| **read-api-keys**            | View API keys and their metadata               |\n| **write-api-keys**           | Create, update, and delete API keys            |\n| **read-users**               | View user information and roles                |\n| **write-users**              | Add, update, and remove users from the organization |\n| **read-organization-metadata** | View organization details and settings       |\n| **write-organization-metadata** | Update organization information            |\n| **read-devices**             | View device information and status             |\n| **write-devices**            | Register and manage devices                    |\n| **read-invitations**         | View pending invitations                       |\n| **write-invitations**        | Create and revoke user invitations             |\n| **read-packets**             | Access packet data and retrieval endpoints     |\n| **read-platform-metrics**    | View platform metrics and analytics            |\n| **read-billing-usage**       | View billing usage information                 |\n| **read-billing-invoices**    | View billing invoices                          |\n| **read-webhooks**            | View webhook configurations                    |\n| **write-webhooks**           | Create and manage webhook endpoints            |\n    \n**Example Scope Combinations**\n- Create a key with read-only access: `[\"read-api-keys\", \"read-users\", \"read-devices\"]`\n- Create a key for device management: `[\"read-devices\", \"write-devices\"]`\n- Create a key for user management: `[\"read-users\", \"write-users\", \"read-invitations\", \"write-invitations\"]`\n    \n**Best Practices for Data Security**\n- Create keys with the minimum required scopes for your use case\n- Regularly review and rotate API keys\n- Use descriptive names for your keys to track their purpose\n- Set appropriate expiration dates for temporary access    \n\n---\n\n## Import API Definition\nYou can quickly import the Hubble Cloud API into your preferred developer environment (such as Postman or Insomnia) using our **public OpenAPI definition**.\nSimply download or import the YAML file directly:\n\n[https://hubble.com/docs/openapi.yaml](https://hubble.com/docs/openapi.yaml)\n\n---\n\n## Pagination\nWhen the number of objects requested exceeds the maximum page size for an endpoint, the API response will be paginated. \nThis means you will receive a subset of the total results, along with a `Continuation-Token` in the Response Header that can be used to fetch subsequent subsets.\n\nTo retrieve the next set of data, you must use the provided `Continuation-Token` in the Request Header of your next API call to the same endpoint. \nContinue using the provided token in each successive request until no `Continuation-Token` is returned, which indicates you have retrieved all available data.\n\n---\n\n## Rate Limits\nThe Hubble Cloud API follows a leaky bucket approach to rate limiting. Endpoints are rate limited to three (3) requests per second. \nYour organization is limited to a total of 15 requests per second. \nIf you exceed this limit, you will receive a 429 status code. \nWe recommend backoff retry logic to stay within the limit.\n\n---\n\n## Request Headers\nAll HTTP responses will include a `X-Request-ID` header that is logged internally and can be used for tracing/debugging a particular API request. \nAll HTTP requests can include a `X-Request-ID` header which will be logged and mapped to the responses' `X-Request-ID` header. \n\nShare Request Headers whenever troubleshooting an API issue with Hubble Support.\n\n---\n\n## Status Codes\nThe Hubble Cloud API returns the following HTTP status codes: `200`, `400`, `401`, `403`, `404`, `429` and `500`. \nUse the tailored message returned with each status code for insight in the specific context of the endpoint you are attempting to access.\n\n---\n\n## Versioning\nOur cloud backend follows a rolling release model. This means:\n- **Continuous Deployment**: New features, security updates, and performance improvements are automatically rolled out.\n- **Backward Compatibility**: Cloud updates are designed to be compatible with devices running firmware/SDK versions within our active or maintained support windows.\n- **Transparent Change Management**: Release notes and changelogs are published regularly so you can track enhancements and understand any adjustments that might affect integrations.\n- **Versioned Public API**: The Cloud API uses basic major versioning in the url paths (`/v1/...`, `/v2/...` etc.). Major backwards incompatible changes will be made by creating a version of the endpoint with a higher version and communicating with customers to migrate. The legacy `/api/...` and `/api/v2/...` paths remain fully supported as aliases for `/v1/...` and `/v2/...` respectively, so previous versions will be supported for a minimum of 1 year.\n\n---\n",
+      "type": "text/plain"
+    }
+  }
+}

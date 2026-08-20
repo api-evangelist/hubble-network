@@ -38,6 +38,8 @@ apis:
   humanURL: https://hubble.com/docs/api-specification/hubble-platform-api
   baseURL: https://api.hubble.com
   tags:
+  - APIKeys
+  tags_raw:
   - API Keys
   properties:
   - type: OpenAPI
@@ -140,6 +142,8 @@ apis:
   humanURL: https://hubble.com/docs/api-specification/hubble-platform-api
   baseURL: https://api.hubble.com
   tags:
+  - Organization
+  tags_raw:
   - Organizations
   properties:
   - type: OpenAPI

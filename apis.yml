@@ -12,6 +12,18 @@ description: 'Hubble Network is a Seattle-based IoT connectivity company, founde
   definition, an open-source Device SDK in C, a Python SDK/CLI, gateway SDKs for Linux,
   iOS and Android, and an official Claude Code agent skill for its Cloud API.'
 url: https://raw.githubusercontent.com/api-evangelist/hubble-network/refs/heads/main/apis.yml
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: true
+  label: Hosted service · you call their endpoint
+  confidence: high
+  source:
+  - openapi
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 image: https://hubble.com/favicon.ico
 x-type: company
 x-source: harvest:secondary-market

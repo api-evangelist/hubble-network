@@ -1,0 +1,26 @@
+slug: hubble-network
+provider: Hubble Network
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Transportation & Logistics
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 1
+edges:
+- tag: Billing
+  spec_file: hubble-network-billing-api-openapi.yml
+  capability_id: BC-4250
+  capability_id_l1: BC-4250
+  capability_name: Subscription Billing & Revenue Management
+  confidence: 0.8
+  evidence: GET /v1/org/{org_id}/billing/invoices  Get Recent Invoices; GET .../billing/subscription  Get
+    current subscription / plan; GET .../billing/usage  Get Billing Usage
+  reason: Operations expose invoices, usage for the billing period, the active subscription plan and stored
+    card payment methods — the recurring/usage-based commercial billing surface of the platform. Spans
+    invoicing, metering and payment collection, so the L1 is given without a single L2.

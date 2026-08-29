@@ -292,6 +292,9 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: CapabilityMap
+  url: capabilities/hubble-network-capability-edges.yml
+  name: Hubble Network Business Capability Map
 - type: AgenticAccess
   url: agentic-access/hubble-network-agentic-access.yml
 - type: DomainSecurity

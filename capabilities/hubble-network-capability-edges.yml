@@ -11,7 +11,7 @@ capability_model:
   attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
     CC BY 4.0
   notice: NOTICE
-edge_count: 1
+edge_count: 2
 edges:
 - tag: Billing
   spec_file: hubble-network-billing-api-openapi.yml
@@ -24,3 +24,14 @@ edges:
   reason: Operations expose invoices, usage for the billing period, the active subscription plan and stored
     card payment methods — the recurring/usage-based commercial billing surface of the platform. Spans
     invoicing, metering and payment collection, so the L1 is given without a single L2.
+- tag: Packet Webhooks
+  spec_file: hubble-network-packet-webhooks-api-openapi.yml
+  capability_id: BC-4270.80
+  capability_id_l1: BC-4270
+  capability_name: Webhook & Event Subscription Management
+  confidence: 0.7
+  evidence: '"Create a Webhook Endpoint", "List Registered Webhooks", "Send a Test Webhook", schema webhookWithSecret'
+  reason: Lifecycle management of outbound webhook subscriptions and delivery testing maps directly to
+    the named Webhook & Event Subscription Management sub-capability; confidence tempered because webhook
+    registration is largely integration plumbing.
+  recovered_from: vertical-defense-aerospace-edges.json

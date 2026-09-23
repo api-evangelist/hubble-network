@@ -1,7 +1,7 @@
 openapi: 3.2.0
 info:
   title: Hubble Platform Organizations API
-  description: "The Hubble platform is built API-first. Use our Cloud API to manage your devices\nand access device data programmatically. \nWe've designed our API following RESTful principles. \nEach endpoint returns standard HTTP status codes and may include JSON payloads.\n\n---\n\n## API Access\nUse API Keys to authenticate with the Hubble Cloud API for your organization. \n\n### Generate an API Key\nLog in to your Hubble dashboard. Navigate to **Developer Tools > API Tokens** to create a new API Key. \nProvide a name for the token, and set an appropriate expiration date for temporary access.\n\n### Organization ID\nYou will need `org_id` to make API requests. From your Hubble dashboard, navigate to \n**Developer Tooks > API Tokens**, or **Organization Settings**, to find your Organization ID. \n\n### Authorization Scopes\nAPI endpoints require specific authorization scopes to perform the intended operation. \n**Required Scope** is always provided in the API documentation.\n\nAPI Keys can be created with specific authorization scopes that control what operations the key can perform. \nIf no scopes are specified, the key will be created with all available scopes (admin-level access).\n\n| **Scope**                   | **Access**                                     |\n|------------------------------|-------------------------------------------------|\n| **read-api-keys**            | View API keys and their metadata               |\n| **write-api-keys**           | Create, update, and delete API keys            |\n| **read-users**               | View user information and roles                |\n| **write-users**              | Add, update, and remove users from the organization |\n| **read-organization-metadata** | View organization details and settings       |\n| **write-organization-metadata** | Update organization information            |\n| **read-devices**             | View device information and status             |\n| **write-devices**            | Register and manage devices                    |\n| **read-invitations**         | View pending invitations                       |\n| **write-invitations**        | Create and revoke user invitations             |\n| **read-packets**             | Access packet data and retrieval endpoints     |\n| **read-platform-metrics**    | View platform metrics and analytics            |\n| **read-billing-usage**       | View billing usage information                 |\n| **read-billing-invoices**    | View billing invoices                          |\n| **read-webhooks**            | View webhook configurations                    |\n| **write-webhooks**           | Create and manage webhook endpoints            |\n    \n**Example Scope Combinations**\n- Create a key with read-only access: `[\"read-api-keys\", \"read-users\", \"read-devices\"]`\n- Create a key for device management: `[\"read-devices\", \"write-devices\"]`\n- Create a key for user management: `[\"read-users\", \"write-users\", \"read-invitations\", \"write-invitations\"]`\n    \n**Best Practices for Data Security**\n- Create keys with the minimum required scopes for your use case\n- Regularly review and rotate API keys\n- Use descriptive names for your keys to track their purpose\n- Set appropriate expiration dates for temporary access    \n\n---\n\n## Import API Definition\nYou can quickly import the Hubble Cloud API into your preferred developer environment (such as Postman or Insomnia) using our **public OpenAPI definition**.\nSimply download or import the YAML file directly:\n\n[https://hubble.com/docs/openapi.yaml](https://hubble.com/docs/openapi.yaml)\n\n---\n\n## Pagination\nWhen the number of objects requested exceeds the maximum page size for an endpoint, the API response will be paginated. \nThis means you will receive a subset of the total results, along with a `Continuation-Token` in the Response Header that can be used to fetch subsequent subsets.\n\nTo retrieve the next set of data, you must use the provided `Continuation-Token` in the Request Header of your next API call to the same endpoint. \nContinue using the provided token in each successive request until no `Continuation-Token` is returned, which indicates you have retrieved all available data.\n\n---\n\n## Rate Limits\nThe Hubble Cloud API follows a leaky bucket approach to rate limiting. Endpoints are rate limited to three (3) requests per second. \nYour organization is limited to a total of 15 requests per second. \nIf you exceed this limit, you will receive a 429 status code. \nWe recommend backoff retry logic to stay within the limit.\n\n---\n\n## Request Headers\nAll HTTP responses will include a `X-Request-ID` header that is logged internally and can be used for tracing/debugging a particular API request. \nAll HTTP requests can include a `X-Request-ID` header which will be logged and mapped to the responses' `X-Request-ID` header. \n\nShare Request Headers whenever troubleshooting an API issue with Hubble Support.\n\n---\n\n## Status Codes\nThe Hubble Cloud API returns the following HTTP status codes: `200`, `400`, `401`, `403`, `404`, `429` and `500`. \nUse the tailored message returned with each status code for insight in the specific context of the endpoint you are attempting to access.\n\n---\n\n## Versioning\nOur cloud backend follows a rolling release model. This means:\n- **Continuous Deployment**: New features, security updates, and performance improvements are automatically rolled out.\n- **Backward Compatibility**: Cloud updates are designed to be compatible with devices running firmware/SDK versions within our active or maintained support windows.\n- **Transparent Change Management**: Release notes and changelogs are published regularly so you can track enhancements and understand any adjustments that might affect integrations.\n- **Versioned Public API**: The Cloud API uses basic major versioning in the url paths (`/v1/...`, `/v2/...` etc.). Major backwards incompatible changes will be made by creating a version of the endpoint with a higher version and communicating with customers to migrate. The legacy `/api/...` and `/api/v2/...` paths remain fully supported as aliases for `/v1/...` and `/v2/...` respectively, so previous versions will be supported for a minimum of 1 year.\n\n---\n"
+  description: The Hubble platform is built API-first.
   version: 1.0.0
 servers:
 - url: https://api.hubble.com
@@ -21,9 +21,7 @@ paths:
       description: 'Update metadata for an organization.
 
 
-        **Required Scope:** `write-organization-metadata`
-
-        '
+        **Required Scope:** `write-organization-metadata`'
       parameters:
       - $ref: '#/components/parameters/orgIdPathParam'
       requestBody:
@@ -62,9 +60,7 @@ paths:
       description: 'Retrieve metadata for an organization.
 
 
-        **Required Scope:** `read-organization-metadata`
-
-        '
+        **Required Scope:** `read-organization-metadata`'
       parameters:
       - $ref: '#/components/parameters/orgIdPathParam'
       responses:
@@ -88,9 +84,7 @@ paths:
       description: 'Page through users in an organization.
 
 
-        **Required Scope:** `read-users`
-
-        '
+        **Required Scope:** `read-users`'
       parameters:
       - $ref: '#/components/parameters/orgIdPathParam'
       - $ref: '#/components/parameters/pageNumberQueryParam'
@@ -117,7 +111,12 @@ paths:
       operationId: add-user-to-organization
       x-criticality: medium
       summary: Add User to Organization
-      description: "Add a user to the organization. \nThis endpoint directly adds the user to the organization and does not create an invitation.\n\n**Required Scope:** `write-users`\n"
+      description: 'Add a user to the organization.
+
+        This endpoint directly adds the user to the organization and does not create an invitation.
+
+
+        **Required Scope:** `write-users`'
       parameters:
       - $ref: '#/components/parameters/orgIdPathParam'
       - $ref: '#/components/parameters/contentTypeJsonHeader'
@@ -164,9 +163,7 @@ paths:
       description: 'Update a user''s metadata and/or role in the organization.
 
 
-        **Required Scope:** `write-users`
-
-        '
+        **Required Scope:** `write-users`'
       parameters:
       - $ref: '#/components/parameters/orgIdPathParam'
       - $ref: '#/components/parameters/userIdPathParam'
@@ -215,9 +212,7 @@ paths:
       description: 'Remove a user from the organization.
 
 
-        **Required Scope:** `write-users`
-
-        '
+        **Required Scope:** `write-users`'
       parameters:
       - $ref: '#/components/parameters/orgIdPathParam'
       - $ref: '#/components/parameters/userIdPathParam'
@@ -246,9 +241,7 @@ paths:
       description: 'Page through pending invites to an organization.
 
 
-        **Required Scope:** `read-invitations`
-
-        '
+        **Required Scope:** `read-invitations`'
       parameters:
       - $ref: '#/components/parameters/orgIdPathParam'
       - $ref: '#/components/parameters/pageNumberQueryParam'
@@ -281,9 +274,7 @@ paths:
       description: 'Invite a user to join the organization.
 
 
-        **Required Scope:** `write-invitations`
-
-        '
+        **Required Scope:** `write-invitations`'
       parameters:
       - $ref: '#/components/parameters/orgIdPathParam'
       - $ref: '#/components/parameters/contentTypeJsonHeader'
@@ -326,9 +317,7 @@ paths:
       description: 'Revoke a pending invitation to the organization.
 
 
-        **Required Scope:** `write-invitations`
-
-        '
+        **Required Scope:** `write-invitations`'
       parameters:
       - $ref: '#/components/parameters/orgIdPathParam'
       - $ref: '#/components/parameters/contentTypeJsonHeader'
@@ -364,6 +353,21 @@ components:
     organizationName:
       type: string
       description: The name of the organization
+    contactInfo:
+      type: object
+      properties:
+        phoneNumber:
+          type: string
+          description: A phone number matching the [E.164](https://en.wikipedia.org/wiki/E.164) specification
+        email:
+          type: string
+          description: An email address
+    orgType:
+      type: string
+      enum:
+      - sandbox
+      - production
+      description: Whether this organization is a sandbox or production organization
     errorResponse:
       type: object
       properties:
@@ -392,12 +396,6 @@ components:
           description: '`name` is a short name for the error.
 
             '
-    userRole:
-      type: string
-      enum:
-      - admin
-      - member
-      description: The role a user is assigned within an organization
     invitation:
       type: object
       description: An invitation to join an organization
@@ -424,6 +422,10 @@ components:
         role:
           $ref: '#/components/schemas/userRole'
           description: Role that will be assigned to the invited user
+    utcTimestampInteger:
+      type: integer
+      format: int64
+      description: An UTC second-precision timestamp formatted as an integer
     address:
       type: object
       properties:
@@ -449,6 +451,39 @@ components:
     timezone:
       type: string
       description: A timezone string defined in the [IANA Time Zone](https://www.iana.org/time-zones) database.
+    userRole:
+      type: string
+      enum:
+      - admin
+      - member
+      description: The role a user is assigned within an organization
+    orgId:
+      type: string
+      format: uuid
+      description: The ID for an organization
+    organization:
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/organizationName'
+        org_id:
+          $ref: '#/components/schemas/orgId'
+        contact_info:
+          $ref: '#/components/schemas/contactInfo'
+        address:
+          $ref: '#/components/schemas/address'
+        timezone:
+          $ref: '#/components/schemas/timezone'
+        org_type:
+          $ref: '#/components/schemas/orgType'
+        production_org_id:
+          allOf:
+          - $ref: '#/components/schemas/orgId'
+          description: 'The org_id of the paired production organization. Only set when
+
+            org_type is sandbox and the sandbox is paired to a production org.
+
+            '
     organizationUser:
       type: object
       description: A user within an organization
@@ -475,53 +510,48 @@ components:
           $ref: '#/components/schemas/utcTimestampInteger'
         role:
           $ref: '#/components/schemas/userRole'
-    organization:
-      type: object
-      properties:
-        name:
-          $ref: '#/components/schemas/organizationName'
-        org_id:
-          $ref: '#/components/schemas/orgId'
-        contact_info:
-          $ref: '#/components/schemas/contactInfo'
-        address:
-          $ref: '#/components/schemas/address'
-        timezone:
-          $ref: '#/components/schemas/timezone'
-        org_type:
-          $ref: '#/components/schemas/orgType'
-        production_org_id:
-          allOf:
-          - $ref: '#/components/schemas/orgId'
-          description: 'The org_id of the paired production organization. Only set when
-
-            org_type is sandbox and the sandbox is paired to a production org.
-
-            '
-    contactInfo:
-      type: object
-      properties:
-        phoneNumber:
-          type: string
-          description: A phone number matching the [E.164](https://en.wikipedia.org/wiki/E.164) specification
-        email:
-          type: string
-          description: An email address
-    orgType:
-      type: string
-      enum:
-      - sandbox
-      - production
-      description: Whether this organization is a sandbox or production organization
-    orgId:
-      type: string
-      format: uuid
-      description: The ID for an organization
-    utcTimestampInteger:
-      type: integer
-      format: int64
-      description: An UTC second-precision timestamp formatted as an integer
+  responses:
+    ErrorUnauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 401
+            description: Authentication is required and has failed or has not been provided.
+            name: Unauthorized
+    ErrorBadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 400
+            description: The request could not be understood by the server due to malformed syntax.
+            name: Bad Request
+    ErrorInternalServer:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 500
+            description: An unknown error has occurred.
+            name: Unknown
   parameters:
+    pageSizeQueryParam:
+      name: page_size
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 5
+        maximum: 100
+        default: 10
+      description: The maximum number of items to return in a single request
     pageNumberQueryParam:
       name: page_number
       in: query
@@ -531,6 +561,13 @@ components:
         minimum: 0
         default: 0
       description: The page number of items to return
+    contentTypeJsonHeader:
+      name: Content-Type
+      in: header
+      schema:
+        type: string
+      description: An indication that the payload is JSON
+      example: application/json
     userIdPathParam:
       name: user_id
       in: path
@@ -546,54 +583,6 @@ components:
       schema:
         $ref: '#/components/schemas/orgId'
       description: Your organization ID
-    pageSizeQueryParam:
-      name: page_size
-      in: query
-      required: false
-      schema:
-        type: integer
-        minimum: 5
-        maximum: 100
-        default: 10
-      description: The maximum number of items to return in a single request
-    contentTypeJsonHeader:
-      name: Content-Type
-      in: header
-      schema:
-        type: string
-      description: An indication that the payload is JSON
-      example: application/json
-  responses:
-    ErrorUnauthorized:
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/errorResponse'
-          example:
-            code: 401
-            description: Authentication is required and has failed or has not been provided.
-            name: Unauthorized
-    ErrorInternalServer:
-      description: Internal Server Error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/errorResponse'
-          example:
-            code: 500
-            description: An unknown error has occurred.
-            name: Unknown
-    ErrorBadRequest:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/errorResponse'
-          example:
-            code: 400
-            description: The request could not be understood by the server due to malformed syntax.
-            name: Bad Request
   securitySchemes:
     BearerAuth:
       type: http

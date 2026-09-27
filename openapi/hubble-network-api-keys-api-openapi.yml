@@ -257,10 +257,16 @@ paths:
           $ref: '#/components/responses/ErrorInternalServer'
 components:
   schemas:
-    apiKeyName:
+    orgId:
       type: string
-      description: A name for an API Key
-      maxLength: 250
+      format: uuid
+      description: The ID for an organization
+    apiKeyId:
+      type: string
+      description: An ID for an API key
+    apiKey:
+      type: string
+      description: An API key
     authScope:
       type: string
       enum:
@@ -281,9 +287,6 @@ components:
       - read-webhooks
       - write-webhooks
       description: Authorization scope for API key permissions
-    apiKey:
-      type: string
-      description: An API key
     apiKeyExpiration:
       type: integer
       format: int64
@@ -292,9 +295,23 @@ components:
         Can be set to 0 to indicate that there is no expiration.
 
         '
-    apiKeyId:
-      type: string
-      description: An ID for an API key
+    apiKeyItem:
+      type: object
+      description: An API Token used to authenticate with the Hubble Platform
+      properties:
+        key_id:
+          $ref: '#/components/schemas/apiKeyId'
+        key_name:
+          $ref: '#/components/schemas/apiKeyId'
+        created_at:
+          $ref: '#/components/schemas/utcTimestampInteger'
+        expires_at_seconds:
+          $ref: '#/components/schemas/apiKeyExpiration'
+        scopes:
+          type: array
+          items:
+            $ref: '#/components/schemas/authScope'
+          description: List of authorization scopes assigned to this API key
     errorResponse:
       type: object
       properties:
@@ -323,31 +340,29 @@ components:
           description: '`name` is a short name for the error.
 
             '
-    orgId:
+    apiKeyName:
       type: string
-      format: uuid
-      description: The ID for an organization
+      description: A name for an API Key
+      maxLength: 250
     utcTimestampInteger:
       type: integer
       format: int64
       description: An UTC second-precision timestamp formatted as an integer
-    apiKeyItem:
-      type: object
-      description: An API Token used to authenticate with the Hubble Platform
-      properties:
-        key_id:
-          $ref: '#/components/schemas/apiKeyId'
-        key_name:
-          $ref: '#/components/schemas/apiKeyId'
-        created_at:
-          $ref: '#/components/schemas/utcTimestampInteger'
-        expires_at_seconds:
-          $ref: '#/components/schemas/apiKeyExpiration'
-        scopes:
-          type: array
-          items:
-            $ref: '#/components/schemas/authScope'
-          description: List of authorization scopes assigned to this API key
+  parameters:
+    orgIdPathParam:
+      name: org_id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/orgId'
+      description: Your organization ID
+    contentTypeJsonHeader:
+      name: Content-Type
+      in: header
+      schema:
+        type: string
+      description: An indication that the payload is JSON
+      example: application/json
   responses:
     ErrorInternalServer:
       description: Internal Server Error
@@ -369,21 +384,6 @@ components:
             code: 400
             description: The request could not be understood by the server due to malformed syntax.
             name: Bad Request
-  parameters:
-    orgIdPathParam:
-      name: org_id
-      in: path
-      required: true
-      schema:
-        $ref: '#/components/schemas/orgId'
-      description: Your organization ID
-    contentTypeJsonHeader:
-      name: Content-Type
-      in: header
-      schema:
-        type: string
-      description: An indication that the payload is JSON
-      example: application/json
   securitySchemes:
     BearerAuth:
       type: http

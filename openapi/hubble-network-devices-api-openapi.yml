@@ -665,10 +665,10 @@ paths:
           $ref: '#/components/responses/ErrorInternalServer'
 components:
   schemas:
-    deviceId:
+    orgId:
       type: string
       format: uuid
-      description: Primary UUID identifier for a registered device
+      description: The ID for an organization
     organizationDevice:
       type: object
       required:
@@ -721,6 +721,44 @@ components:
                 location:
                   $ref: '#/components/schemas/latLongLocation'
                   description: Location data from a recent terrestrial packet
+    deviceTags:
+      type: object
+      additionalProperties:
+        type: string
+      description: "Tags are user-defined key/value pairs that can be attributed to a device. \nA device may have up to 10 tags.\n**Custom tags:** create your own tags with `key` length up to 32 characters and `value` length up to 128 characters.\n**Platform tags:** use Hubble-defined tags to organize devices.\n- `_env` tag: `production` indicates if a device belongs to the live environment, and `sandbox` for the test environment. A device will always have an `_env` tag assigned.\n"
+      example:
+        _env: production
+    utcTimestampNumber:
+      type: number
+      format: double
+      description: An UTC second-precision timestamp formatted as a floating point number
+    installLocation:
+      type: object
+      description: 'Fixed installation location of a device.
+
+        To clear a previously set location, send lat/long of 0,0.
+
+        '
+      required:
+      - lat
+      - long
+      properties:
+        lat:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+          description: Latitude in Decimal Degrees DDD.DDDDD°
+        long:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+          description: Longitude in Decimal Degrees DDD.DDDDD°
+        location_name:
+          type: string
+          maxLength: 500
+          description: Human-readable label for the location.
     latLongLocation:
       type: object
       required:
@@ -739,6 +777,54 @@ components:
           format: double
           minimum: -180
           maximum: 180
+    errorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: The HTTP status code
+        description:
+          type: string
+          description: 'A description for the error.
+
+            For user errors, we attempt to be as descriptive as possible to help with diagnosing the issue.
+
+            For internal errors, the error description is only indicates that a retry should occur but we log the full error so that we can diagnose it.
+
+            Error descriptions can change over time and should not be programmed against.
+
+            '
+        name:
+          type: string
+          enum:
+          - Bad Request
+          - Unauthorized
+          - Not Found
+          - Too Many Requests
+          - Internal Server Error
+          description: '`name` is a short name for the error.
+
+            '
+    utcTimestampInteger:
+      type: integer
+      format: int64
+      description: An UTC second-precision timestamp formatted as an integer
+    deviceId:
+      type: string
+      format: uuid
+      description: Primary UUID identifier for a registered device
+    deviceName:
+      type: string
+      description: Assigned name for the device
+      maxLength: 250
+    deviceEncryption:
+      type: string
+      enum:
+      - AES-256-CTR
+      - AES-128-CTR
+      - AES-128-EAX
+      - NONE
+      description: Encryption mode configured for the device at registration.
     eidRotation:
       type: object
       description: 'Configuration for EID (Ephemeral ID) rotation on a device.
@@ -773,106 +859,47 @@ components:
             Matches the IN100 hardware''s configuration field. Must be between 10 (~17 minutes) and 15 (~9 hours) inclusive.
 
             '
-    errorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-          description: The HTTP status code
-        description:
-          type: string
-          description: 'A description for the error.
-
-            For user errors, we attempt to be as descriptive as possible to help with diagnosing the issue.
-
-            For internal errors, the error description is only indicates that a retry should occur but we log the full error so that we can diagnose it.
-
-            Error descriptions can change over time and should not be programmed against.
-
-            '
-        name:
-          type: string
-          enum:
-          - Bad Request
-          - Unauthorized
-          - Not Found
-          - Too Many Requests
-          - Internal Server Error
-          description: '`name` is a short name for the error.
-
-            '
-    utcTimestampInteger:
-      type: integer
-      format: int64
-      description: An UTC second-precision timestamp formatted as an integer
-    deviceTags:
-      type: object
-      additionalProperties:
-        type: string
-      description: "Tags are user-defined key/value pairs that can be attributed to a device. \nA device may have up to 10 tags.\n**Custom tags:** create your own tags with `key` length up to 32 characters and `value` length up to 128 characters.\n**Platform tags:** use Hubble-defined tags to organize devices.\n- `_env` tag: `production` indicates if a device belongs to the live environment, and `sandbox` for the test environment. A device will always have an `_env` tag assigned.\n"
-      example:
-        _env: production
-    deviceEncryption:
-      type: string
-      enum:
-      - AES-256-CTR
-      - AES-128-CTR
-      - AES-128-EAX
-      - NONE
-      description: Encryption mode configured for the device at registration.
-    utcTimestampNumber:
-      type: number
-      format: double
-      description: An UTC second-precision timestamp formatted as a floating point number
-    orgId:
-      type: string
-      format: uuid
-      description: The ID for an organization
-    installLocation:
-      type: object
-      description: 'Fixed installation location of a device.
-
-        To clear a previously set location, send lat/long of 0,0.
-
-        '
-      required:
-      - lat
-      - long
-      properties:
-        lat:
-          type: number
-          format: double
-          minimum: -90
-          maximum: 90
-          description: Latitude in Decimal Degrees DDD.DDDDD°
-        long:
-          type: number
-          format: double
-          minimum: -180
-          maximum: 180
-          description: Longitude in Decimal Degrees DDD.DDDDD°
-        location_name:
-          type: string
-          maxLength: 500
-          description: Human-readable label for the location.
-    deviceName:
-      type: string
-      description: Assigned name for the device
-      maxLength: 250
   parameters:
+    orgIdPathParam:
+      name: org_id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/orgId'
+      description: Your organization ID
     deviceIdPathParam:
       name: device_id
       in: path
       required: true
       schema:
         $ref: '#/components/schemas/deviceId'
-    filterCreatedTSQueryParam:
-      name: filter_created_ts
+    limitQueryParam:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        minimum: 10
+        default: 250
+      description: A limit for the page size of devices
+    sortFieldQueryParam:
+      name: sort_field
       in: query
       required: false
       schema:
         type: string
-      description: "Filter devices by creation timestamp (e.g., filter_created_ts=between:1000:2000)\nTimestamps are in seconds since the Unix epoch.\nThe only supported filtering operator currently is `between`. \n"
+        enum:
+        - created_ts
+        - most_recent_packet_ts
+      description: Field to sort devices by
+    continuationTokenHeader:
+      name: Continuation-Token
+      in: header
+      required: false
+      schema:
+        type: string
+      description: A token to indicate how to continue paging
     contentTypeJsonHeader:
       name: Content-Type
       in: header
@@ -880,6 +907,21 @@ components:
         type: string
       description: An indication that the payload is JSON
       example: application/json
+    filterCreatedTSQueryParam:
+      name: filter_created_ts
+      in: query
+      required: false
+      schema:
+        type: string
+      description: "Filter devices by creation timestamp (e.g., filter_created_ts=between:1000:2000)\nTimestamps are in seconds since the Unix epoch.\nThe only supported filtering operator currently is `between`. \n"
+    sortAscendingQueryParam:
+      name: sort_ascending
+      in: query
+      required: false
+      schema:
+        type: boolean
+        default: true
+      description: Sort order (true for ascending, false for descending)
     deviceKeyFormatQueryParam:
       name: key_format
       in: query
@@ -895,40 +937,6 @@ components:
         `hex` returns a lowercase hexadecimal string.
 
         '
-    filterMostRecentPacketTSQueryParam:
-      name: filter_most_recent_packet_ts
-      in: query
-      required: false
-      schema:
-        type: string
-      description: "Filter devices by most recent packet timestamp (e.g., filter_most_recent_packet_ts=between:1000:2000)\nTimestamps are in seconds since the Unix epoch.\nThe most recent packet value is only updated periodically.\nThe only supported filtering operator currently is `between`. \n"
-    limitQueryParam:
-      name: limit
-      in: query
-      required: false
-      schema:
-        type: integer
-        maximum: 1000
-        minimum: 10
-        default: 250
-      description: A limit for the page size of devices
-    continuationTokenHeader:
-      name: Continuation-Token
-      in: header
-      required: false
-      schema:
-        type: string
-      description: A token to indicate how to continue paging
-    sortFieldQueryParam:
-      name: sort_field
-      in: query
-      required: false
-      schema:
-        type: string
-        enum:
-        - created_ts
-        - most_recent_packet_ts
-      description: Field to sort devices by
     filterTagsQueryParam:
       name: filter_tags
       in: query
@@ -949,32 +957,14 @@ components:
         Packet matching criteria uses AND logic when different tag keys are used in a list of tags, and OR logic when the same tag key is used more than once.
 
         '
-    orgIdPathParam:
-      name: org_id
-      in: path
-      required: true
-      schema:
-        $ref: '#/components/schemas/orgId'
-      description: Your organization ID
-    sortAscendingQueryParam:
-      name: sort_ascending
+    filterMostRecentPacketTSQueryParam:
+      name: filter_most_recent_packet_ts
       in: query
       required: false
       schema:
-        type: boolean
-        default: true
-      description: Sort order (true for ascending, false for descending)
+        type: string
+      description: "Filter devices by most recent packet timestamp (e.g., filter_most_recent_packet_ts=between:1000:2000)\nTimestamps are in seconds since the Unix epoch.\nThe most recent packet value is only updated periodically.\nThe only supported filtering operator currently is `between`. \n"
   responses:
-    ErrorBadRequest:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/errorResponse'
-          example:
-            code: 400
-            description: The request could not be understood by the server due to malformed syntax.
-            name: Bad Request
     ErrorInternalServer:
       description: Internal Server Error
       content:
@@ -985,6 +975,16 @@ components:
             code: 500
             description: An unknown error has occurred.
             name: Unknown
+    ErrorBadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 400
+            description: The request could not be understood by the server due to malformed syntax.
+            name: Bad Request
   headers:
     ContinuationTokenHeader:
       description: A token to indicate how to continue paging

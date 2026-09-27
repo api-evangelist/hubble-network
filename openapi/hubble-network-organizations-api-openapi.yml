@@ -350,9 +350,65 @@ paths:
           $ref: '#/components/responses/ErrorInternalServer'
 components:
   schemas:
-    organizationName:
+    orgId:
       type: string
-      description: The name of the organization
+      format: uuid
+      description: The ID for an organization
+    orgType:
+      type: string
+      enum:
+      - sandbox
+      - production
+      description: Whether this organization is a sandbox or production organization
+    invitation:
+      type: object
+      description: An invitation to join an organization
+      required:
+      - invitee_email
+      - role
+      - created_at
+      - expires_at
+      properties:
+        invitee_email:
+          type: string
+          format: email
+          description: Email address of the invited user
+        inviter_email:
+          type: string
+          format: email
+          description: Email address of the user who sent the invitation
+        created_at:
+          $ref: '#/components/schemas/utcTimestampInteger'
+          description: Timestamp when the invitation was created
+        expires_at:
+          $ref: '#/components/schemas/utcTimestampInteger'
+          description: Timestamp when the invitation expires
+        role:
+          $ref: '#/components/schemas/userRole'
+          description: Role that will be assigned to the invited user
+    organization:
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/organizationName'
+        org_id:
+          $ref: '#/components/schemas/orgId'
+        contact_info:
+          $ref: '#/components/schemas/contactInfo'
+        address:
+          $ref: '#/components/schemas/address'
+        timezone:
+          $ref: '#/components/schemas/timezone'
+        org_type:
+          $ref: '#/components/schemas/orgType'
+        production_org_id:
+          allOf:
+          - $ref: '#/components/schemas/orgId'
+          description: 'The org_id of the paired production organization. Only set when
+
+            org_type is sandbox and the sandbox is paired to a production org.
+
+            '
     contactInfo:
       type: object
       properties:
@@ -362,12 +418,28 @@ components:
         email:
           type: string
           description: An email address
-    orgType:
-      type: string
-      enum:
-      - sandbox
-      - production
-      description: Whether this organization is a sandbox or production organization
+    address:
+      type: object
+      properties:
+        street_address:
+          type: string
+          description: The first line of a street address
+          maxLength: 250
+        street_address_line_two:
+          type: string
+          description: The optional second line of a street address
+          maxLength: 250
+        city:
+          type: string
+          description: A city that the address relates to
+          maxLength: 100
+        state:
+          type: string
+          description: A state that the address relates to
+          maxLength: 100
+        country:
+          type: number
+          description: A country code defined by [ISO-3166](https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes).
     errorResponse:
       type: object
       properties:
@@ -396,94 +468,16 @@ components:
           description: '`name` is a short name for the error.
 
             '
-    invitation:
-      type: object
-      description: An invitation to join an organization
-      required:
-      - invitee_email
-      - role
-      - created_at
-      - expires_at
-      properties:
-        invitee_email:
-          type: string
-          format: email
-          description: Email address of the invited user
-        inviter_email:
-          type: string
-          format: email
-          description: Email address of the user who sent the invitation
-        created_at:
-          $ref: '#/components/schemas/utcTimestampInteger'
-          description: Timestamp when the invitation was created
-        expires_at:
-          $ref: '#/components/schemas/utcTimestampInteger'
-          description: Timestamp when the invitation expires
-        role:
-          $ref: '#/components/schemas/userRole'
-          description: Role that will be assigned to the invited user
     utcTimestampInteger:
       type: integer
       format: int64
       description: An UTC second-precision timestamp formatted as an integer
-    address:
-      type: object
-      properties:
-        street_address:
-          type: string
-          description: The first line of a street address
-          maxLength: 250
-        street_address_line_two:
-          type: string
-          description: The optional second line of a street address
-          maxLength: 250
-        city:
-          type: string
-          description: A city that the address relates to
-          maxLength: 100
-        state:
-          type: string
-          description: A state that the address relates to
-          maxLength: 100
-        country:
-          type: number
-          description: A country code defined by [ISO-3166](https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes).
-    timezone:
-      type: string
-      description: A timezone string defined in the [IANA Time Zone](https://www.iana.org/time-zones) database.
     userRole:
       type: string
       enum:
       - admin
       - member
       description: The role a user is assigned within an organization
-    orgId:
-      type: string
-      format: uuid
-      description: The ID for an organization
-    organization:
-      type: object
-      properties:
-        name:
-          $ref: '#/components/schemas/organizationName'
-        org_id:
-          $ref: '#/components/schemas/orgId'
-        contact_info:
-          $ref: '#/components/schemas/contactInfo'
-        address:
-          $ref: '#/components/schemas/address'
-        timezone:
-          $ref: '#/components/schemas/timezone'
-        org_type:
-          $ref: '#/components/schemas/orgType'
-        production_org_id:
-          allOf:
-          - $ref: '#/components/schemas/orgId'
-          description: 'The org_id of the paired production organization. Only set when
-
-            org_type is sandbox and the sandbox is paired to a production org.
-
-            '
     organizationUser:
       type: object
       description: A user within an organization
@@ -510,6 +504,54 @@ components:
           $ref: '#/components/schemas/utcTimestampInteger'
         role:
           $ref: '#/components/schemas/userRole'
+    timezone:
+      type: string
+      description: A timezone string defined in the [IANA Time Zone](https://www.iana.org/time-zones) database.
+    organizationName:
+      type: string
+      description: The name of the organization
+  parameters:
+    orgIdPathParam:
+      name: org_id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/orgId'
+      description: Your organization ID
+    userIdPathParam:
+      name: user_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The ID of the user
+    contentTypeJsonHeader:
+      name: Content-Type
+      in: header
+      schema:
+        type: string
+      description: An indication that the payload is JSON
+      example: application/json
+    pageNumberQueryParam:
+      name: page_number
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: The page number of items to return
+    pageSizeQueryParam:
+      name: page_size
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 5
+        maximum: 100
+        default: 10
+      description: The maximum number of items to return in a single request
   responses:
     ErrorUnauthorized:
       description: Unauthorized
@@ -521,16 +563,6 @@ components:
             code: 401
             description: Authentication is required and has failed or has not been provided.
             name: Unauthorized
-    ErrorBadRequest:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/errorResponse'
-          example:
-            code: 400
-            description: The request could not be understood by the server due to malformed syntax.
-            name: Bad Request
     ErrorInternalServer:
       description: Internal Server Error
       content:
@@ -541,48 +573,16 @@ components:
             code: 500
             description: An unknown error has occurred.
             name: Unknown
-  parameters:
-    pageSizeQueryParam:
-      name: page_size
-      in: query
-      required: false
-      schema:
-        type: integer
-        minimum: 5
-        maximum: 100
-        default: 10
-      description: The maximum number of items to return in a single request
-    pageNumberQueryParam:
-      name: page_number
-      in: query
-      required: false
-      schema:
-        type: integer
-        minimum: 0
-        default: 0
-      description: The page number of items to return
-    contentTypeJsonHeader:
-      name: Content-Type
-      in: header
-      schema:
-        type: string
-      description: An indication that the payload is JSON
-      example: application/json
-    userIdPathParam:
-      name: user_id
-      in: path
-      required: true
-      schema:
-        type: string
-        format: uuid
-      description: The ID of the user
-    orgIdPathParam:
-      name: org_id
-      in: path
-      required: true
-      schema:
-        $ref: '#/components/schemas/orgId'
-      description: Your organization ID
+    ErrorBadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 400
+            description: The request could not be understood by the server due to malformed syntax.
+            name: Bad Request
   securitySchemes:
     BearerAuth:
       type: http

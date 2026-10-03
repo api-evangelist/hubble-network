@@ -230,18 +230,6 @@ paths:
           $ref: '#/components/responses/ErrorInternalServer'
 components:
   schemas:
-    orgId:
-      type: string
-      format: uuid
-      description: The ID for an organization
-    metricsSuccessRate:
-      type: number
-      format: float
-      description: "Success rate of requests (0-1). \nWhen total requests is 0, the success rate defaults to 1.0 or 100%.\n"
-    formattedTimestamp:
-      type: string
-      format: date-time
-      description: "Start of the bucket in ISO 8601 format.\nFor example: `2025-04-25T14:01:54Z`. \n"
     errorResponse:
       type: object
       properties:
@@ -270,6 +258,18 @@ components:
           description: '`name` is a short name for the error.
 
             '
+    orgId:
+      type: string
+      format: uuid
+      description: The ID for an organization
+    formattedTimestamp:
+      type: string
+      format: date-time
+      description: "Start of the bucket in ISO 8601 format.\nFor example: `2025-04-25T14:01:54Z`. \n"
+    metricsSuccessRate:
+      type: number
+      format: float
+      description: "Success rate of requests (0-1). \nWhen total requests is 0, the success rate defaults to 1.0 or 100%.\n"
   parameters:
     orgIdPathParam:
       name: org_id
@@ -327,16 +327,6 @@ components:
 
         '
   responses:
-    ErrorInternalServer:
-      description: Internal Server Error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/errorResponse'
-          example:
-            code: 500
-            description: An unknown error has occurred.
-            name: Unknown
     ErrorBadRequest:
       description: Bad Request
       content:
@@ -347,6 +337,16 @@ components:
             code: 400
             description: The request could not be understood by the server due to malformed syntax.
             name: Bad Request
+    ErrorInternalServer:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 500
+            description: An unknown error has occurred.
+            name: Unknown
   securitySchemes:
     BearerAuth:
       type: http

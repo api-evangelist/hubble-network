@@ -257,61 +257,10 @@ paths:
           $ref: '#/components/responses/ErrorInternalServer'
 components:
   schemas:
-    orgId:
-      type: string
-      format: uuid
-      description: The ID for an organization
-    apiKeyId:
-      type: string
-      description: An ID for an API key
-    apiKey:
-      type: string
-      description: An API key
-    authScope:
-      type: string
-      enum:
-      - read-api-keys
-      - write-api-keys
-      - read-users
-      - write-users
-      - read-organization-metadata
-      - write-organization-metadata
-      - read-devices
-      - write-devices
-      - read-invitations
-      - write-invitations
-      - read-packets
-      - read-platform-metrics
-      - read-billing-usage
-      - read-billing-invoices
-      - read-webhooks
-      - write-webhooks
-      description: Authorization scope for API key permissions
-    apiKeyExpiration:
+    utcTimestampInteger:
       type: integer
       format: int64
-      description: 'An UTC second-precision timestamp formatted as an integer.
-
-        Can be set to 0 to indicate that there is no expiration.
-
-        '
-    apiKeyItem:
-      type: object
-      description: An API Token used to authenticate with the Hubble Platform
-      properties:
-        key_id:
-          $ref: '#/components/schemas/apiKeyId'
-        key_name:
-          $ref: '#/components/schemas/apiKeyId'
-        created_at:
-          $ref: '#/components/schemas/utcTimestampInteger'
-        expires_at_seconds:
-          $ref: '#/components/schemas/apiKeyExpiration'
-        scopes:
-          type: array
-          items:
-            $ref: '#/components/schemas/authScope'
-          description: List of authorization scopes assigned to this API key
+      description: An UTC second-precision timestamp formatted as an integer
     errorResponse:
       type: object
       properties:
@@ -340,22 +289,66 @@ components:
           description: '`name` is a short name for the error.
 
             '
+    apiKey:
+      type: string
+      description: An API key
     apiKeyName:
       type: string
       description: A name for an API Key
       maxLength: 250
-    utcTimestampInteger:
+    orgId:
+      type: string
+      format: uuid
+      description: The ID for an organization
+    apiKeyExpiration:
       type: integer
       format: int64
-      description: An UTC second-precision timestamp formatted as an integer
+      description: 'An UTC second-precision timestamp formatted as an integer.
+
+        Can be set to 0 to indicate that there is no expiration.
+
+        '
+    apiKeyId:
+      type: string
+      description: An ID for an API key
+    apiKeyItem:
+      type: object
+      description: An API Token used to authenticate with the Hubble Platform
+      properties:
+        key_id:
+          $ref: '#/components/schemas/apiKeyId'
+        key_name:
+          $ref: '#/components/schemas/apiKeyId'
+        created_at:
+          $ref: '#/components/schemas/utcTimestampInteger'
+        expires_at_seconds:
+          $ref: '#/components/schemas/apiKeyExpiration'
+        scopes:
+          type: array
+          items:
+            $ref: '#/components/schemas/authScope'
+          description: List of authorization scopes assigned to this API key
+    authScope:
+      type: string
+      enum:
+      - read-api-keys
+      - write-api-keys
+      - read-users
+      - write-users
+      - read-organization-metadata
+      - write-organization-metadata
+      - read-devices
+      - write-devices
+      - read-invitations
+      - write-invitations
+      - read-packets
+      - read-platform-metrics
+      - read-billing-usage
+      - read-billing-invoices
+      - read-webhooks
+      - write-webhooks
+      description: Authorization scope for API key permissions
   parameters:
-    orgIdPathParam:
-      name: org_id
-      in: path
-      required: true
-      schema:
-        $ref: '#/components/schemas/orgId'
-      description: Your organization ID
     contentTypeJsonHeader:
       name: Content-Type
       in: header
@@ -363,6 +356,13 @@ components:
         type: string
       description: An indication that the payload is JSON
       example: application/json
+    orgIdPathParam:
+      name: org_id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/orgId'
+      description: Your organization ID
   responses:
     ErrorInternalServer:
       description: Internal Server Error

@@ -665,77 +665,6 @@ paths:
           $ref: '#/components/responses/ErrorInternalServer'
 components:
   schemas:
-    orgId:
-      type: string
-      format: uuid
-      description: The ID for an organization
-    deviceTags:
-      type: object
-      additionalProperties:
-        type: string
-      description: "Tags are user-defined key/value pairs that can be attributed to a device. \nA device may have up to 10 tags.\n**Custom tags:** create your own tags with `key` length up to 32 characters and `value` length up to 128 characters.\n**Platform tags:** use Hubble-defined tags to organize devices.\n- `_env` tag: `production` indicates if a device belongs to the live environment, and `sandbox` for the test environment. A device will always have an `_env` tag assigned.\n"
-      example:
-        _env: production
-    eidRotation:
-      type: object
-      description: 'Configuration for EID (Ephemeral ID) rotation on a device.
-
-        EID rotation allows devices to use rotating ephemeral identifiers based on the specified counter source.
-
-        When not specified, devices will use the UNIX_TIME counter source which relies on the device knowing an accurate epoch time.
-
-        The DEVICE_UPTIME counter source enables EID rotation without requiring a real-time clock.
-
-        '
-      properties:
-        counter_source:
-          type: string
-          enum:
-          - UNIX_TIME
-          - DEVICE_UPTIME
-          description: 'The counter source used for EID rotation.
-
-            * `UNIX_TIME` - Counter is based on the current Unix (epoch) time.
-
-            * `DEVICE_UPTIME` - Counter is based on the device''s uptime.
-
-            '
-        period_exponent:
-          type: integer
-          minimum: 10
-          maximum: 15
-          default: 15
-          description: 'Base-2 exponent of the EID rotation period in seconds, used only with `encryption` of "AES-128-EAX" (IN100 protocol).
-
-            Matches the IN100 hardware''s configuration field. Must be between 10 (~17 minutes) and 15 (~9 hours) inclusive.
-
-            '
-    utcTimestampInteger:
-      type: integer
-      format: int64
-      description: An UTC second-precision timestamp formatted as an integer
-    deviceId:
-      type: string
-      format: uuid
-      description: Primary UUID identifier for a registered device
-    latLongLocation:
-      type: object
-      required:
-      - latitude
-      - longitude
-      properties:
-        latitude:
-          type: number
-          description: Latitude in Decimal Degrees DDD.DDDDD°
-          format: double
-          minimum: -90
-          maximum: 90
-        longitude:
-          type: number
-          description: Longitude in Decimal Degrees DDD.DDDDD°
-          format: double
-          minimum: -180
-          maximum: 180
     errorResponse:
       type: object
       properties:
@@ -764,18 +693,6 @@ components:
           description: '`name` is a short name for the error.
 
             '
-    deviceEncryption:
-      type: string
-      enum:
-      - AES-256-CTR
-      - AES-128-CTR
-      - AES-128-EAX
-      - NONE
-      description: Encryption mode configured for the device at registration.
-    utcTimestampNumber:
-      type: number
-      format: double
-      description: An UTC second-precision timestamp formatted as a floating point number
     installLocation:
       type: object
       description: 'Fixed installation location of a device.
@@ -803,6 +720,14 @@ components:
           type: string
           maxLength: 500
           description: Human-readable label for the location.
+    utcTimestampInteger:
+      type: integer
+      format: int64
+      description: An UTC second-precision timestamp formatted as an integer
+    orgId:
+      type: string
+      format: uuid
+      description: The ID for an organization
     organizationDevice:
       type: object
       required:
@@ -855,10 +780,195 @@ components:
                 location:
                   $ref: '#/components/schemas/latLongLocation'
                   description: Location data from a recent terrestrial packet
+    deviceTags:
+      type: object
+      additionalProperties:
+        type: string
+      description: "Tags are user-defined key/value pairs that can be attributed to a device. \nA device may have up to 10 tags.\n**Custom tags:** create your own tags with `key` length up to 32 characters and `value` length up to 128 characters.\n**Platform tags:** use Hubble-defined tags to organize devices.\n- `_env` tag: `production` indicates if a device belongs to the live environment, and `sandbox` for the test environment. A device will always have an `_env` tag assigned.\n"
+      example:
+        _env: production
+    eidRotation:
+      type: object
+      description: 'Configuration for EID (Ephemeral ID) rotation on a device.
+
+        EID rotation allows devices to use rotating ephemeral identifiers based on the specified counter source.
+
+        When not specified, devices will use the UNIX_TIME counter source which relies on the device knowing an accurate epoch time.
+
+        The DEVICE_UPTIME counter source enables EID rotation without requiring a real-time clock.
+
+        '
+      properties:
+        counter_source:
+          type: string
+          enum:
+          - UNIX_TIME
+          - DEVICE_UPTIME
+          description: 'The counter source used for EID rotation.
+
+            * `UNIX_TIME` - Counter is based on the current Unix (epoch) time.
+
+            * `DEVICE_UPTIME` - Counter is based on the device''s uptime.
+
+            '
+        period_exponent:
+          type: integer
+          minimum: 10
+          maximum: 15
+          default: 15
+          description: 'Base-2 exponent of the EID rotation period in seconds, used only with `encryption` of "AES-128-EAX" (IN100 protocol).
+
+            Matches the IN100 hardware''s configuration field. Must be between 10 (~17 minutes) and 15 (~9 hours) inclusive.
+
+            '
     deviceName:
       type: string
       description: Assigned name for the device
       maxLength: 250
+    latLongLocation:
+      type: object
+      required:
+      - latitude
+      - longitude
+      properties:
+        latitude:
+          type: number
+          description: Latitude in Decimal Degrees DDD.DDDDD°
+          format: double
+          minimum: -90
+          maximum: 90
+        longitude:
+          type: number
+          description: Longitude in Decimal Degrees DDD.DDDDD°
+          format: double
+          minimum: -180
+          maximum: 180
+    deviceId:
+      type: string
+      format: uuid
+      description: Primary UUID identifier for a registered device
+    deviceEncryption:
+      type: string
+      enum:
+      - AES-256-CTR
+      - AES-128-CTR
+      - AES-128-EAX
+      - NONE
+      description: Encryption mode configured for the device at registration.
+    utcTimestampNumber:
+      type: number
+      format: double
+      description: An UTC second-precision timestamp formatted as a floating point number
+  headers:
+    ContinuationTokenHeader:
+      description: A token to indicate how to continue paging
+      schema:
+        type: string
+  parameters:
+    deviceIdPathParam:
+      name: device_id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/deviceId'
+    continuationTokenHeader:
+      name: Continuation-Token
+      in: header
+      required: false
+      schema:
+        type: string
+      description: A token to indicate how to continue paging
+    filterCreatedTSQueryParam:
+      name: filter_created_ts
+      in: query
+      required: false
+      schema:
+        type: string
+      description: "Filter devices by creation timestamp (e.g., filter_created_ts=between:1000:2000)\nTimestamps are in seconds since the Unix epoch.\nThe only supported filtering operator currently is `between`. \n"
+    sortAscendingQueryParam:
+      name: sort_ascending
+      in: query
+      required: false
+      schema:
+        type: boolean
+        default: true
+      description: Sort order (true for ascending, false for descending)
+    filterMostRecentPacketTSQueryParam:
+      name: filter_most_recent_packet_ts
+      in: query
+      required: false
+      schema:
+        type: string
+      description: "Filter devices by most recent packet timestamp (e.g., filter_most_recent_packet_ts=between:1000:2000)\nTimestamps are in seconds since the Unix epoch.\nThe most recent packet value is only updated periodically.\nThe only supported filtering operator currently is `between`. \n"
+    deviceKeyFormatQueryParam:
+      name: key_format
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+        - base64
+        - hex
+        default: base64
+      description: 'Encoding for `device.key` in the response. `base64` (default) returns standard Base64;
+
+        `hex` returns a lowercase hexadecimal string.
+
+        '
+    sortFieldQueryParam:
+      name: sort_field
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+        - created_ts
+        - most_recent_packet_ts
+      description: Field to sort devices by
+    filterTagsQueryParam:
+      name: filter_tags
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          description: 'A tag to match against. For example: _env:production.
+
+            '
+      description: 'A set of device **platform tags** specifying which packets to include.
+
+        Only platform tags are queryable: `_env:production`, `_env:sandbox`.
+
+        The query param can be used multiple times to form a list of tags.
+
+        Packet matching criteria uses AND logic when different tag keys are used in a list of tags, and OR logic when the same tag key is used more than once.
+
+        '
+    contentTypeJsonHeader:
+      name: Content-Type
+      in: header
+      schema:
+        type: string
+      description: An indication that the payload is JSON
+      example: application/json
+    limitQueryParam:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        minimum: 10
+        default: 250
+      description: A limit for the page size of devices
+    orgIdPathParam:
+      name: org_id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/orgId'
+      description: Your organization ID
   responses:
     ErrorBadRequest:
       description: Bad Request
@@ -880,116 +990,6 @@ components:
             code: 500
             description: An unknown error has occurred.
             name: Unknown
-  parameters:
-    filterMostRecentPacketTSQueryParam:
-      name: filter_most_recent_packet_ts
-      in: query
-      required: false
-      schema:
-        type: string
-      description: "Filter devices by most recent packet timestamp (e.g., filter_most_recent_packet_ts=between:1000:2000)\nTimestamps are in seconds since the Unix epoch.\nThe most recent packet value is only updated periodically.\nThe only supported filtering operator currently is `between`. \n"
-    contentTypeJsonHeader:
-      name: Content-Type
-      in: header
-      schema:
-        type: string
-      description: An indication that the payload is JSON
-      example: application/json
-    deviceKeyFormatQueryParam:
-      name: key_format
-      in: query
-      required: false
-      schema:
-        type: string
-        enum:
-        - base64
-        - hex
-        default: base64
-      description: 'Encoding for `device.key` in the response. `base64` (default) returns standard Base64;
-
-        `hex` returns a lowercase hexadecimal string.
-
-        '
-    orgIdPathParam:
-      name: org_id
-      in: path
-      required: true
-      schema:
-        $ref: '#/components/schemas/orgId'
-      description: Your organization ID
-    filterTagsQueryParam:
-      name: filter_tags
-      in: query
-      required: false
-      schema:
-        type: array
-        items:
-          type: string
-          description: 'A tag to match against. For example: _env:production.
-
-            '
-      description: 'A set of device **platform tags** specifying which packets to include.
-
-        Only platform tags are queryable: `_env:production`, `_env:sandbox`.
-
-        The query param can be used multiple times to form a list of tags.
-
-        Packet matching criteria uses AND logic when different tag keys are used in a list of tags, and OR logic when the same tag key is used more than once.
-
-        '
-    deviceIdPathParam:
-      name: device_id
-      in: path
-      required: true
-      schema:
-        $ref: '#/components/schemas/deviceId'
-    sortFieldQueryParam:
-      name: sort_field
-      in: query
-      required: false
-      schema:
-        type: string
-        enum:
-        - created_ts
-        - most_recent_packet_ts
-      description: Field to sort devices by
-    filterCreatedTSQueryParam:
-      name: filter_created_ts
-      in: query
-      required: false
-      schema:
-        type: string
-      description: "Filter devices by creation timestamp (e.g., filter_created_ts=between:1000:2000)\nTimestamps are in seconds since the Unix epoch.\nThe only supported filtering operator currently is `between`. \n"
-    limitQueryParam:
-      name: limit
-      in: query
-      required: false
-      schema:
-        type: integer
-        maximum: 1000
-        minimum: 10
-        default: 250
-      description: A limit for the page size of devices
-    sortAscendingQueryParam:
-      name: sort_ascending
-      in: query
-      required: false
-      schema:
-        type: boolean
-        default: true
-      description: Sort order (true for ascending, false for descending)
-    continuationTokenHeader:
-      name: Continuation-Token
-      in: header
-      required: false
-      schema:
-        type: string
-      description: A token to indicate how to continue paging
-  headers:
-    ContinuationTokenHeader:
-      description: A token to indicate how to continue paging
-      schema:
-        type: string
   securitySchemes:
     BearerAuth:
       type: http

@@ -288,6 +288,78 @@ components:
           description: '`name` is a short name for the error.
 
             '
+    formattedTimestamp:
+      type: string
+      format: date-time
+      description: "Start of the bucket in ISO 8601 format.\nFor example: `2025-04-25T14:01:54Z`. \n"
+    orgId:
+      type: string
+      format: uuid
+      description: The ID for an organization
+    BillingActiveDevicesResponse:
+      type: object
+      required:
+      - devices
+      - period_start
+      - period_end
+      properties:
+        devices:
+          type: array
+          items:
+            $ref: '#/components/schemas/BillingActiveDevice'
+        period_start:
+          type: string
+          format: date-time
+          description: Start of the current billing period (ISO 8601).
+        period_end:
+          type: string
+          format: date-time
+          description: End of the current billing period (ISO 8601).
+    BillingActiveDevice:
+      type: object
+      required:
+      - device_id
+      - name
+      properties:
+        device_id:
+          type: string
+          description: The device identifier.
+        name:
+          type: string
+          description: The device display name.
+        network_type:
+          type: string
+          enum:
+          - terrestrial
+          - satellite
+          description: The network on which the device was most recently active.
+        last_active:
+          type: number
+          format: double
+          description: Unix timestamp (seconds, fractional) of the device's most recent packet.
+    BillingPaymentMethodCard:
+      type: object
+      required:
+      - id
+      - type
+      properties:
+        id:
+          type: string
+          description: Stripe PaymentMethod id (`pm_...`)
+        type:
+          type: string
+          example: card
+        brand:
+          type: string
+          example: visa
+        last4:
+          type: string
+        exp_month:
+          type: integer
+          format: int64
+        exp_year:
+          type: integer
+          format: int64
     BillingSubscription:
       type: object
       required:
@@ -326,74 +398,6 @@ components:
         overage_per_device_cents:
           type: integer
           format: int64
-    BillingActiveDevice:
-      type: object
-      required:
-      - device_id
-      - name
-      properties:
-        device_id:
-          type: string
-          description: The device identifier.
-        name:
-          type: string
-          description: The device display name.
-        network_type:
-          type: string
-          enum:
-          - terrestrial
-          - satellite
-          description: The network on which the device was most recently active.
-        last_active:
-          type: number
-          format: double
-          description: Unix timestamp (seconds, fractional) of the device's most recent packet.
-    orgId:
-      type: string
-      format: uuid
-      description: The ID for an organization
-    BillingActiveDevicesResponse:
-      type: object
-      required:
-      - devices
-      - period_start
-      - period_end
-      properties:
-        devices:
-          type: array
-          items:
-            $ref: '#/components/schemas/BillingActiveDevice'
-        period_start:
-          type: string
-          format: date-time
-          description: Start of the current billing period (ISO 8601).
-        period_end:
-          type: string
-          format: date-time
-          description: End of the current billing period (ISO 8601).
-    BillingPaymentMethodCard:
-      type: object
-      required:
-      - id
-      - type
-      properties:
-        id:
-          type: string
-          description: Stripe PaymentMethod id (`pm_...`)
-        type:
-          type: string
-          example: card
-        brand:
-          type: string
-          example: visa
-        last4:
-          type: string
-        exp_month:
-          type: integer
-          format: int64
-        exp_year:
-          type: integer
-          format: int64
     BillingPaymentMethodsResponse:
       type: object
       required:
@@ -406,70 +410,16 @@ components:
         default_payment_method_id:
           type: string
           description: Customer invoice_settings.default_payment_method when set
-    formattedTimestamp:
-      type: string
-      format: date-time
-      description: "Start of the bucket in ISO 8601 format.\nFor example: `2025-04-25T14:01:54Z`. \n"
     utcTimestampNumber:
       type: number
       format: double
       description: An UTC second-precision timestamp formatted as a floating point number
-  parameters:
-    orgIdPathParam:
-      name: org_id
-      in: path
-      required: true
-      schema:
-        $ref: '#/components/schemas/orgId'
-      description: Your organization ID
-    limitQueryParam:
-      name: limit
-      in: query
-      required: false
-      schema:
-        type: integer
-        maximum: 1000
-        minimum: 10
-        default: 250
-      description: A limit for the page size of devices
-    continuationTokenHeader:
-      name: Continuation-Token
-      in: header
-      required: false
+  headers:
+    ContinuationTokenHeader:
+      description: A token to indicate how to continue paging
       schema:
         type: string
-      description: A token to indicate how to continue paging
   responses:
-    ErrorBadRequest:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/errorResponse'
-          example:
-            code: 400
-            description: The request could not be understood by the server due to malformed syntax.
-            name: Bad Request
-    ErrorNotFound:
-      description: Not Found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/errorResponse'
-          example:
-            code: 404
-            description: The requested resource was not found.
-            name: Not Found
-    ErrorForbidden:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/errorResponse'
-          example:
-            code: 403
-            description: The authenticated principal is not allowed to perform this operation.
-            name: Forbidden
     ErrorInternalServer:
       description: Internal Server Error
       content:
@@ -480,11 +430,61 @@ components:
             code: 500
             description: An unknown error has occurred.
             name: Unknown
-  headers:
-    ContinuationTokenHeader:
-      description: A token to indicate how to continue paging
+    ErrorNotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 404
+            description: The requested resource was not found.
+            name: Not Found
+    ErrorBadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 400
+            description: The request could not be understood by the server due to malformed syntax.
+            name: Bad Request
+    ErrorForbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 403
+            description: The authenticated principal is not allowed to perform this operation.
+            name: Forbidden
+  parameters:
+    continuationTokenHeader:
+      name: Continuation-Token
+      in: header
+      required: false
       schema:
         type: string
+      description: A token to indicate how to continue paging
+    limitQueryParam:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        minimum: 10
+        default: 250
+      description: A limit for the page size of devices
+    orgIdPathParam:
+      name: org_id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/orgId'
+      description: Your organization ID
   securitySchemes:
     BearerAuth:
       type: http

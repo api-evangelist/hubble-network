@@ -196,32 +196,35 @@ paths:
         '500':
           description: Internal Server Error. Please Retry.
 components:
-  responses:
-    ErrorBadRequest:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/errorResponse'
-          example:
-            code: 400
-            description: The request could not be understood by the server due to malformed syntax.
-            name: Bad Request
-    ErrorInternalServer:
-      description: Internal Server Error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/errorResponse'
-          example:
-            code: 500
-            description: An unknown error has occurred.
-            name: Unknown
   schemas:
-    orgId:
-      type: string
-      format: uuid
-      description: The ID for an organization
+    errorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: The HTTP status code
+        description:
+          type: string
+          description: 'A description for the error.
+
+            For user errors, we attempt to be as descriptive as possible to help with diagnosing the issue.
+
+            For internal errors, the error description is only indicates that a retry should occur but we log the full error so that we can diagnose it.
+
+            Error descriptions can change over time and should not be programmed against.
+
+            '
+        name:
+          type: string
+          enum:
+          - Bad Request
+          - Unauthorized
+          - Not Found
+          - Too Many Requests
+          - Internal Server Error
+          description: '`name` is a short name for the error.
+
+            '
     packetBatch:
       type: object
       properties:
@@ -236,42 +239,6 @@ components:
         Hubble will send this token in the HTTP header `HTTP-X-HUBBLE-TOKEN` when making HTTPS requests to your endpoint.
 
         '
-    deviceTags:
-      type: object
-      additionalProperties:
-        type: string
-      description: "Tags are user-defined key/value pairs that can be attributed to a device. \nA device may have up to 10 tags.\n**Custom tags:** create your own tags with `key` length up to 32 characters and `value` length up to 128 characters.\n**Platform tags:** use Hubble-defined tags to organize devices.\n- `_env` tag: `production` indicates if a device belongs to the live environment, and `sandbox` for the test environment. A device will always have an `_env` tag assigned.\n"
-      example:
-        _env: production
-    utcTimestampInteger:
-      type: integer
-      format: int64
-      description: An UTC second-precision timestamp formatted as an integer
-    location:
-      type: object
-      required:
-      - latitude
-      - longitude
-      - altitude
-      - timestamp
-      properties:
-        latitude:
-          type: number
-          description: Latitude in Decimal Degrees DDD.DDDDD°
-        longitude:
-          type: number
-          description: Longitude in Decimal Degrees DDD.DDDDD°
-        altitude:
-          type: number
-          description: Altitude in meters for the provided gps coordinates
-        horizontal_accuracy:
-          type: number
-          description: Horizontal accuracy in meters for the provided gps coordinates
-        vertical_accuracy:
-          type: number
-          description: Vertical accuracy in meters for the provided gps coordinates
-        timestamp:
-          $ref: '#/components/schemas/utcTimestampNumber'
     gateway:
       type: object
       description: 'Metadata about the scanning gateway that received this packet — the relay
@@ -304,42 +271,14 @@ components:
 
             '
           example: fca6
-    deviceId:
+    utcTimestampInteger:
+      type: integer
+      format: int64
+      description: An UTC second-precision timestamp formatted as an integer
+    orgId:
       type: string
       format: uuid
-      description: Primary UUID identifier for a registered device
-    errorResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-          description: The HTTP status code
-        description:
-          type: string
-          description: 'A description for the error.
-
-            For user errors, we attempt to be as descriptive as possible to help with diagnosing the issue.
-
-            For internal errors, the error description is only indicates that a retry should occur but we log the full error so that we can diagnose it.
-
-            Error descriptions can change over time and should not be programmed against.
-
-            '
-        name:
-          type: string
-          enum:
-          - Bad Request
-          - Unauthorized
-          - Not Found
-          - Too Many Requests
-          - Internal Server Error
-          description: '`name` is a short name for the error.
-
-            '
-    utcTimestampNumber:
-      type: number
-      format: double
-      description: An UTC second-precision timestamp formatted as a floating point number
+      description: The ID for an organization
     packet:
       type: object
       properties:
@@ -382,11 +321,93 @@ components:
           - SATELLITE
         gateway:
           $ref: '#/components/schemas/gateway'
+    location:
+      type: object
+      required:
+      - latitude
+      - longitude
+      - altitude
+      - timestamp
+      properties:
+        latitude:
+          type: number
+          description: Latitude in Decimal Degrees DDD.DDDDD°
+        longitude:
+          type: number
+          description: Longitude in Decimal Degrees DDD.DDDDD°
+        altitude:
+          type: number
+          description: Altitude in meters for the provided gps coordinates
+        horizontal_accuracy:
+          type: number
+          description: Horizontal accuracy in meters for the provided gps coordinates
+        vertical_accuracy:
+          type: number
+          description: Vertical accuracy in meters for the provided gps coordinates
+        timestamp:
+          $ref: '#/components/schemas/utcTimestampNumber'
+    deviceTags:
+      type: object
+      additionalProperties:
+        type: string
+      description: "Tags are user-defined key/value pairs that can be attributed to a device. \nA device may have up to 10 tags.\n**Custom tags:** create your own tags with `key` length up to 32 characters and `value` length up to 128 characters.\n**Platform tags:** use Hubble-defined tags to organize devices.\n- `_env` tag: `production` indicates if a device belongs to the live environment, and `sandbox` for the test environment. A device will always have an `_env` tag assigned.\n"
+      example:
+        _env: production
     deviceName:
       type: string
       description: Assigned name for the device
       maxLength: 250
+    deviceId:
+      type: string
+      format: uuid
+      description: Primary UUID identifier for a registered device
+    utcTimestampNumber:
+      type: number
+      format: double
+      description: An UTC second-precision timestamp formatted as a floating point number
+  headers:
+    ContinuationTokenHeader:
+      description: A token to indicate how to continue paging
+      schema:
+        type: string
+    RetryAfterHeader:
+      description: 'The number of seconds to wait to attempt a retry.
+
+        When attached to a 200, this is a suggestion because the most recent data has been retrieved already.
+
+        When attached to a 429, this delay is a recommendation to reduce repeat 429s.
+
+        '
+      schema:
+        type: integer
+        minimum: 0
+        maximum: 300
   parameters:
+    continuationTokenHeader:
+      name: Continuation-Token
+      in: header
+      required: false
+      schema:
+        type: string
+      description: A token to indicate how to continue paging
+    webhookSecretHeader:
+      name: HTTP-X-HUBBLE-TOKEN
+      in: header
+      required: true
+      schema:
+        $ref: '#/components/schemas/webhookSecret'
+      description: 'A confidential, unique string generated for your webhook endpoint to validate that the request came from Hubble.
+
+        '
+    deviceIdQueryParam:
+      name: device_id
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/deviceId'
+      description: 'Filter packets to a specific device
+
+        '
     startQueryParam:
       name: start
       in: query
@@ -394,6 +415,26 @@ components:
       schema:
         $ref: '#/components/schemas/utcTimestampInteger'
       description: "UTC timestamp (in seconds) indicating when to start retrieving packets. \nThis timestamp corresponds to when the packet was received by the network.\nIf omitted, defaults to 7 days before the current UTC time.\n"
+    filterTagsQueryParam:
+      name: filter_tags
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          description: 'A tag to match against. For example: _env:production.
+
+            '
+      description: 'A set of device **platform tags** specifying which packets to include.
+
+        Only platform tags are queryable: `_env:production`, `_env:sandbox`.
+
+        The query param can be used multiple times to form a list of tags.
+
+        Packet matching criteria uses AND logic when different tag keys are used in a list of tags, and OR logic when the same tag key is used more than once.
+
+        '
     endQueryParam:
       name: end
       in: query
@@ -423,68 +464,27 @@ components:
       schema:
         $ref: '#/components/schemas/orgId'
       description: Your organization ID
-    filterTagsQueryParam:
-      name: filter_tags
-      in: query
-      required: false
-      schema:
-        type: array
-        items:
-          type: string
-          description: 'A tag to match against. For example: _env:production.
-
-            '
-      description: 'A set of device **platform tags** specifying which packets to include.
-
-        Only platform tags are queryable: `_env:production`, `_env:sandbox`.
-
-        The query param can be used multiple times to form a list of tags.
-
-        Packet matching criteria uses AND logic when different tag keys are used in a list of tags, and OR logic when the same tag key is used more than once.
-
-        '
-    deviceIdQueryParam:
-      name: device_id
-      in: query
-      required: false
-      schema:
-        $ref: '#/components/schemas/deviceId'
-      description: 'Filter packets to a specific device
-
-        '
-    webhookSecretHeader:
-      name: HTTP-X-HUBBLE-TOKEN
-      in: header
-      required: true
-      schema:
-        $ref: '#/components/schemas/webhookSecret'
-      description: 'A confidential, unique string generated for your webhook endpoint to validate that the request came from Hubble.
-
-        '
-    continuationTokenHeader:
-      name: Continuation-Token
-      in: header
-      required: false
-      schema:
-        type: string
-      description: A token to indicate how to continue paging
-  headers:
-    ContinuationTokenHeader:
-      description: A token to indicate how to continue paging
-      schema:
-        type: string
-    RetryAfterHeader:
-      description: 'The number of seconds to wait to attempt a retry.
-
-        When attached to a 200, this is a suggestion because the most recent data has been retrieved already.
-
-        When attached to a 429, this delay is a recommendation to reduce repeat 429s.
-
-        '
-      schema:
-        type: integer
-        minimum: 0
-        maximum: 300
+  responses:
+    ErrorBadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 400
+            description: The request could not be understood by the server due to malformed syntax.
+            name: Bad Request
+    ErrorInternalServer:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 500
+            description: An unknown error has occurred.
+            name: Unknown
   securitySchemes:
     BearerAuth:
       type: http

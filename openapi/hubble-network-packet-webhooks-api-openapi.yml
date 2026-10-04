@@ -176,6 +176,21 @@ paths:
           $ref: '#/components/responses/ErrorInternalServer'
 components:
   schemas:
+    webhookId:
+      type: string
+      description: An identifier for a webhook
+    basicWebhook:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/legacyWebhook'
+      - type: object
+        properties:
+          webhook_id:
+            $ref: '#/components/schemas/webhookId'
+          org_id:
+            $ref: '#/components/schemas/orgId'
+          name:
+            $ref: '#/components/schemas/webhookName'
     errorResponse:
       type: object
       properties:
@@ -204,16 +219,33 @@ components:
           description: '`name` is a short name for the error.
 
             '
-    webhookMaxBatchSize:
-      type: integer
-      description: The maximum number of packets that Hubble will batch into one webhook request
-      default: 100
-      minimum: 10
-      maximum: 1000
+    webhookURL:
+      type: string
+      description: A webhook url
+      maxLength: 2000
+    testWebhookResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Whether the webhook endpoint returned a successful HTTP status code
+        status_code:
+          type: integer
+          description: HTTP status code returned by the webhook endpoint, if a response was received
+        error:
+          type: string
+          description: Error details when the test delivery failed
     orgId:
       type: string
       format: uuid
       description: The ID for an organization
+    legacyWebhook:
+      type: object
+      properties:
+        url:
+          $ref: '#/components/schemas/webhookURL'
+        max_batch_size:
+          $ref: '#/components/schemas/webhookMaxBatchSize'
     webhookSecret:
       type: string
       description: 'A confidential, unique string generated for your webhook endpoint to validate that the request came from Hubble.
@@ -229,48 +261,47 @@ components:
         properties:
           secret:
             $ref: '#/components/schemas/webhookSecret'
-    testWebhookResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-          description: Whether the webhook endpoint returned a successful HTTP status code
-        status_code:
-          type: integer
-          description: HTTP status code returned by the webhook endpoint, if a response was received
-        error:
-          type: string
-          description: Error details when the test delivery failed
+    webhookMaxBatchSize:
+      type: integer
+      description: The maximum number of packets that Hubble will batch into one webhook request
+      default: 100
+      minimum: 10
+      maximum: 1000
     webhookName:
       type: string
       description: A name/description for a webhook
       maxLength: 250
-    webhookId:
-      type: string
-      description: An identifier for a webhook
-    legacyWebhook:
-      type: object
-      properties:
-        url:
-          $ref: '#/components/schemas/webhookURL'
-        max_batch_size:
-          $ref: '#/components/schemas/webhookMaxBatchSize'
-    basicWebhook:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/legacyWebhook'
-      - type: object
-        properties:
-          webhook_id:
-            $ref: '#/components/schemas/webhookId'
-          org_id:
-            $ref: '#/components/schemas/orgId'
-          name:
-            $ref: '#/components/schemas/webhookName'
-    webhookURL:
-      type: string
-      description: A webhook url
-      maxLength: 2000
+  responses:
+    ErrorInternalServer:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 500
+            description: An unknown error has occurred.
+            name: Unknown
+    ErrorNotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 404
+            description: The requested resource was not found.
+            name: Not Found
+    ErrorBadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            code: 400
+            description: The request could not be understood by the server due to malformed syntax.
+            name: Bad Request
   parameters:
     webhookIdPathParam:
       name: webhook_id
@@ -285,37 +316,6 @@ components:
       schema:
         $ref: '#/components/schemas/orgId'
       description: Your organization ID
-  responses:
-    ErrorBadRequest:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/errorResponse'
-          example:
-            code: 400
-            description: The request could not be understood by the server due to malformed syntax.
-            name: Bad Request
-    ErrorNotFound:
-      description: Not Found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/errorResponse'
-          example:
-            code: 404
-            description: The requested resource was not found.
-            name: Not Found
-    ErrorInternalServer:
-      description: Internal Server Error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/errorResponse'
-          example:
-            code: 500
-            description: An unknown error has occurred.
-            name: Unknown
   securitySchemes:
     BearerAuth:
       type: http

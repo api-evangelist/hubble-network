@@ -289,28 +289,6 @@ components:
           description: '`name` is a short name for the error.
 
             '
-    apiKey:
-      type: string
-      description: An API key
-    apiKeyName:
-      type: string
-      description: A name for an API Key
-      maxLength: 250
-    orgId:
-      type: string
-      format: uuid
-      description: The ID for an organization
-    apiKeyExpiration:
-      type: integer
-      format: int64
-      description: 'An UTC second-precision timestamp formatted as an integer.
-
-        Can be set to 0 to indicate that there is no expiration.
-
-        '
-    apiKeyId:
-      type: string
-      description: An ID for an API key
     apiKeyItem:
       type: object
       description: An API Token used to authenticate with the Hubble Platform
@@ -328,6 +306,20 @@ components:
           items:
             $ref: '#/components/schemas/authScope'
           description: List of authorization scopes assigned to this API key
+    apiKey:
+      type: string
+      description: An API key
+    orgId:
+      type: string
+      format: uuid
+      description: The ID for an organization
+    apiKeyName:
+      type: string
+      description: A name for an API Key
+      maxLength: 250
+    apiKeyId:
+      type: string
+      description: An ID for an API key
     authScope:
       type: string
       enum:
@@ -348,21 +340,14 @@ components:
       - read-webhooks
       - write-webhooks
       description: Authorization scope for API key permissions
-  parameters:
-    contentTypeJsonHeader:
-      name: Content-Type
-      in: header
-      schema:
-        type: string
-      description: An indication that the payload is JSON
-      example: application/json
-    orgIdPathParam:
-      name: org_id
-      in: path
-      required: true
-      schema:
-        $ref: '#/components/schemas/orgId'
-      description: Your organization ID
+    apiKeyExpiration:
+      type: integer
+      format: int64
+      description: 'An UTC second-precision timestamp formatted as an integer.
+
+        Can be set to 0 to indicate that there is no expiration.
+
+        '
   responses:
     ErrorInternalServer:
       description: Internal Server Error
@@ -384,6 +369,21 @@ components:
             code: 400
             description: The request could not be understood by the server due to malformed syntax.
             name: Bad Request
+  parameters:
+    contentTypeJsonHeader:
+      name: Content-Type
+      in: header
+      schema:
+        type: string
+      description: An indication that the payload is JSON
+      example: application/json
+    orgIdPathParam:
+      name: org_id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/orgId'
+      description: Your organization ID
   securitySchemes:
     BearerAuth:
       type: http
